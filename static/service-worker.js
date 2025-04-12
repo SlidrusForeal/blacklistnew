@@ -1,39 +1,41 @@
 const CACHE_NAME = "sosmark-cache-v1";
-const OFFLINE_URL = "/offline.html";
+const OFFLINE_URL = "/offline";
 
+// List the static assets to cache. Adjust as needed.
 const STATIC_FILES = [
-  "/",
-  "/index.html",
-  "/css/style.css",
-  "/js/checker.js",
-  "/js/fullist.js",
-  "/pages/fullist.html",
-  "/pages/contacts.html",
-  "/offline.html",
-  "/icons/favicon.ico"
+  "/",                                       // The home route (Flask renders the index page)
+  "/offline",                                // The offline route (serves the offline page)
+  "/static/css/style.css",                   // Main stylesheet
+  "/static/manifest.json",                   // Manifest file for PWA
+  "/static/icons/favicon.ico"                // Favicon
+  // Add more static assets as needed, e.g. images or additional CSS/JS if used.
 ];
 
-// Установка service worker и кэширование статических файлов
+// Installation: Cache static assets.
 self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(STATIC_FILES))
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.addAll(STATIC_FILES);
+    })
   );
 });
 
-// Активация service worker и удаление старого кэша
+// Activation: Delete outdated caches.
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
         keys.map(key => {
-          if (key !== CACHE_NAME) return caches.delete(key);
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
+          }
         })
       )
     )
   );
 });
 
-// Перехват запросов
+// Fetching: Serve requests from network; fall back to cache, then offline page.
 self.addEventListener("fetch", event => {
   event.respondWith(
     fetch(event.request)

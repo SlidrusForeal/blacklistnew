@@ -3,16 +3,34 @@
 <head>
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>{% block title %}ЧС Сосмарка{% endblock %}</title>
+  {# Child templates can override the page_title variable if desired #}
+  {% set page_title = page_title|default("ЧС Сосмарка") %}
+  <title>{{ page_title }}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Проверьте наличие вашего никнейма в черном списке Сосмаркской Империи. Мгновенная проверка и актуальные данные.">
+  <meta name="keywords" content="ЧС, черный список, Сосмарк, blacklist, проверка никнейма">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="SlidrusForeal">
+
+  <!-- Open Graph Meta Tags -->
+  <meta property="og:site_name" content="ЧС Сосмарка">
+  <meta property="og:title" content="{{ page_title }}">
+  <meta property="og:description" content="Проверьте наличие вашего никнейма в черном списке Сосмаркской Империи.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ request.url }}">
+  <meta property="og:image" content="{{ url_for('static', filename='icons/og-image.png') }}">
+  <meta property="og:locale" content="ru_RU">
+
   <!-- PWA and Icons -->
   <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/apple-touch-icon.png') }}">
   <link rel="icon" href="{{ url_for('static', filename='icons/favicon.ico') }}" type="image/x-icon">
   <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+
   <!-- CSS -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
-  <!-- Open Graph and SEO meta tags can be defined here or overridden in each template -->
   {% block head %}{% endblock %}
 </head>
 <body>
