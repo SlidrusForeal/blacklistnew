@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Оффлайн – ЧС Сосмарка{% endblock %}
+
+{% block content %}
+<main class="container">
+  <h1>Вы оффлайн</h1>
+  <p>Похоже, у вас нет подключения к Интернету. Зайдите позже!</p>
+  <a href="{{ url_for('index') }}" class="btn-check">На главную</a>
+</main>
+{% endblock %}

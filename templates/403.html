@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}403 – Доступ запрещён{% endblock %}
+
+{% block content %}
+<main class="container">
+  <h1>403 – Доступ запрещён</h1>
+  <p>У вас недостаточно прав для просмотра этой страницы.</p>
+  <a href="{{ url_for('index') }}" class="btn-check">На главную</a>
+</main>
+{% endblock %}

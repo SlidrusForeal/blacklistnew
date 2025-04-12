@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}ЧС Сосмарка - Полный список{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1>ПОЛНЫЙ СПИСОК</h1>
+  <input type="text" id="search-input" placeholder="Поиск по нику...">
+  <ul id="blacklist">
+    {% for player in players %}
+      <li>
+        <img src="https://mc-heads.net/avatar/{{ player.uuid }}" alt="{{ player.name }}'s face" loading="lazy">
+        <a href="https://namemc.com/profile/{{ player.uuid }}" target="_blank" rel="noopener noreferrer">
+          {{ player.name }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+<script>
+  // A small inline script to filter the list client-side
+  document.getElementById("search-input").addEventListener("input", function() {
+    const term = this.value.toLowerCase();
+    document.querySelectorAll("#blacklist li").forEach(function(li) {
+      li.style.display = li.textContent.toLowerCase().includes(term) ? "" : "none";
+    });
+  });
+</script>
+{% endblock %}

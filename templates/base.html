@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>{% block title %}ЧС Сосмарка{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- PWA and Icons -->
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/apple-touch-icon.png') }}">
+  <link rel="icon" href="{{ url_for('static', filename='icons/favicon.ico') }}" type="image/x-icon">
+  <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+  <!-- CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+  <!-- Open Graph and SEO meta tags can be defined here or overridden in each template -->
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <noscript>Для работы приложения требуется JavaScript</noscript>
+
+  <header>
+    <nav>
+      <ul>
+        <li><a href="{{ url_for('index') }}">Главная</a></li>
+        <li><a href="{{ url_for('fullist') }}">Полный список</a></li>
+        <li><a href="{{ url_for('contacts') }}">Контакты</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="notification">
+      {% for category, message in messages %}
+        <p class="{{ category }}">{{ message }}</p>
+      {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+
+  <footer>
+    <p>&copy; <span id="year">{{ current_year() }}</span> Сосмарк. Все права защищены.</p>
+  </footer>
+
+  <!-- Service Worker registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('{{ url_for("static", filename="service-worker.js") }}')
+        .then(reg => console.log("✅ Service Worker зарегистрирован", reg))
+        .catch(err => console.error("❌ Service Worker ошибка", err));
+    }
+  </script>
+</body>
+</html>

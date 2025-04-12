@@ -1,0 +1,407 @@
+/* Общие стили */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --color-bg: #1a1a1a;
+    --color-bg-secondary: #2c2c2c;
+    --color-text: #f1f1f1;
+    --color-accent: #6186ff;
+    --transition-speed: 0.3s;
+    --animation-speed: 1s;
+    --font-primary: 'Poppins', sans-serif;
+}
+
+body {
+    font-family: var(--font-primary);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    line-height: 1.6;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+/* Анимации */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideInDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.animated {
+    animation: fadeIn var(--animation-speed) ease-in-out;
+}
+
+/* Шапка сайта */
+header {
+    background-color: var(--color-bg-secondary, #2c2c2c);
+    padding: 15px 20px;
+    margin-bottom: 30px;
+}
+
+ul {
+    list-style: none;
+}
+
+header nav ul {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    gap: 30px;
+    padding: 0;
+    margin: 0;
+}
+
+header nav ul li a {
+    text-decoration: none;
+    color: var(--color-text, #f1f1f1);
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+
+header nav ul li a:hover {
+    background-color: var(--color-accent, #6186ff);
+    color: var(--color-bg, #1a1a1a);
+}
+
+header nav ul li a.active {
+    background-color: var(--color-accent);
+    color: var(--color-bg);
+}
+
+/* Основной контейнер */
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: var(--color-bg-secondary, #2c2c2c);
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    animation: fadeIn var(--animation-speed) ease-in-out;
+}
+
+.container h1 {
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 20px;
+    color: var(--color-text, #f1f1f1);
+}
+
+/* Чекер */
+.checker h1 {
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 20px;
+    animation: slideInDown 0.5s ease-out;
+}
+
+a {
+    text-decoration: none;
+    color: var(--color-text, #f1f1f1);
+}
+
+.checker p {
+    text-align: center;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+/* Группа ввода */
+.input-group {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.input-group input[type="text"] {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 50px;
+    background-color: #3a3a3a;
+    color: var(--color-text);
+    font-size: 1rem;
+    transition: box-shadow var(--transition-speed) ease-in-out;
+}
+
+.input-group input[type="text"]:focus {
+    outline: none;
+    box-shadow: 0 0 10px var(--color-accent);
+}
+
+.suggestions-container {
+    position: absolute;
+    top: 110%;
+    left: 0;
+    right: 0;
+    background-color: var(--color-bg-secondary);
+    border: 1px solid #555;
+    border-top: none;
+    border-radius: 0 0 10px 10px;
+    z-index: 100;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+/* Кнопка чекера */
+.btn-check {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    background-color: var(--color-accent);
+    color: var(--color-bg);
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background-color var(--transition-speed) ease-in-out, transform var(--transition-speed) ease-in-out;
+    animation: fadeIn var(--animation-speed) ease-in-out;
+}
+
+.btn-check:hover {
+    background-color: #75c1ff;
+    transform: translateY(-3px);
+}
+
+/* Результаты */
+.result-container {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: var(--color-bg);
+    border-radius: 8px;
+    font-size: 1rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    animation: fadeIn var(--animation-speed) ease-in-out;
+}
+
+/* Уведомления */
+.notification {
+    visibility: hidden;
+    min-width: 250px;
+    background-color: var(--color-bg-secondary, #2c2c2c);
+    color: var(--color-text, #f1f1f1);
+    text-align: center;
+    border-radius: 4px;
+    padding: 15px;
+    position: fixed;
+    left: 50%;
+    bottom: 30px;
+    transform: translateX(-50%);
+    z-index: 100;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    animation: fadeIn 0.5s ease-in-out;
+    transition: visibility 0.3s, opacity 0.3s;
+    opacity: 0;
+}
+
+.notification.active {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Футер */
+footer {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 0.9rem;
+    color: #bbb;
+    animation: fadeIn var(--animation-speed) ease-in-out;
+}
+
+/* Контактная информация */
+.contact-info {
+    background-color: var(--color-bg);
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.contact-info ul {
+    margin-top: 15px;
+    padding-left: 25px;
+}
+
+li {
+    transition: background-color 0.2s ease;
+    border-radius: 4px;
+}
+
+li:hover {
+    background-color: rgba(97, 134, 255, 0.05);
+}
+
+/* Анимация при клике */
+li:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+}
+
+.contact-info li {
+    position: relative;
+    transition: all var(--transition-speed) ease;
+    cursor: pointer;
+    padding: 12px;
+    margin-bottom: 10px;
+    background-color: var(--color-bg-secondary);
+    border-left: 4px solid transparent;
+}
+
+.contact-info li:hover {
+    background-color: #4a4a4a;
+    border-left-color: var(--color-accent);
+    transform: translateX(8px);
+    box-shadow: 0 4px 15px rgba(97, 134, 255, 0.2);
+}
+
+.contact-info li:hover {
+    transform: translateX(10px);
+}
+
+.contact-info a {
+    color: var(--color-accent);
+    text-decoration: none;
+}
+
+.contact-info a:hover {
+    text-decoration: underline;
+}
+
+/* Черный список */
+#blacklist {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#blacklist li {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    margin: 10px 0;
+    background-color: var(--color-bg);
+    border-radius: 6px;
+    animation: slideInUp 0.5s ease-out;
+    border-bottom: 1px solid #444;
+    color: var(--color-text, #f1f1f1);
+    transition: all var(--transition-speed) ease;
+    padding: 15px;
+    border: 1px solid transparent;
+}
+
+#blacklist li:hover {
+    background-color: #3a3a3a;
+    border-color: var(--color-accent);
+    box-shadow: 0 2px 8px rgba(97, 134, 255, 0.15);
+}
+
+#blacklist li::before {
+    content: "⛔";
+    font-size: 1.4em;
+}
+
+/* Контейнер чекера */
+.checker-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.checker-container p {
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+
+/* Основной контейнер с анимацией */
+main.container {
+    animation: fadeIn 0.8s ease-out;
+}
+
+/* Адаптивный дизайн */
+@media (max-width: 768px) {
+    .container {
+        padding: 20px;
+        margin: 15px;
+    }
+
+    .nav-list {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .checker h1 {
+        font-size: 2rem;
+    }
+
+    .btn-check {
+        font-size: 1rem;
+        padding: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .contact-info li {
+        font-size: 0.9rem;
+        word-break: break-all;
+    }
+    
+    #blacklist li {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+#search-input {
+  width: 100%;
+  padding: 12px 20px;
+  border: 1px solid #444;
+  border-radius: 50px;
+  background-color: #3a3a3a;
+  color: var(--color-text, #f1f1f1);
+  font-size: 1rem;
+  transition: box-shadow 0.3s ease-in-out, border-color 0.3s ease-in-out;
+}
+
+#search-input::placeholder {
+  color: #bbb;
+}
+
+#search-input:focus {
+  outline: none;
+  border-color: var(--color-accent, #6186ff);
+  box-shadow: 0 0 10px var(--color-accent, #6186ff);
+  background-color: #444;
+}
+

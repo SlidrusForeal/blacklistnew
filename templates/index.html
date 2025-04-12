@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}ЧС Сосмарка - Главная{% endblock %}
+
+{% block content %}
+<main class="container">
+  <h1>Добро пожаловать!</h1>
+  <form method="POST" action="{{ url_for('index') }}" class="checker-container">
+    <p>Введите ваш никнейм для проверки:</p>
+    <div class="input-group">
+      <input
+        type="text"
+        name="nickname"
+        placeholder="Ваш никнейм"
+        value="{{ nickname }}"
+        autocomplete="off" />
+    </div>
+    <button type="submit" class="btn-check">Проверить</button>
+  </form>
+
+  {% if result %}
+  <div class="result-container" style="color: {{ result.color }}">
+      <p>{{ result.message }}</p>
+  </div>
+  {% endif %}
+</main>
+{% endblock %}

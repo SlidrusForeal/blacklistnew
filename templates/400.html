@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}400 – Неверный запрос{% endblock %}
+
+{% block content %}
+<main class="container">
+  <h1>400 – Неверный запрос</h1>
+  <p>Сервер не может обработать ваш запрос из-за некорректного синтаксиса.</p>
+  <a href="{{ url_for('index') }}" class="btn-check">На главную</a>
+</main>
+{% endblock %}

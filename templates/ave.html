@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>AVE</title>
+    <link rel="icon" href="icon.png" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            background: black;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            user-select: none;
+            font-family: Arial, sans-serif;
+        }
+
+        #ave {
+            display: flex;
+            transition: transform 0.3s ease-out;
+        }
+
+        .letter {
+            font-size: 10vw;
+            font-weight: 900;
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            padding: 0 5px;
+            position: relative;
+            transition: filter 0.3s ease;
+            filter: drop-shadow(0 0 8px rgba(255,255,255,0.15));
+            -webkit-text-stroke: 1px rgba(255,255,255,0.4);
+        }
+
+        #ave:hover .letter {
+            filter: drop-shadow(0 0 12px rgba(255,255,255,0.35))
+                    drop-shadow(0 0 20px rgba(255,255,255,0.2));
+            -webkit-text-stroke: 1.5px rgba(255,255,255,0.6);
+            animation: subtleWiggle 0.15s infinite;
+        }
+
+        @keyframes subtleWiggle {
+            0%   { transform: rotate(0deg); }
+            25%  { transform: rotate(0.5deg); }
+            50%  { transform: rotate(-0.5deg); }
+            75%  { transform: rotate(0.25deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        footer {
+            position: absolute;
+            bottom: 10px;
+            color: white;
+            font-size: 1rem;
+        }
+
+        @media (max-width: 600px) {
+            .letter {
+                font-size: 20vw;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="ave">
+        <span class="letter">A</span>
+        <span class="letter">V</span>
+        <span class="letter">E</span>
+    </div>
+
+    <footer>
+        <p>&copy; <span id="year"></span> Сосмарк. Все права защищены.</p>
+    </footer>
+
+    <script>
+        function generateGradient() {
+            if (!localStorage.getItem('aveGradient')) {
+                const hue1 = Math.floor(Math.random() * 360);
+                const hue2 = (hue1 + 150) % 360;
+                const gradient = `linear-gradient(135deg, hsl(${hue1}, 100%, 50%), hsl(${hue2}, 100%, 50%))`;
+                localStorage.setItem('aveGradient', gradient);
+            }
+            return localStorage.getItem('aveGradient');
+        }
+
+        const gradient = generateGradient();
+        const aveElement = document.getElementById('ave');
+        const letters = document.querySelectorAll('.letter');
+
+        letters.forEach(letter => {
+            letter.style.backgroundImage = gradient;
+        });
+
+        function updatePosition(x, y) {
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            const moveX = (x - centerX) * -0.05;
+            const moveY = (y - centerY) * -0.05;
+            aveElement.style.transform = `translate(${moveX}px, ${moveY}px)`;
+
+            const angle = Math.atan2(y - centerY, x - centerX) * 180 / Math.PI;
+            letters.forEach(letter => {
+                letter.style.backgroundImage = `linear-gradient(${angle}deg, ${gradient})`;
+            });
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            updatePosition(e.clientX, e.clientY);
+            aveElement.classList.add('active');
+        });
+
+        document.addEventListener('mouseleave', () => {
+            aveElement.style.transform = 'translate(0, 0)';
+            aveElement.classList.remove('active');
+        });
+
+        document.addEventListener('touchstart', (e) => {
+            const touch = e.touches[0];
+            updatePosition(touch.clientX, touch.clientY);
+            aveElement.classList.add('active');
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            const touch = e.touches[0];
+            updatePosition(touch.clientX, touch.clientY);
+        });
+
+        document.addEventListener('touchend', () => {
+            aveElement.style.transform = 'translate(0, 0)';
+            aveElement.classList.remove('active');
+        });
+
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>

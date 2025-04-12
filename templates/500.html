@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}500 – Ошибка сервера{% endblock %}
+
+{% block content %}
+<main class="container">
+  <h1>500 – Ошибка сервера</h1>
+  <p>Произошла внутренняя ошибка сервера. Мы уже работаем над решением проблемы.</p>
+  <a href="{{ url_for('index') }}" class="btn-check">На главную</a>
+  <a href="mailto:itsos@sosmark.ru" class="btn-check">Сообщить об ошибке</a>
+</main>
+{% endblock %}
