@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Админ панель{% endblock %}
+
+{% block content %}
+<main class="container">
+  <h1>Админ панель</h1>
+  <a href="{{ url_for('admin_logout') }}" class="btn-check">Выйти</a>
+
+  <!-- Форма для обновления ников -->
+  <form method="POST" action="{{ url_for('update_nicknames') }}" style="margin-top: 20px;">
+    <button type="submit" class="btn-check">Обновить ники</button>
+  </form>
+
+  <h2>Добавить запись в чёрный список</h2>
+  <form method="POST" action="{{ url_for('admin_panel') }}">
+    <div class="input-group">
+      <input type="text" name="nickname" placeholder="Никнейм" required />
+    </div>
+    <div class="input-group">
+      <input type="text" name="reason" placeholder="Причина" required />
+    </div>
+    <button type="submit" class="btn-check">Добавить</button>
+  </form>
+  
+  <h2>Список записей в ЧС</h2>
+  <ul id="blacklist">
+    {% for entry in entries %}
+      <li>
+        {{ entry.nickname }} – {{ entry.reason }}
+        <form method="POST" action="{{ url_for('delete_entry', entry_id=entry.id) }}" style="display:inline;">
+          <button type="submit" class="btn-check" style="background-color: red;">Удалить</button>
+        </form>
+      </li>
+    {% endfor %}
+  </ul>
+</main>
+{% endblock %}

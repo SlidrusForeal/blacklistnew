@@ -9,16 +9,20 @@
   <ul id="blacklist">
     {% for player in players %}
       <li>
-        <img src="https://mc-heads.net/avatar/{{ player.uuid }}" alt="{{ player.name }}'s face" loading="lazy">
-        <a href="https://namemc.com/profile/{{ player.uuid }}" target="_blank" rel="noopener noreferrer">
-          {{ player.name }}
-        </a>
+        <!-- Изменение: используем nickname для получения аватара -->
+        <img src="https://mc-heads.net/avatar/{{ player.nickname }}" alt="{{ player.nickname }}'s face" loading="lazy">
+        <div class="player-info">
+          <a href="https://namemc.com/profile/{{ player.uuid }}" target="_blank" rel="noopener noreferrer">
+            {{ player.nickname }}
+          </a>
+          <p>Причина: {{ player.reason }}</p>
+        </div>
       </li>
     {% endfor %}
   </ul>
 </div>
 <script>
-  // A small inline script to filter the list client-side
+  // Небольшой скрипт для фильтрации списка на стороне клиента
   document.getElementById("search-input").addEventListener("input", function() {
     const term = this.value.toLowerCase();
     document.querySelectorAll("#blacklist li").forEach(function(li) {

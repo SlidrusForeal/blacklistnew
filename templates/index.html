@@ -21,6 +21,9 @@
   {% if result %}
   <div class="result-container" style="color: {{ result.color }}">
       <p>{{ result.message }}</p>
+      {% if result.color == "red" and result.reason %}
+        <p>Причина: {{ result.reason }}</p>
+      {% endif %}
   </div>
   {% endif %}
 </main>
