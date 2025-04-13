@@ -1,0 +1,17 @@
+User-agent: *
+Disallow: /asuka/
+Disallow: /admin_login.html
+Disallow: /admin_panel.html
+Disallow: /admin_register.html
+Disallow: /admin_users.html
+Disallow: /admin_whitelist.html
+Disallow: /400.html
+Disallow: /401.html
+Disallow: /403.html
+Disallow: /404.html
+Disallow: /500.html
+Disallow: /static/
+
+Allow: /
+
+Sitemap: https://sosmark.ru/sitemap.xml
