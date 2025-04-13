@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Админ-панель{% endblock %}
+
+{% block content %}
+<main class="container">
+  <h1>Добро пожаловать в админ-панель</h1>
+  <p>Здесь вы можете управлять настройками и просматривать статистику.</p>
+  <p><a href="{{ url_for('admin_logout') }}" class="btn-check">Выйти</a></p>
+  <!-- Добавьте дополнительный функционал по необходимости -->
+</main>
+{% endblock %}

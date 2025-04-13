@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Управление черным списком{% endblock %}
+
+{% block content %}
+<main class="container">
+  <h1>Управление черным списком</h1>
+  <form method="POST">
+    <input type="text" name="uuid" placeholder="UUID для добавления/удаления" required>
+    <textarea name="description" placeholder="Описание" required></textarea>
+    <button type="submit" name="action" value="add" class="btn-check">Добавить в черный список</button>
+    <button type="submit" name="action" value="remove" class="btn-check">Удалить из черного списка</button>
+  </form>
+
+  <h2>Список заблокированных UUID</h2>
+  <ul>
+    {% for item in blacklist %}
+      <li>
+        UUID: {{ item.uuid }}<br>
+        Описание: {{ item.description }}
+        <a href="{{ url_for('add_description', uuid=item.uuid) }}" class="btn-check">Добавить/редактировать описание</a>
+      </li>
+    {% endfor %}
+  </ul>
+</main>
+{% endblock %}
