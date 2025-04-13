@@ -8,7 +8,6 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, login_required, LoginManager, UserMixin, current_user
-from blacklist import BLACKLIST_DATA, BLACKLIST
 import psycopg2
 import requests
 
@@ -103,7 +102,6 @@ def load_user(user_id):
     except Exception as e:
         return None
 
-# Основной маршрут для проверки черного списка
 @app.route("/", methods=["GET", "POST"])
 def index():
     result = None
@@ -114,10 +112,13 @@ def index():
             flash("Введите никнейм для проверки.", "warning")
         else:
             normalized = nickname.lower()
-            if normalized in BLACKLIST:
+            # Пытаемся найти запись в таблице Blacklist по имени (без учета регистра)
+            entry = Blacklist.query.filter(func.lower(Blacklist.name) == normalized).first()
+            if entry:
                 result = {
                     "message": f"{nickname}, поздравляем – вы в ЧС!",
-                    "color": "red"
+                    "color": "red",
+                    "reason": entry.reason  # Добавляем причину из базы
                 }
             else:
                 result = {
@@ -128,9 +129,9 @@ def index():
 
 @app.route("/fullist")
 def fullist():
-    # Сортировка полного списка по имени игрока (игнорируя регистр)
-    sorted_list = sorted(BLACKLIST_DATA, key=lambda x: x["name"].lower())
-    return render_template("fullist.html", players=sorted_list)
+    # Получаем все записи из базы данных, сортируя по имени (игнорируя регистр)
+    entries = Blacklist.query.order_by(func.lower(Blacklist.name)).all()
+    return render_template("fullist.html", players=entries)
 
 @app.route("/contacts")
 def contacts():
@@ -162,26 +163,44 @@ def admin_panel():
 @roles_required(['admin', 'owner','moderator'])
 def admin_blacklist():
     if not current_user.is_authenticated or current_user.role.name not in ['owner', 'admin', 'moderator']:
-        abort(403)  # Доступ запрещен
+        abort(403)  # Доступ запрещён
 
     if request.method == 'POST':
-        nickname = request.form.get("nickname").strip()
-        uuid = request.form.get("uuid").strip()
-        reason = request.form.get("reason").strip()
+        nickname = request.form.get("nickname", "").strip()
+        reason = request.form.get("reason", "").strip()
 
-        # Проверяем наличие записи с таким UUID в черном списке
-        existing_entry = Blacklist.query.filter_by(uuid=uuid).first()
-        if existing_entry:
-            flash(f"{nickname} уже в черном списке!", "warning")
+        if not nickname:
+            flash("Введите никнейм для добавления в чёрный список.", "warning")
+        elif not reason:
+            flash("Укажите причину для добавления в чёрный список.", "warning")
         else:
-            # Добавляем новый элемент в черный список
-            new_entry = Blacklist(name=nickname, uuid=uuid, reason=reason, added_by=current_user.id)
-            db.session.add(new_entry)
-            db.session.commit()
-            flash(f"{nickname} успешно добавлен в черный список!", "success")
+            # Получаем UUID по никнейму через Mojang API
+            uuid = get_uuid_for_username(nickname)
+            if uuid is None:
+                flash(f"Не удалось получить UUID для {nickname}. Проверьте правильность написания.", "danger")
+            else:
+                # Проверяем наличие записи по UUID в базе
+                existing_entry = Blacklist.query.filter_by(uuid=uuid).first()
+                if existing_entry:
+                    # Если запись уже есть, обновляем имя и причину (на случай, если пользователь сменил ник)
+                    existing_entry.name = nickname
+                    existing_entry.reason = reason
+                    db.session.commit()
+                    flash(f"Запись для {nickname} успешно обновлена!", "success")
+                else:
+                    # Если записи ещё нет, создаём новую запись
+                    new_entry = Blacklist(
+                        name=nickname,
+                        uuid=uuid,
+                        reason=reason,
+                        added_by=current_user.id
+                    )
+                    db.session.add(new_entry)
+                    db.session.commit()
+                    flash(f"{nickname} успешно добавлен в чёрный список!", "success")
 
-    # Получаем все записи черного списка для отображения
-    blacklist = Blacklist.query.all()
+    # Получаем все записи чёрного списка для отображения
+    blacklist = Blacklist.query.order_by(func.lower(Blacklist.name)).all()
     return render_template('admin_blacklist.html', blacklist=blacklist)
 
 @app.route("/admin/whitelist", methods=["GET", "POST"])
@@ -281,4 +300,4 @@ def inject_current_year():
     return {'current_year': lambda: datetime.now().year}
 
 if __name__ == '__main__':
-    app.run(debug=os.environ.get("FLASK_DEBUG", "False") == "True")
+    app.run(debug=os.environ.get("FLASK_DEBUG", "True"))

@@ -8,7 +8,7 @@
   <input type="text" id="search-input" placeholder="Поиск по нику...">
   <ul id="blacklist">
     {% for player in players %}
-      <li>
+      <li data-reason="{{ player.reason }}">
         <img src="https://mc-heads.net/avatar/{{ player.uuid }}" alt="{{ player.name }}'s face" loading="lazy">
         <a href="https://namemc.com/profile/{{ player.uuid }}" target="_blank" rel="noopener noreferrer">
           {{ player.name }}
@@ -17,13 +17,91 @@
     {% endfor %}
   </ul>
 </div>
+
+<!-- Модальное окно для отображения причины -->
+<div id="reason-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-button">&times;</span>
+    <h2>Причина добавления в ЧС</h2>
+    <p id="reason-text"></p>
+  </div>
+</div>
+
+<!-- Стилизация модального окна в едином стиле -->
+<style>
+  /* Модальное окно с использованием ваших CSS-переменных */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(26, 26, 26, 0.8); /* var(--color-bg) с прозрачностью */
+    animation: fadeIn var(--animation-speed) ease-in-out;
+  }
+  .modal-content {
+    background-color: var(--color-bg-secondary);
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    color: var(--color-text);
+    animation: slideInDown 0.5s ease-out;
+  }
+  .close-button {
+    color: var(--color-text);
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color var(--transition-speed) ease-in-out;
+  }
+  .close-button:hover,
+  .close-button:focus {
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+</style>
+
 <script>
-  // A small inline script to filter the list client-side
+  // Фильтрация списка по вводу в поле "Поиск по нику"
   document.getElementById("search-input").addEventListener("input", function() {
     const term = this.value.toLowerCase();
     document.querySelectorAll("#blacklist li").forEach(function(li) {
       li.style.display = li.textContent.toLowerCase().includes(term) ? "" : "none";
     });
+  });
+
+  // Работа с модальным окном
+  const modal = document.getElementById("reason-modal");
+  const modalContent = document.getElementById("reason-text");
+  const closeButton = document.querySelector(".close-button");
+
+  // Открываем модальное окно при клике на элемент списка
+  document.querySelectorAll("#blacklist li").forEach(function(li) {
+    li.addEventListener("click", function() {
+      const reason = li.getAttribute("data-reason");
+      modalContent.textContent = reason;
+      modal.style.display = "block";
+    });
+  });
+
+  // Закрываем модальное окно при клике на кнопку закрытия
+  closeButton.addEventListener("click", function() {
+    modal.style.display = "none";
+  });
+
+  // Закрываем модальное окно при клике вне его содержимого
+  window.addEventListener("click", function(event) {
+    if (event.target === modal) {
+      modal.style.display = "none";
+    }
   });
 </script>
 {% endblock %}
