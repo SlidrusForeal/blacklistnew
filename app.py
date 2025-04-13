@@ -25,9 +25,6 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'index'
 
-# Путь к файлу белого списка UUID
-UUID_LIST_FILE = 'uuid_list.json'
-
 # Определение моделей
 class Role(db.Model):
     id = db.Column(db.Integer, primary_key=True)
