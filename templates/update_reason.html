@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Обновление причины{% endblock %}
+
+{% block content %}
+<main class="container">
+  <h1>Обновление причины для {{ entry.nickname }}</h1>
+  <form method="POST" action="{{ url_for('update_reason', entry_id=entry.id) }}">
+    <div class="input-group">
+      <input type="text" name="reason" placeholder="Новая причина" value="{{ entry.reason }}" required>
+    </div>
+    <button type="submit" class="btn-check">Сохранить</button>
+  </form>
+  <a href="{{ url_for('admin_panel') }}" class="btn-check">Назад в админ панель</a>
+</main>
+{% endblock %}

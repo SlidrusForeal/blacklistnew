@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Регистрация пользователя{% endblock %}
+
+{% block content %}
+<main class="container">
+  <h1>Регистрация нового пользователя</h1>
+  <form method="POST" action="{{ url_for('admin_register') }}">
+    <div class="input-group">
+      <input type="text" name="username" placeholder="Имя пользователя" required>
+    </div>
+    <div class="input-group">
+      <input type="password" name="password" placeholder="Пароль" required>
+    </div>
+    <div class="input-group">
+      <label for="role">Роль:</label>
+      <select name="role" id="role" required>
+        <option value="admin">Admin</option>
+        <option value="moderator">Moderator</option>
+        <option value="owner">Owner</option>
+      </select>
+    </div>
+    <button type="submit" class="btn-check">Зарегистрировать</button>
+  </form>
+  <a href="{{ url_for('admin_panel') }}" class="btn-check">Назад в админ панель</a>
+</main>
+{% endblock %}

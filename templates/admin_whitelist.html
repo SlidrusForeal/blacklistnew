@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Редактор whitelist{% endblock %}
+
+{% block content %}
+<main class="container">
+  <h1>Редактор whitelist</h1>
+  
+  <a href="{{ url_for('admin_panel') }}" class="btn-check">Назад в админ панель</a>
+  
+  <h2>Добавить UUID в whitelist</h2>
+  <form method="POST" action="{{ url_for('admin_whitelist') }}">
+    <div class="input-group">
+      <input type="text" name="uuid" placeholder="Введите UUID" required>
+    </div>
+    <button type="submit" name="action" value="add" class="btn-check">Добавить</button>
+  </form>
+  
+  <h2>Текущий whitelist</h2>
+  {% if whitelist %}
+    <ul>
+      {% for uuid_value in whitelist %}
+        <li>
+          {{ uuid_value }}
+          <form method="POST" action="{{ url_for('admin_whitelist') }}" style="display:inline;">
+            <input type="hidden" name="uuid" value="{{ uuid_value }}">
+            <button type="submit" name="action" value="delete" class="btn-check" style="background-color: red;">Удалить</button>
+          </form>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Whitelist пуст.</p>
+  {% endif %}
+</main>
+{% endblock %}
