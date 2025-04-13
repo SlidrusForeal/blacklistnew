@@ -40,6 +40,11 @@
     <nav>
       <ul>
         <li><a href="{{ url_for('index') }}">Главная</a></li>
+        {% if current_user.is_authenticated %}
+          <li><a href="{{ url_for('logout') }}">Выйти</a></li>
+        {% else %}
+          <li><a href="{{ url_for('login') }}">Войти</a></li>
+        {% endif %}
         <li><a href="{{ url_for('fullist') }}">Полный список</a></li>
         <li><a href="{{ url_for('contacts') }}">Контакты</a></li>
       </ul>

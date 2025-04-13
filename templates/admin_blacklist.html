@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}ЧС Сосмарка - Админ панель{% endblock %}
+
+{% block content %}
+<main class="container">
+  <h1>Администрирование Чёрного списка</h1>
+  <form method="POST">
+    <input type="text" name="nickname" placeholder="Никнейм" required>
+    <input type="text" name="uuid" placeholder="UUID" required>
+    <textarea name="reason" placeholder="Причина" required></textarea>
+    <button type="submit">Добавить в ЧС</button>
+  </form>
+
+  <h2>Текущий чёрный список</h2>
+  <ul>
+    {% for entry in blacklist %}
+      <li>{{ entry.name }} ({{ entry.uuid }}) - Причина: {{ entry.reason }} добавлен: {{ entry.user.username }}</li>
+    {% endfor %}
+  </ul>
+</main>
+{% endblock %}

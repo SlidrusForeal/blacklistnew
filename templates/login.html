@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Вход в систему{% endblock %}
+
+{% block content %}
+<main class="container">
+  <h1>Вход в систему</h1>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="notification">
+        {% for category, message in messages %}
+          <p class="{{ category }}">{{ message }}</p>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <form method="POST" action="{{ url_for('login') }}">
+    <div class="input-group">
+      <label for="username">Имя пользователя:</label>
+      <input type="text" name="username" id="username" placeholder="Введите имя пользователя" required>
+    </div>
+    <div class="input-group">
+      <label for="password">Пароль:</label>
+      <input type="password" name="password" id="password" placeholder="Введите пароль" required>
+    </div>
+    <button type="submit" class="btn-check">Войти</button>
+  </form>
+
+  <p>
+    Если у вас нет аккаунта, свяжитесь с администратором для создания учетной записи.
+  </p>
+</main>
+{% endblock %}
