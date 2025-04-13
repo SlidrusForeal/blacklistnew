@@ -10,7 +10,7 @@
     {% for player in players %}
       <li>
         <!-- Изменение: используем nickname для получения аватара -->
-        <img src="https://mc-heads.net/avatar/{{ player.nickname }}" alt="{{ player.nickname }}'s face" loading="lazy">
+        <img src="https://crafatar.com/avatars/{{ player.uuid.replace('-', '') }}?size=100&overlay" alt="{{ player.nickname }}'s head">
         <div class="player-info">
           <a href="https://namemc.com/profile/{{ player.uuid }}" target="_blank" rel="noopener noreferrer">
             {{ player.nickname }}

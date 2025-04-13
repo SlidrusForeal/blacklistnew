@@ -45,7 +45,18 @@ class AdminUser(db.Model):
 
 # Функция для получения UUID на основе никнейма (UUID v5 для стабильности)
 def get_uuid_from_nickname(nickname):
-    return str(uuid.uuid5(uuid.NAMESPACE_DNS, nickname.lower()))
+    try:
+        response = requests.get(f"https://api.mojang.com/users/profiles/minecraft/{nickname}")
+        if response.status_code == 200:
+            data = response.json()
+            uuid = data['id']
+            return str(uuid)
+        else:
+            app.logger.error(f"Mojang API response: {response.status_code}")
+            return None
+    except Exception as e:
+        app.logger.error(f"Ошибка получения UUID: {e}")
+        return None
 
 # Декоратор для проверки входа в админ панель
 def admin_login_required(f):
