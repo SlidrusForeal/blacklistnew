@@ -1,5 +1,6 @@
 --only-binary=:all:
 Flask==2.2.3
 Flask-SQLAlchemy==3.0.2
+Werkzeug<3.0
 psycopg2-binary==2.9.10
 requests==2.28.1
