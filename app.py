@@ -8,7 +8,6 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, login_required, LoginManager, UserMixin, current_user
-import psycopg2
 import requests
 
 load_dotenv()  # Загружаем переменные окружения из .env
