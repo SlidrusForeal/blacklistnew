@@ -1,6 +1,9 @@
+# ─────────────── url_encode monkey-patch ───────────────
 import werkzeug.urls
+# alias url_encode → urlencode для совместимости с Flask‑WTF
 werkzeug.urls.url_encode = werkzeug.urls.urlencode
 
+# ─────────────── Начало вашего app.py ───────────────
 import json
 import os
 import time
@@ -14,6 +17,7 @@ from flask import (
     url_for, session, flash, request, abort
 )
 from flask_sqlalchemy import SQLAlchemy
+# теперь imports flask_wtf уже найдут url_encode
 from flask_wtf import FlaskForm, CSRFProtect
 from werkzeug.security import generate_password_hash, check_password_hash
 from wtforms import StringField, PasswordField, SelectField, SubmitField
