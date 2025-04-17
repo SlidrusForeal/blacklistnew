@@ -1,3 +1,6 @@
+import werkzeug.urls
+werkzeug.urls.url_encode = werkzeug.urls.urlencode
+
 import json
 import os
 import time
