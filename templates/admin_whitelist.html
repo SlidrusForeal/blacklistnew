@@ -1,3 +1,4 @@
+{# templates/admin_whitelist.html #}
 {% extends "base.html" %}
 
 {% block title %}Редактор whitelist{% endblock %}
@@ -5,28 +6,25 @@
 {% block content %}
 <main class="container">
   <h1>Редактор whitelist</h1>
-  
   <a href="{{ url_for('admin_panel') }}" class="btn-check">Назад в админ панель</a>
-  
-  <h2>Добавить UUID в whitelist</h2>
+
+  <h2>Добавить/удалить UUID в whitelist</h2>
   <form method="POST" action="{{ url_for('admin_whitelist') }}">
+    {{ form.hidden_tag() }}
     <div class="input-group">
-      <input type="text" name="uuid" placeholder="Введите UUID" required>
+      {{ form.uuid(placeholder="Введите UUID") }}
     </div>
-    <button type="submit" name="action" value="add" class="btn-check">Добавить</button>
+    <div class="input-group">
+      {{ form.action() }}
+    </div>
+    {{ form.submit(class="btn-check") }}
   </form>
-  
+
   <h2>Текущий whitelist</h2>
   {% if whitelist %}
     <ul>
-      {% for uuid_value in whitelist %}
-        <li>
-          {{ uuid_value }}
-          <form method="POST" action="{{ url_for('admin_whitelist') }}" style="display:inline;">
-            <input type="hidden" name="uuid" value="{{ uuid_value }}">
-            <button type="submit" name="action" value="delete" class="btn-check" style="background-color: red;">Удалить</button>
-          </form>
-        </li>
+      {% for u in whitelist %}
+        <li>{{ u }}</li>
       {% endfor %}
     </ul>
   {% else %}

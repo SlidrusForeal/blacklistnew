@@ -1,3 +1,4 @@
+{# templates/admin_register.html #}
 {% extends "base.html" %}
 
 {% block title %}Регистрация пользователя{% endblock %}
@@ -6,21 +7,18 @@
 <main class="container">
   <h1>Регистрация нового пользователя</h1>
   <form method="POST" action="{{ url_for('admin_register') }}">
+    {{ form.hidden_tag() }}
     <div class="input-group">
-      <input type="text" name="username" placeholder="Имя пользователя" required>
+      {{ form.username(placeholder="Имя пользователя") }}
     </div>
     <div class="input-group">
-      <input type="password" name="password" placeholder="Пароль" required>
+      {{ form.password(placeholder="Пароль") }}
     </div>
     <div class="input-group">
-      <label for="role">Роль:</label>
-      <select name="role" id="role" required>
-        <option value="admin">Admin</option>
-        <option value="moderator">Moderator</option>
-        <option value="owner">Owner</option>
-      </select>
+      {{ form.role.label }}<br>
+      {{ form.role() }}
     </div>
-    <button type="submit" class="btn-check">Зарегистрировать</button>
+    {{ form.submit(class="btn-check") }}
   </form>
   <a href="{{ url_for('admin_panel') }}" class="btn-check">Назад в админ панель</a>
 </main>

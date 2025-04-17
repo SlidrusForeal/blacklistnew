@@ -1,3 +1,4 @@
+{# templates/admin_login.html #}
 {% extends "base.html" %}
 
 {% block title %}Админ панель - Вход{% endblock %}
@@ -6,14 +7,14 @@
 <main class="container">
   <h1>Вход в админ панель</h1>
   <form method="POST" action="{{ url_for('admin_login') }}">
+    {{ form.hidden_tag() }}
     <div class="input-group">
-      <input type="text" name="username" placeholder="Имя пользователя" required />
+      {{ form.username(placeholder="Имя пользователя") }}
     </div>
     <div class="input-group">
-      <input type="password" name="password" placeholder="Пароль" required
-             style="width: 100%; padding: 15px; border: 1px solid #555; border-radius: 4px; background-color: #3a3a3a; color: var(--color-text); font-size: 1rem; margin-bottom: 15px;" />
+      {{ form.password(placeholder="Пароль") }}
     </div>
-    <button type="submit" class="btn-check">Войти</button>
+    {{ form.submit(class="btn-check") }}
   </form>
 </main>
 {% endblock %}

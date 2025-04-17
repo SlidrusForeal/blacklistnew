@@ -1,23 +1,38 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session, abort
-from flask_sqlalchemy import SQLAlchemy
-from werkzeug.security import generate_password_hash, check_password_hash
-import uuid
+import json
+import os
+import time
 from datetime import datetime
 from functools import wraps
+
 import requests
-import time
-import json  # Для работы с whitelist и JSON
+from dotenv import load_dotenv
+from flask import (
+    Flask, render_template, redirect,
+    url_for, session, flash, request, abort
+)
+from flask_sqlalchemy import SQLAlchemy
+from flask_wtf import FlaskForm, CSRFProtect
+from werkzeug.security import generate_password_hash, check_password_hash
+from wtforms import StringField, PasswordField, SelectField, SubmitField
+from wtforms.validators import DataRequired, Length
+
+# ─────────────── Конфигурация ───────────────
+load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = "aYmi2Tfq1kbW-OlU8-r7cJO1p"  # Ключ для flash-сообщений и сессий
-
-# Настройка подключения к базе PostgreSQL
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:VcqdfYPqFanWbPDsGxJKRCjnIJxDZBpl@yamanote.proxy.rlwy.net:38858/railway"
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+app.config['WTF_CSRF_SECRET_KEY'] = os.getenv('WTF_CSRF_SECRET_KEY')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
 
-# Модель записи чёрного списка
+db = SQLAlchemy(app)
+csrf = CSRFProtect(app)
+
+
+# ─────────────── Модели ───────────────
+
 class BlacklistEntry(db.Model):
+    __tablename__ = 'blacklist_entry'
     id = db.Column(db.Integer, primary_key=True)
     nickname = db.Column(db.String(64), nullable=False)
     uuid = db.Column(db.String(36), unique=True, nullable=False)
@@ -27,12 +42,13 @@ class BlacklistEntry(db.Model):
     def __repr__(self):
         return f"<BlacklistEntry {self.nickname} ({self.uuid})>"
 
-# Модель администратора
+
 class AdminUser(db.Model):
+    __tablename__ = 'admin_user'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True, nullable=False)
-    password_hash = db.Column(db.String(256), nullable=False)  # Увеличенная длина
-    role = db.Column(db.String(16), nullable=False)  # "owner", "admin" или "moderator"
+    password_hash = db.Column(db.String(256), nullable=False)
+    role = db.Column(db.String(16), nullable=False)  # owner, admin, moderator
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -41,44 +57,90 @@ class AdminUser(db.Model):
         return check_password_hash(self.password_hash, password)
 
     def __repr__(self):
-        return f"<AdminUser {self.username} - {self.role}>"
+        return f"<AdminUser {self.username} ({self.role})>"
 
-# Функция для получения UUID на основе никнейма (UUID v5 для стабильности)
-def get_uuid_from_nickname(nickname):
+
+# ─────────────── Формы ───────────────
+class CheckForm(FlaskForm):
+    nickname = StringField('Никнейм', validators=[DataRequired(), Length(max=64)])
+    submit = SubmitField('Проверить')
+
+
+class AdminLoginForm(FlaskForm):
+    username = StringField('Имя пользователя', validators=[DataRequired(), Length(max=64)])
+    password = PasswordField('Пароль', validators=[DataRequired(), Length(min=6, max=128)])
+    submit = SubmitField('Войти')
+
+
+class AdminRegisterForm(FlaskForm):
+    username = StringField('Имя пользователя', validators=[DataRequired(), Length(max=64)])
+    password = PasswordField('Пароль', validators=[DataRequired(), Length(min=6)])
+    role     = SelectField('Роль',
+                choices=[('admin','Admin'),('moderator','Moderator'),('owner','Owner')],
+                validators=[DataRequired()])
+    submit   = SubmitField('Зарегистрировать')
+
+
+class BlacklistForm(FlaskForm):
+    nickname = StringField('Никнейм', validators=[DataRequired(), Length(max=64)])
+    reason = StringField('Причина', validators=[DataRequired(), Length(max=256)])
+    submit = SubmitField('Добавить')
+
+
+class UpdateReasonForm(FlaskForm):
+    reason = StringField('Новая причина', validators=[DataRequired(), Length(max=256)])
+    submit = SubmitField('Сохранить')
+
+
+class WhitelistForm(FlaskForm):
+    uuid = StringField('UUID', validators=[DataRequired(), Length(max=36)])
+    action = SelectField(
+        'Действие',
+        choices=[('add', 'Добавить'), ('delete', 'Удалить')],
+        validators=[DataRequired()]
+    )
+    submit = SubmitField('Применить')
+
+
+# ─────────────── Утилиты и декораторы ───────────────
+def get_uuid_from_nickname(nickname: str) -> str | None:
+    """Получить Minecraft UUID по нику через Mojang API."""
     try:
-        response = requests.get(f"https://api.mojang.com/users/profiles/minecraft/{nickname}")
-        if response.status_code == 200:
-            data = response.json()
-            uuid = data['id']
-            return str(uuid)
-        else:
-            app.logger.error(f"Mojang API response: {response.status_code}")
-            return None
+        resp = requests.get(f"https://api.mojang.com/users/profiles/minecraft/{nickname}")
+        if resp.status_code == 200:
+            return resp.json().get('id')
     except Exception as e:
-        app.logger.error(f"Ошибка получения UUID: {e}")
-        return None
+        app.logger.error(f"UUID lookup error: {e}")
+    return None
+
 
 # Декоратор для проверки входа в админ панель
 def admin_login_required(f):
     @wraps(f)
-    def decorated_function(*args, **kwargs):
+    def decorated(*args, **kwargs):
         if 'admin_user' not in session:
-            flash("Требуется вход в админ панель", "warning")
+            flash("Требуется вход в админ-панель", "warning")
             return redirect(url_for('admin_login'))
         return f(*args, **kwargs)
-    return decorated_function
+
+    return decorated
+
 
 # Декоратор для ограничения доступа по ролям (разрешены любые из указанных)
 def require_any_role(*roles):
     def decorator(f):
         @wraps(f)
-        def decorated_function(*args, **kwargs):
-            if 'admin_role' not in session or session['admin_role'].lower() not in [role.lower() for role in roles]:
-                flash("Доступ запрещён: недостаточно прав.", "danger")
+        def decorated(*args, **kwargs):
+            role = session.get('admin_role', '').lower()
+            if role not in [r.lower() for r in roles]:
+                flash("Недостаточно прав.", "danger")
                 return redirect(url_for('admin_login'))
             return f(*args, **kwargs)
-        return decorated_function
+
+        return decorated
+
     return decorator
+
 
 # Функции для работы с whitelist (файл uuid_list.json)
 def load_whitelist():
@@ -89,6 +151,7 @@ def load_whitelist():
         app.logger.error(f"Ошибка загрузки whitelist: {str(e)}")
         return []
 
+
 def save_whitelist(data):
     try:
         with open("uuid_list.json", "w", encoding="utf-8") as f:
@@ -96,231 +159,205 @@ def save_whitelist(data):
     except Exception as e:
         app.logger.error(f"Ошибка сохранения whitelist: {str(e)}")
 
+
 # --- Маршруты публичного сайта ---
 @app.route("/", methods=["GET", "POST"])
 def index():
+    form = CheckForm()
     result = None
-    nickname = ""
-    if request.method == "POST":
-        nickname = request.form.get("nickname", "").strip()
-        if not nickname:
-            flash("Введите никнейм для проверки.", "warning")
+    if form.validate_on_submit():
+        name = form.nickname.data.strip()
+        entry = BlacklistEntry.query.filter(
+            db.func.lower(BlacklistEntry.nickname) == name.lower()
+        ).first()
+        if entry:
+            new_uuid = get_uuid_from_nickname(name)
+            if new_uuid and new_uuid.lower() != entry.uuid.lower():
+                entry.uuid = new_uuid
+                entry.nickname = name
+                db.session.commit()
+            result = {
+                "message": f"{name}, вы в ЧС!",
+                "reason": entry.reason,
+                "color": "red"
+            }
         else:
-            # Поиск по никнейму без учёта регистра
-            entry = BlacklistEntry.query.filter(
-                db.func.lower(BlacklistEntry.nickname) == nickname.lower()
-            ).first()
-            if entry:
-                new_uuid = get_uuid_from_nickname(nickname)
-                if entry.uuid.lower() != new_uuid.lower():
-                    entry.uuid = new_uuid
-                    if entry.nickname != nickname:
-                        entry.nickname = nickname
-                    db.session.commit()
-                result = {
-                    "message": f"{nickname}, поздравляем – вы в ЧС!",
-                    "reason": entry.reason,
-                    "color": "red"
-                }
-            else:
-                result = {
-                    "message": f"{nickname}, вы не в ЧС! Возможно, вы сменили ник?",
-                    "color": "green"
-                }
-    return render_template("index.html", result=result, nickname=nickname)
+            result = {
+                "message": f"{name}, вы не в ЧС!",
+                "color": "green"
+            }
+    return render_template("index.html", form=form, result=result)
+
 
 @app.route("/fullist")
 def fullist():
-    entries = BlacklistEntry.query.order_by(BlacklistEntry.nickname.asc()).all()
-    return render_template("fullist.html", players=entries)
+    players = BlacklistEntry.query.order_by(BlacklistEntry.nickname.asc()).all()
+    return render_template("fullist.html", players=players)
+
+@app.route("/ave")
+def ave():
+    return render_template("ave.html")
 
 @app.route("/contacts")
 def contacts():
     return render_template("contacts.html")
 
+
 @app.route("/offline")
 def offline():
     return render_template("offline.html")
 
-# Обработчики ошибок
-@app.errorhandler(400)
-def bad_request(error):
-    return render_template("400.html"), 400
 
-@app.errorhandler(401)
-def unauthorized(error):
-    return render_template("401.html"), 401
+# ─────────────── Ошибки ───────────────
+for code in [400, 401, 403, 404, 500]:
+    @app.errorhandler(code)
+    def error_page(error, code=code):
+        return render_template(f"{code}.html"), code
 
-@app.errorhandler(403)
-def forbidden(error):
-    return render_template("403.html"), 403
-
-@app.errorhandler(404)
-def not_found(error):
-    return render_template("404.html"), 404
-
-@app.errorhandler(500)
-def server_error(error):
-    return render_template("500.html"), 500
 
 # Контекстный процессор для получения текущего года
 @app.context_processor
 def inject_current_year():
     return {'current_year': lambda: datetime.now().year}
 
-# --- Маршруты админ панели ---
+
+# ─────────────── Админ-панель ───────────────
 @app.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
-    if request.method == "POST":
-        username = request.form.get("username", "").strip()
-        password = request.form.get("password", "").strip()
-        admin_user = AdminUser.query.filter_by(username=username).first()
-        if admin_user and admin_user.check_password(password):
-            session['admin_user'] = admin_user.username
-            # Сохраняем роль в нижнем регистре для корректного сравнения
-            session['admin_role'] = admin_user.role.lower()
-            flash("Успешный вход в админ панель", "success")
-            return redirect(url_for("admin_panel"))
-        else:
-            flash("Неверное имя пользователя или пароль", "danger")
-    return render_template("admin_login.html")
+    form = AdminLoginForm()
+    if form.validate_on_submit():
+        user = AdminUser.query.filter_by(username=form.username.data).first()
+        if user and user.check_password(form.password.data):
+            session['admin_user'] = user.username
+            session['admin_role'] = user.role.lower()
+            flash("Вход выполнен успешно.", "success")
+            return redirect(url_for('admin_panel'))
+        flash("Неверный логин или пароль.", "danger")
+    return render_template("admin_login.html", form=form)
+
 
 @app.route("/admin/logout")
 def admin_logout():
-    session.pop('admin_user', None)
-    session.pop('admin_role', None)
-    flash("Вы вышли из админ панели", "info")
-    return redirect(url_for("admin_login"))
+    session.clear()
+    flash("Вы вышли из админ-панели.", "info")
+    return redirect(url_for('admin_login'))
 
-# Функция регистрации пользователей (только для владельца)
+
 @app.route("/admin/register", methods=["GET", "POST"])
 @admin_login_required
 @require_any_role("owner")
 def admin_register():
-    if request.method == "POST":
-        username = request.form.get("username", "").strip()
-        password = request.form.get("password", "").strip()
-        role = request.form.get("role", "").strip().lower()
-        if not username or not password or not role:
-            flash("Все поля должны быть заполнены.", "warning")
-        elif role not in ["owner", "admin", "moderator"]:
-            flash("Неверное значение роли.", "warning")
-        else:
-            if AdminUser.query.filter_by(username=username).first():
-                flash("Пользователь с таким именем уже существует.", "warning")
-            else:
-                new_user = AdminUser(username=username, role=role)
-                new_user.set_password(password)
-                db.session.add(new_user)
-                db.session.commit()
-                flash("Пользователь успешно зарегистрирован.", "success")
-                return redirect(url_for("admin_panel"))
-    return render_template("admin_register.html")
+    form = AdminRegisterForm()
+    if form.validate_on_submit():
+        username = form.username.data.strip()
+        password = form.password.data
+        role     = form.role.data
 
-# Админ панель для добавления/удаления записей в черном списке (owner и admin)
+        if AdminUser.query.filter_by(username=username).first():
+            flash("Пользователь с таким именем уже существует.", "warning")
+        else:
+            new_user = AdminUser(username=username, role=role)
+            new_user.set_password(password)
+            db.session.add(new_user)
+            db.session.commit()
+            flash("Пользователь успешно зарегистрирован.", "success")
+            return redirect(url_for("admin_panel"))
+
+    # при GET-запросе или ошибках валидации подставляем form в шаблон
+    return render_template("admin_register.html", form=form)
+
+
 @app.route("/admin", methods=["GET", "POST"])
 @admin_login_required
-@require_any_role("owner", "admin")
+@require_any_role("owner", "admin", "moderator")
 def admin_panel():
-    if request.method == "POST":
-        nickname = request.form.get("nickname", "").strip()
-        reason = request.form.get("reason", "").strip()
-        if not nickname or not reason:
-            flash("Все поля должны быть заполнены", "warning")
+    form = BlacklistForm()
+    if form.validate_on_submit():
+        nick = form.nickname.data.strip()
+        reason = form.reason.data.strip()
+        if not get_uuid_from_nickname(nick):
+            flash("Не удалось получить UUID.", "warning")
+        elif BlacklistEntry.query.filter_by(uuid=get_uuid_from_nickname(nick)).first():
+            flash("Уже в черном списке.", "info")
         else:
-            user_uuid = get_uuid_from_nickname(nickname)
-            entry = BlacklistEntry.query.filter_by(uuid=user_uuid).first()
-            if entry:
-                flash("Элемент с данным никнеймом уже существует", "warning")
-            else:
-                new_entry = BlacklistEntry(nickname=nickname, uuid=user_uuid, reason=reason)
-                db.session.add(new_entry)
-                db.session.commit()
-                flash("Запись успешно добавлена", "success")
-                return redirect(url_for("admin_panel"))
-    entries = BlacklistEntry.query.order_by(BlacklistEntry.nickname.asc()).all()
-    return render_template("admin_panel.html", entries=entries)
+            entry = BlacklistEntry(
+                nickname=nick,
+                uuid=get_uuid_from_nickname(nick),
+                reason=reason
+            )
+            db.session.add(entry)
+            db.session.commit()
+            flash("Запись добавлена в ЧС.", "success")
+            return redirect(url_for('admin_panel'))
+    entries = BlacklistEntry.query.order_by(BlacklistEntry.nickname).all()
+    return render_template("admin_panel.html", form=form, entries=entries)
+
 
 # Обновление никнеймов (доступ только для владельца)
 @app.route("/admin/update_nicknames", methods=["POST"])
 @admin_login_required
-@require_any_role("owner")
+@require_any_role("owner", "admin")
 def update_nicknames():
     entries = BlacklistEntry.query.all()
-    updated_count = 0
-    for entry in entries:
-        uuid_for_api = entry.uuid.replace("-", "")
-        url = f"https://api.mojang.com/user/profile/{uuid_for_api}"
-        try:
-            response = requests.get(url)
-            if response.status_code == 200:
-                data = response.json()  # Объект с полями "id" и "name"
-                correct_name = data.get("name", "").strip()
-                app.logger.info(f"Обработка UUID '{entry.uuid}': API вернул NAME: '{correct_name}'")
-                if correct_name and entry.nickname.lower() != correct_name.lower():
-                    entry.nickname = correct_name
-                    updated_count += 1
-            else:
-                app.logger.warning(f"Не удалось получить данные по UUID {entry.uuid}. Статус: {response.status_code}")
-                flash(f"Не удалось обновить данные для {entry.nickname} (UUID: {entry.uuid}). Статус: {response.status_code}", "warning")
-        except Exception as e:
-            app.logger.error(f"Ошибка при запросе для UUID {entry.uuid}: {str(e)}")
-            flash(f"Ошибка при обновлении данных для {entry.nickname}: {str(e)}", "danger")
-        time.sleep(1)  # Задержка для соблюдения лимитов API
+    count = 0
+    for e in entries:
+        new_uuid = get_uuid_from_nickname(e.nickname)
+        if new_uuid and new_uuid.lower() != e.uuid.lower():
+            e.uuid = new_uuid
+            count += 1
+        time.sleep(1)
     db.session.commit()
-    flash(f"Обновлено {updated_count} записей.", "success")
-    return redirect(url_for("admin_panel"))
+    flash(f"UUID обновлены для {count} записей.", "success")
+    return redirect(url_for('admin_panel'))
 
-# Обновление причины занесения в ЧС (доступ для owner и moderator)
+
 @app.route("/admin/update_reason/<int:entry_id>", methods=["GET", "POST"])
 @admin_login_required
 @require_any_role("owner", "admin", "moderator")
 def update_reason(entry_id):
     entry = BlacklistEntry.query.get_or_404(entry_id)
-    if request.method == "POST":
-        new_reason = request.form.get("reason", "").strip()
-        if not new_reason:
-            flash("Поле 'причина' не может быть пустым.", "warning")
+    form = UpdateReasonForm(reason=entry.reason)
+    if form.validate_on_submit():
+        if form.reason.data.strip() != entry.reason:
+            entry.reason = form.reason.data.strip()
+            db.session.commit()
+            flash("Причина изменена.", "success")
         else:
-            if entry.reason != new_reason:
-                entry.reason = new_reason
-                db.session.commit()
-                flash("Причина успешно обновлена.", "success")
-            else:
-                flash("Новая причина совпадает с текущей.", "info")
-            return redirect(url_for("admin_panel"))
-    return render_template("update_reason.html", entry=entry)
+            flash("Новая причина совпадает со старой.", "info")
+        return redirect(url_for('admin_panel'))
+    return render_template("update_reason.html", form=form, entry=entry)
 
-# Редактор whitelist (доступ только для владельца)
+
 @app.route("/admin/whitelist", methods=["GET", "POST"])
 @admin_login_required
 @require_any_role("owner")
 def admin_whitelist():
-    if request.method == "POST":
-        action = request.form.get("action")
-        uuid_value = request.form.get("uuid", "").strip()
-        whitelist = load_whitelist()
-        if action == "add" and uuid_value:
-            if uuid_value not in whitelist:
-                whitelist.append(uuid_value)
-                flash(f"UUID {uuid_value} добавлен в whitelist", "success")
+    form = WhitelistForm()
+    if form.validate_on_submit():
+        wl = json.load(open("uuid_list.json", "r", encoding="utf-8"))
+        u = form.uuid.data.strip()
+        if form.action.data == 'add':
+            if u not in wl:
+                wl.append(u)
+                flash("UUID добавлен в whitelist.", "success")
             else:
-                flash(f"UUID {uuid_value} уже существует в whitelist", "warning")
-        elif action == "delete" and uuid_value:
-            if uuid_value in whitelist:
-                whitelist.remove(uuid_value)
-                flash(f"UUID {uuid_value} удалён из whitelist", "success")
+                flash("UUID уже в whitelist.", "info")
+        else:
+            if u in wl:
+                wl.remove(u)
+                flash("UUID удалён из whitelist.", "success")
             else:
-                flash(f"UUID {uuid_value} не найден в whitelist", "warning")
-        save_whitelist(whitelist)
-        return redirect(url_for("admin_whitelist"))
-    whitelist = load_whitelist()
-    return render_template("admin_whitelist.html", whitelist=whitelist)
+                flash("UUID не найден в whitelist.", "warning")
+        json.dump(wl, open("uuid_list.json", "w", encoding="utf-8"), indent=2)
+        return redirect(url_for('admin_whitelist'))
+    wl_current = json.load(open("uuid_list.json", "r", encoding="utf-8"))
+    return render_template("admin_whitelist.html", form=form, whitelist=wl_current)
 
-# Маршрут для отдачи сервис-воркера
+
 @app.route("/sw.js")
 def service_worker():
     return app.send_static_file("service-worker.js")
+
 
 # Удаление записи из черного списка (доступ для owner и admin)
 @app.route("/admin/delete/<int:entry_id>", methods=["POST"])
@@ -330,31 +367,53 @@ def delete_entry(entry_id):
     entry = BlacklistEntry.query.get_or_404(entry_id)
     db.session.delete(entry)
     db.session.commit()
-    flash("Запись удалена", "success")
-    return redirect(url_for("admin_panel"))
+    flash("Запись удалена из ЧС.", "success")
+    return redirect(url_for('admin_panel'))
+
 
 # Список пользователей (admin panel) – доступ только для owner
 @app.route("/admin/users", methods=["GET"])
 @admin_login_required
 @require_any_role("owner")
 def admin_users():
-    users = AdminUser.query.order_by(AdminUser.username.asc()).all()
+    users = AdminUser.query.order_by(AdminUser.username).all()
     return render_template("admin_users.html", users=users)
+
 
 # Удаление пользователя (только для владельца)
 @app.route("/admin/delete_user/<int:user_id>", methods=["POST"])
 @admin_login_required
 @require_any_role("owner")
 def delete_user(user_id):
-    user = AdminUser.query.get_or_404(user_id)
-    # Защита: не разрешаем удалить текущего владельца (например, залогиненного)
-    if user.username == session.get("admin_user"):
-        flash("Нельзя удалить активного пользователя.", "warning")
-        return redirect(url_for("admin_users"))
-    db.session.delete(user)
-    db.session.commit()
-    flash("Пользователь удалён.", "success")
-    return redirect(url_for("admin_users"))
+    u = AdminUser.query.get_or_404(user_id)
+    if u.username == session.get('admin_user'):
+        flash("Нельзя удалить себя.", "warning")
+    else:
+        db.session.delete(u)
+        db.session.commit()
+        flash("Пользователь удалён.", "success")
+    return redirect(url_for('admin_users'))
+
+
+@app.after_request
+def set_security_headers(response):
+    response.headers['Content-Security-Policy'] = (
+        "default-src 'self';"
+        "connect-src 'self' https://api.mojang.com https://api.namemc.com;"
+        "img-src 'self' https://minotar.net https://minotar.net *.minotar.net;"
+        "script-src 'self' https://cdnjs.cloudflare.com;"
+        "object-src 'none';"
+        "base-uri 'self';"
+    )
+    response.headers['X-Frame-Options'] = 'DENY'
+    return response
+
+@app.before_request
+def block_sensitive_paths():
+    if request.path == '/.env':
+        abort(403)
+    if request.path.startswith('/asuka'):
+        abort(403)
 
 if __name__ == '__main__':
     app.run(debug=True)

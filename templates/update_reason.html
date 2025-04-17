@@ -1,3 +1,4 @@
+{# templates/update_reason.html #}
 {% extends "base.html" %}
 
 {% block title %}Обновление причины{% endblock %}
@@ -6,10 +7,11 @@
 <main class="container">
   <h1>Обновление причины для {{ entry.nickname }}</h1>
   <form method="POST" action="{{ url_for('update_reason', entry_id=entry.id) }}">
+    {{ form.hidden_tag() }}
     <div class="input-group">
-      <input type="text" name="reason" placeholder="Новая причина" value="{{ entry.reason }}" required>
+      {{ form.reason(placeholder="Новая причина") }}
     </div>
-    <button type="submit" class="btn-check">Сохранить</button>
+    {{ form.submit(class="btn-check") }}
   </form>
   <a href="{{ url_for('admin_panel') }}" class="btn-check">Назад в админ панель</a>
 </main>
