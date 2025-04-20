@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 import requests
 from flask import (
     Flask, render_template, redirect,
-    url_for, session, flash, request, abort,
+    url_for, flash, request, abort,
     jsonify, Response, make_response, g
 )
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt, set_access_cookies, get_jwt_identity, unset_jwt_cookies, verify_jwt_in_request
@@ -28,6 +28,9 @@ from wtforms.validators import DataRequired, Length
 from requests.adapters import HTTPAdapter
 from requests.exceptions import RequestException, HTTPError
 import logging.config
+import subprocess
+import hmac
+import hashlib
 
 # ─────────────── Конфигурация Flask ───────────────
 load_dotenv()
@@ -42,6 +45,7 @@ app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 app.config['JWT_ACCESS_COOKIE_PATH'] = '/'
 app.config['JWT_COOKIE_CSRF_PROTECT'] = True
+app.config['GUTHUB_SECRET'] = os.getenv('WEBHOOK_SECRET')
 
 # ─────────────── Настройка логирования ───────────────
 # Создаём папку для логов, если её нет
@@ -875,6 +879,24 @@ def api_locations_report():
         json.dump(locations, f, indent=2, ensure_ascii=False)
 
     return jsonify({"success": True}), 200
+
+@app.route('/github-webhook', methods=['POST'])
+def hook():
+    # Получаем секрет из конфигурации
+    secret = app.config['GITHUB_SECRET'].encode('utf-8')
+
+    signature = request.headers.get('X-Hub-Signature-256', '')
+    mac = 'sha256=' + hmac.new(secret, request.data, hashlib.sha256).hexdigest()
+    if not hmac.compare_digest(mac, signature):
+        abort(403)
+
+    # Всё ок — вызываем скрипт обновления
+    subprocess.Popen(
+        ['/usr/local/bin/github-webhook.sh'],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL
+    )
+    return '', 204
     
 @app.after_request
 def set_security_headers(response):
