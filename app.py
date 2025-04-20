@@ -45,7 +45,10 @@ app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 app.config['JWT_ACCESS_COOKIE_PATH'] = '/'
 app.config['JWT_COOKIE_CSRF_PROTECT'] = True
-app.config['GUTHUB_SECRET'] = os.getenv('WEBHOOK_SECRET')
+app.config['GITHUB_SECRET'] = os.getenv('WEBHOOK_SECRET', '')
+if not app.config['GITHUB_SECRET']:
+    raise RuntimeError("WEBHOOK_SECRET not set in .env")
+secret = app.config['GITHUB_SECRET'].encode('utf-8')
 
 # ─────────────── Настройка логирования ───────────────
 # Создаём папку для логов, если её нет
@@ -407,10 +410,25 @@ def offline():
 
 
 # ─────────────── Ошибки ───────────────
-for code in [400, 401, 403, 404, 500]:
-    @app.errorhandler(code)
-    def error_page(error, code=code):
-        return render_template(f"{code}.html"), code
+@app.errorhandler(400)
+def bad_request(error):
+    return render_template('400.html'), 400
+
+@app.errorhandler(401)
+def unauthorized(error):
+    return render_template('401.html'), 401
+
+@app.errorhandler(403)
+def forbidden(error):
+    return render_template('403.html'), 403
+
+@app.errorhandler(404)
+def not_found(error):
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def server_error(error):
+    return render_template('500.html'), 500
 
 
 # Контекстный процессор для получения текущего года
@@ -880,22 +898,36 @@ def api_locations_report():
 
     return jsonify({"success": True}), 200
 
-@app.route('/github-webhook', methods=['POST'])
-def hook():
-    # Получаем секрет из конфигурации
-    secret = app.config['GITHUB_SECRET'].encode('utf-8')
+# Кастомная ошибка 403
+@app.errorhandler(403)
+def forbidden(e):
+    return render_template('403.html'), 403
 
-    signature = request.headers.get('X-Hub-Signature-256', '')
-    mac = 'sha256=' + hmac.new(secret, request.data, hashlib.sha256).hexdigest()
-    if not hmac.compare_digest(mac, signature):
+@csrf.exempt
+@app.route('/github-webhook', methods=['GET', 'POST'])
+def hook():
+    if request.method == 'GET':
+        return 'pong', 200
+
+    # Иначе — это POST с событиями, проверяем подпись и т.п.
+    signature256 = request.headers.get('X-Hub-Signature-256', '')
+    signature1   = request.headers.get('X-Hub-Signature', '')
+    data = request.data
+    secret = app.config['GITHUB_SECRET'].encode()
+
+    valid = False
+    if signature256.startswith('sha256='):
+        expected = 'sha256=' + hmac.new(secret, data, hashlib.sha256).hexdigest()
+        valid = hmac.compare_digest(expected, signature256)
+    elif signature1.startswith('sha1='):
+        expected = 'sha1=' + hmac.new(secret, data, hashlib.sha1).hexdigest()
+        valid = hmac.compare_digest(expected, signature1)
+
+    if not valid:
         abort(403)
 
-    # Всё ок — вызываем скрипт обновления
-    subprocess.Popen(
-        ['/usr/local/bin/github-webhook.sh'],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL
-    )
+    subprocess.Popen(['/usr/local/bin/github-webhook.sh'],
+                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     return '', 204
     
 @app.after_request
