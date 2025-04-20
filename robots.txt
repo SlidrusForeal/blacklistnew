@@ -25,3 +25,5 @@ User-Agent: 6OT-AHKAIIA
 Disallow: /
 
 Sitemap: https://sosmark.ru/sitemap.xml
+
+ifyouseethisthingisworking
