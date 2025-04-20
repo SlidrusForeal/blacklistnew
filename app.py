@@ -898,63 +898,37 @@ def api_locations_report():
 
     return jsonify({"success": True}), 200
 
-# Кастомная ошибка 403
-@app.errorhandler(403)
-def forbidden(e):
-    return render_template('403.html'), 403
-<<<<<<< HEAD
-
 @csrf.exempt
 @app.route('/github-webhook', methods=['GET', 'POST'])
 def hook():
+    # GitHub Ping
     if request.method == 'GET':
         return 'pong', 200
 
-    # Иначе — это POST с событиями, проверяем подпись и т.п.
-    signature256 = request.headers.get('X-Hub-Signature-256', '')
-    signature1   = request.headers.get('X-Hub-Signature', '')
-    data = request.data
-    secret = app.config['GITHUB_SECRET'].encode()
-
-    valid = False
-    if signature256.startswith('sha256='):
-        expected = 'sha256=' + hmac.new(secret, data, hashlib.sha256).hexdigest()
-        valid = hmac.compare_digest(expected, signature256)
-    elif signature1.startswith('sha1='):
-        expected = 'sha1=' + hmac.new(secret, data, hashlib.sha1).hexdigest()
-        valid = hmac.compare_digest(expected, signature1)
-=======
-
-@app.route('/github-webhook', methods=['POST'])
-def hook():
-    data = request.data
-    # GitHub может прислать и sha256, и sha1
+    # Проверяем подпись POST
+    secret = app.config['GITHUB_SECRET'].encode('utf-8')
+    data = request.get_data()
     sig256 = request.headers.get('X-Hub-Signature-256', '')
     sig1   = request.headers.get('X-Hub-Signature', '')
 
     valid = False
     if sig256.startswith('sha256='):
-        expected256 = 'sha256=' + hmac.new(secret, data, hashlib.sha256).hexdigest()
-        valid = hmac.compare_digest(expected256, sig256)
+        expected = 'sha256=' + hmac.new(secret, data, hashlib.sha256).hexdigest()
+        valid = hmac.compare_digest(expected, sig256)
     elif sig1.startswith('sha1='):
-        expected1 = 'sha1=' + hmac.new(secret, data, hashlib.sha1).hexdigest()
-        valid = hmac.compare_digest(expected1, sig1)
->>>>>>> 47bcf6dca76aad8c9abfacd6fe723a0fbdf23a7c
+        expected = 'sha1=' + hmac.new(secret, data, hashlib.sha1).hexdigest()
+        valid = hmac.compare_digest(expected, sig1)
 
     if not valid:
         abort(403)
 
-<<<<<<< HEAD
-    subprocess.Popen(['/usr/local/bin/github-webhook.sh'],
-                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-=======
-    # Подпись верная — запускаем обновление
+    # Всё ок — запускаем скрипт из корня проекта
+    script_path = os.path.join(os.path.dirname(__file__), 'github‑webhook.sh')
     subprocess.Popen(
-        ['/usr/local/bin/github-webhook.sh'],
+        [script_path],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL
     )
->>>>>>> 47bcf6dca76aad8c9abfacd6fe723a0fbdf23a7c
     return '', 204
     
 @app.after_request
