@@ -1,0 +1,1523 @@
+2025-04-19 16:12:24,570 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1788, in dispatch_request
+    self.raise_routing_exception(req)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1770, in raise_routing_exception
+    raise request.routing_exception  # type: ignore
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/ctx.py", line 351, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/werkzeug/routing/map.py", line 619, in match
+    raise MethodNotAllowed(valid_methods=list(e.have_match_for)) from None
+werkzeug.exceptions.MethodNotAllowed: 405 Method Not Allowed: The method is not allowed for the requested URL.
+2025-04-19 21:05:54,807 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1788, in dispatch_request
+    self.raise_routing_exception(req)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1770, in raise_routing_exception
+    raise request.routing_exception  # type: ignore
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/ctx.py", line 351, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/werkzeug/routing/map.py", line 619, in match
+    raise MethodNotAllowed(valid_methods=list(e.have_match_for)) from None
+werkzeug.exceptions.MethodNotAllowed: 405 Method Not Allowed: The method is not allowed for the requested URL.
+2025-04-19 21:06:03,918 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1788, in dispatch_request
+    self.raise_routing_exception(req)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1770, in raise_routing_exception
+    raise request.routing_exception  # type: ignore
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/ctx.py", line 351, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/werkzeug/routing/map.py", line 619, in match
+    raise MethodNotAllowed(valid_methods=list(e.have_match_for)) from None
+werkzeug.exceptions.MethodNotAllowed: 405 Method Not Allowed: The method is not allowed for the requested URL.
+2025-04-19 21:06:24,302 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1788, in dispatch_request
+    self.raise_routing_exception(req)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1770, in raise_routing_exception
+    raise request.routing_exception  # type: ignore
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/ctx.py", line 351, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/werkzeug/routing/map.py", line 619, in match
+    raise MethodNotAllowed(valid_methods=list(e.have_match_for)) from None
+werkzeug.exceptions.MethodNotAllowed: 405 Method Not Allowed: The method is not allowed for the requested URL.
+2025-04-19 21:21:16,395 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1788, in dispatch_request
+    self.raise_routing_exception(req)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1770, in raise_routing_exception
+    raise request.routing_exception  # type: ignore
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/ctx.py", line 351, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/werkzeug/routing/map.py", line 619, in match
+    raise MethodNotAllowed(valid_methods=list(e.have_match_for)) from None
+werkzeug.exceptions.MethodNotAllowed: 405 Method Not Allowed: The method is not allowed for the requested URL.
+2025-04-19 21:21:18,827 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1788, in dispatch_request
+    self.raise_routing_exception(req)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1770, in raise_routing_exception
+    raise request.routing_exception  # type: ignore
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/ctx.py", line 351, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/werkzeug/routing/map.py", line 619, in match
+    raise MethodNotAllowed(valid_methods=list(e.have_match_for)) from None
+werkzeug.exceptions.MethodNotAllowed: 405 Method Not Allowed: The method is not allowed for the requested URL.
+2025-04-19 21:21:19,385 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1788, in dispatch_request
+    self.raise_routing_exception(req)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1770, in raise_routing_exception
+    raise request.routing_exception  # type: ignore
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/ctx.py", line 351, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/werkzeug/routing/map.py", line 619, in match
+    raise MethodNotAllowed(valid_methods=list(e.have_match_for)) from None
+werkzeug.exceptions.MethodNotAllowed: 405 Method Not Allowed: The method is not allowed for the requested URL.
+2025-04-19 22:10:16,019 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 292, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 306, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 795, in api_locations_view
+    ts = entry.get("timestamp", 0)
+AttributeError: 'str' object has no attribute 'get'
+2025-04-19 22:10:16,121 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 292, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 306, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 795, in api_locations_view
+    ts = entry.get("timestamp", 0)
+AttributeError: 'str' object has no attribute 'get'
+2025-04-19 22:10:16,680 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 292, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 306, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 795, in api_locations_view
+    ts = entry.get("timestamp", 0)
+AttributeError: 'str' object has no attribute 'get'
+2025-04-19 22:10:17,544 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 292, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 306, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 795, in api_locations_view
+    ts = entry.get("timestamp", 0)
+AttributeError: 'str' object has no attribute 'get'
+2025-04-19 22:10:18,543 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 292, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 306, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 795, in api_locations_view
+    ts = entry.get("timestamp", 0)
+AttributeError: 'str' object has no attribute 'get'
+2025-04-19 22:10:18,621 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 292, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 306, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 795, in api_locations_view
+    ts = entry.get("timestamp", 0)
+AttributeError: 'str' object has no attribute 'get'
+2025-04-19 22:10:19,433 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 292, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 306, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 795, in api_locations_view
+    ts = entry.get("timestamp", 0)
+AttributeError: 'str' object has no attribute 'get'
+2025-04-19 22:10:20,464 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 292, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 306, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 795, in api_locations_view
+    ts = entry.get("timestamp", 0)
+AttributeError: 'str' object has no attribute 'get'
+2025-04-19 22:10:21,468 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 292, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 306, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 795, in api_locations_view
+    ts = entry.get("timestamp", 0)
+AttributeError: 'str' object has no attribute 'get'
+2025-04-19 22:10:22,437 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 292, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 306, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 795, in api_locations_view
+    ts = entry.get("timestamp", 0)
+AttributeError: 'str' object has no attribute 'get'
+2025-04-19 22:10:23,445 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 292, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 306, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 795, in api_locations_view
+    ts = entry.get("timestamp", 0)
+AttributeError: 'str' object has no attribute 'get'
+2025-04-19 22:10:24,518 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 292, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 306, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 795, in api_locations_view
+    ts = entry.get("timestamp", 0)
+AttributeError: 'str' object has no attribute 'get'
+2025-04-19 22:10:25,435 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 292, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 306, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 795, in api_locations_view
+    ts = entry.get("timestamp", 0)
+AttributeError: 'str' object has no attribute 'get'
+2025-04-19 22:10:26,440 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 292, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 306, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 795, in api_locations_view
+    ts = entry.get("timestamp", 0)
+AttributeError: 'str' object has no attribute 'get'
+2025-04-19 22:10:27,431 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 292, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 306, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 795, in api_locations_view
+    ts = entry.get("timestamp", 0)
+AttributeError: 'str' object has no attribute 'get'
+2025-04-19 22:10:28,434 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 292, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 306, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 795, in api_locations_view
+    ts = entry.get("timestamp", 0)
+AttributeError: 'str' object has no attribute 'get'
+2025-04-19 22:10:29,438 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 292, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 306, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 795, in api_locations_view
+    ts = entry.get("timestamp", 0)
+AttributeError: 'str' object has no attribute 'get'
+2025-04-19 22:10:30,430 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 292, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 306, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 795, in api_locations_view
+    ts = entry.get("timestamp", 0)
+AttributeError: 'str' object has no attribute 'get'
+2025-04-19 22:10:31,962 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 292, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 306, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 795, in api_locations_view
+    ts = entry.get("timestamp", 0)
+AttributeError: 'str' object has no attribute 'get'
+2025-04-19 22:10:32,935 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 292, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 306, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 795, in api_locations_view
+    ts = entry.get("timestamp", 0)
+AttributeError: 'str' object has no attribute 'get'
+2025-04-19 22:10:33,923 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 292, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 306, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 795, in api_locations_view
+    ts = entry.get("timestamp", 0)
+AttributeError: 'str' object has no attribute 'get'
+2025-04-19 22:10:34,915 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 292, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 306, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 795, in api_locations_view
+    ts = entry.get("timestamp", 0)
+AttributeError: 'str' object has no attribute 'get'
+2025-04-19 22:11:45,587 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:11:50,546 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:11:55,558 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:12:00,545 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:12:05,599 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:12:10,606 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:12:15,646 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:12:20,657 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:12:25,648 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:12:30,647 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:12:35,695 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:12:40,693 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:12:45,697 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:12:50,694 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:12:55,743 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:13:00,743 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:13:05,747 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:13:10,794 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:13:15,855 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:13:20,893 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:13:25,952 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:13:30,952 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:13:35,993 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:13:40,995 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:13:46,044 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:13:51,043 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:13:56,045 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:14:01,091 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:14:06,096 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:14:11,147 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:14:16,201 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:14:21,244 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:14:26,244 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:14:31,294 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:14:36,292 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:14:41,345 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:14:46,353 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:14:51,427 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:14:56,396 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:18:54,408 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:18:59,418 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:19:04,476 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:19:09,467 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:19:14,515 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:19:19,517 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:19:24,520 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:19:29,513 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 22:19:34,515 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 854, in api_locations_report
+    locations = json.load(f)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/opt/python/python-3.9.0/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/opt/python/python-3.9.0/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-19 23:40:10,333 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 292, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 306, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 661, in admin_map
+    return render_template("admin_map.html")
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/templating.py", line 147, in render_template
+    return _render(app, template, context)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/templating.py", line 130, in _render
+    rv = template.render(context)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/var/www/u3085459/data/www/sosmark.ru/templates/admin_map.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "/var/www/u3085459/data/www/sosmark.ru/templates/base.html", line 78, in top-level template code
+    {% block content %}{% endblock %}
+  File "/var/www/u3085459/data/www/sosmark.ru/templates/admin_map.html", line 32, in block 'content'
+    <a href="{{ url_for('logout') }}">Выйти</a>
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 2034, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 2023, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/werkzeug/routing/map.py", line 917, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'logout'. Did you mean 'admin_logout' instead?
+2025-04-19 23:40:27,163 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 292, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 306, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 661, in admin_map
+    return render_template("admin_map.html")
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/templating.py", line 147, in render_template
+    return _render(app, template, context)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/templating.py", line 130, in _render
+    rv = template.render(context)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/var/www/u3085459/data/www/sosmark.ru/templates/admin_map.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "/var/www/u3085459/data/www/sosmark.ru/templates/base.html", line 78, in top-level template code
+    {% block content %}{% endblock %}
+  File "/var/www/u3085459/data/www/sosmark.ru/templates/admin_map.html", line 32, in block 'content'
+    <a href="{{ url_for('logout') }}">Выйти</a>
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 2034, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 2023, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/werkzeug/routing/map.py", line 917, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'logout'. Did you mean 'admin_logout' instead?
+2025-04-19 23:41:11,014 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 292, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 306, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 661, in admin_map
+    return render_template("admin_map.html")
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/templating.py", line 147, in render_template
+    return _render(app, template, context)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/templating.py", line 130, in _render
+    rv = template.render(context)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/var/www/u3085459/data/www/sosmark.ru/templates/admin_map.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "/var/www/u3085459/data/www/sosmark.ru/templates/base.html", line 78, in top-level template code
+    {% block content %}{% endblock %}
+  File "/var/www/u3085459/data/www/sosmark.ru/templates/admin_map.html", line 32, in block 'content'
+    <a href="{{ url_for('logout') }}">Выйти</a>
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 2034, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 2023, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/werkzeug/routing/map.py", line 917, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'logout'. Did you mean 'admin_logout' instead?
+2025-04-19 23:41:11,057 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 292, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 306, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 661, in admin_map
+    return render_template("admin_map.html")
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/templating.py", line 147, in render_template
+    return _render(app, template, context)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/templating.py", line 130, in _render
+    rv = template.render(context)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/var/www/u3085459/data/www/sosmark.ru/templates/admin_map.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "/var/www/u3085459/data/www/sosmark.ru/templates/base.html", line 78, in top-level template code
+    {% block content %}{% endblock %}
+  File "/var/www/u3085459/data/www/sosmark.ru/templates/admin_map.html", line 32, in block 'content'
+    <a href="{{ url_for('logout') }}">Выйти</a>
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 2034, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 2023, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/werkzeug/routing/map.py", line 917, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'logout'. Did you mean 'admin_logout' instead?
+2025-04-19 23:41:11,935 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 292, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 306, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 661, in admin_map
+    return render_template("admin_map.html")
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/templating.py", line 147, in render_template
+    return _render(app, template, context)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/templating.py", line 130, in _render
+    rv = template.render(context)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/var/www/u3085459/data/www/sosmark.ru/templates/admin_map.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "/var/www/u3085459/data/www/sosmark.ru/templates/base.html", line 78, in top-level template code
+    {% block content %}{% endblock %}
+  File "/var/www/u3085459/data/www/sosmark.ru/templates/admin_map.html", line 32, in block 'content'
+    <a href="{{ url_for('logout') }}">Выйти</a>
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 2034, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 2023, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/werkzeug/routing/map.py", line 917, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'logout'. Did you mean 'admin_logout' instead?
+2025-04-19 23:42:08,685 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 292, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 306, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 661, in admin_map
+    return render_template("admin_map.html")
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/templating.py", line 147, in render_template
+    return _render(app, template, context)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/templating.py", line 130, in _render
+    rv = template.render(context)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/var/www/u3085459/data/www/sosmark.ru/templates/admin_map.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "/var/www/u3085459/data/www/sosmark.ru/templates/base.html", line 78, in top-level template code
+    {% block content %}{% endblock %}
+  File "/var/www/u3085459/data/www/sosmark.ru/templates/admin_map.html", line 32, in block 'content'
+    <a href="{{ url_for('logout') }}">Выйти</a>
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 2034, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 2023, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/werkzeug/routing/map.py", line 917, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'logout'. Did you mean 'admin_logout' instead?
+2025-04-19 23:42:08,728 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 292, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 306, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 661, in admin_map
+    return render_template("admin_map.html")
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/templating.py", line 147, in render_template
+    return _render(app, template, context)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/templating.py", line 130, in _render
+    rv = template.render(context)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/var/www/u3085459/data/www/sosmark.ru/templates/admin_map.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "/var/www/u3085459/data/www/sosmark.ru/templates/base.html", line 78, in top-level template code
+    {% block content %}{% endblock %}
+  File "/var/www/u3085459/data/www/sosmark.ru/templates/admin_map.html", line 32, in block 'content'
+    <a href="{{ url_for('logout') }}">Выйти</a>
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 2034, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 2023, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/werkzeug/routing/map.py", line 917, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'logout'. Did you mean 'admin_logout' instead?
+2025-04-19 23:42:09,294 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 292, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 306, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 661, in admin_map
+    return render_template("admin_map.html")
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/templating.py", line 147, in render_template
+    return _render(app, template, context)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/templating.py", line 130, in _render
+    rv = template.render(context)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/var/www/u3085459/data/www/sosmark.ru/templates/admin_map.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "/var/www/u3085459/data/www/sosmark.ru/templates/base.html", line 78, in top-level template code
+    {% block content %}{% endblock %}
+  File "/var/www/u3085459/data/www/sosmark.ru/templates/admin_map.html", line 32, in block 'content'
+    <a href="{{ url_for('logout') }}">Выйти</a>
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 2034, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 2023, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/werkzeug/routing/map.py", line 917, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'logout'. Did you mean 'admin_logout' instead?
+2025-04-19 23:42:09,340 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 292, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 306, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 661, in admin_map
+    return render_template("admin_map.html")
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/templating.py", line 147, in render_template
+    return _render(app, template, context)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/templating.py", line 130, in _render
+    rv = template.render(context)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/var/www/u3085459/data/www/sosmark.ru/templates/admin_map.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "/var/www/u3085459/data/www/sosmark.ru/templates/base.html", line 78, in top-level template code
+    {% block content %}{% endblock %}
+  File "/var/www/u3085459/data/www/sosmark.ru/templates/admin_map.html", line 32, in block 'content'
+    <a href="{{ url_for('logout') }}">Выйти</a>
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 2034, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 2023, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/werkzeug/routing/map.py", line 917, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'logout'. Did you mean 'admin_logout' instead?
+2025-04-19 23:42:09,947 ERROR    [app] Unhandled exception:
+Traceback (most recent call last):
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 292, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 306, in decorated
+    return f(*args, **kwargs)
+  File "/var/www/u3085459/data/www/sosmark.ru/app.py", line 661, in admin_map
+    return render_template("admin_map.html")
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/templating.py", line 147, in render_template
+    return _render(app, template, context)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/templating.py", line 130, in _render
+    rv = template.render(context)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/var/www/u3085459/data/www/sosmark.ru/templates/admin_map.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "/var/www/u3085459/data/www/sosmark.ru/templates/base.html", line 78, in top-level template code
+    {% block content %}{% endblock %}
+  File "/var/www/u3085459/data/www/sosmark.ru/templates/admin_map.html", line 32, in block 'content'
+    <a href="{{ url_for('logout') }}">Выйти</a>
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 2034, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/flask/app.py", line 2023, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+  File "/var/www/u3085459/data/flaskenv/lib/python3.9/site-packages/werkzeug/routing/map.py", line 917, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'logout'. Did you mean 'admin_logout' instead?

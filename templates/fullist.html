@@ -1,16 +1,15 @@
 {% extends "base.html" %}
 
-{% block title %}ЧС Сосмарка - Полный список{% endblock %}
+{% block title %}ЧС Сосмарка – Полный список{% endblock %}
 
 {% block content %}
 <div class="container">
-  <h1>ПОЛНЫЙ СПИСОК</h1>
+  <h1>Полный список</h1>
   <input type="text" id="search-input" placeholder="Поиск по нику...">
   <ul id="blacklist">
     {% for player in players %}
       <li>
-        <!-- Изменение: используем nickname для получения аватара -->
-        <img src="https://minotar.net/helm/{{ player.nickname }}/100.png" alt="{{ player.nickname }}'s head">
+        <img class="avatar skeleton" data-src="{{ url_for('avatar', user_uuid=player.uuid) }}" alt="{{ player.nickname }}">
         <div class="player-info">
           <a href="https://namemc.com/profile/{{ player.uuid }}" target="_blank" rel="noopener noreferrer">
             {{ player.nickname }}
@@ -21,13 +20,9 @@
     {% endfor %}
   </ul>
 </div>
-<script>
-  // Небольшой скрипт для фильтрации списка на стороне клиента
-  document.getElementById("search-input").addEventListener("input", function() {
-    const term = this.value.toLowerCase();
-    document.querySelectorAll("#blacklist li").forEach(function(li) {
-      li.style.display = li.textContent.toLowerCase().includes(term) ? "" : "none";
-    });
-  });
-</script>
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <script src="{{ url_for('static', filename='js/filter-list.js') }}" defer></script>
 {% endblock %}

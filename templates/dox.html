@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Getcha — Сосмарк{% endblock %}
+
+{% block content %}
+  <div class="shmok-video-container">
+    <video
+      id="random-video"
+      controls autoplay loop
+      style="max-width:100%; height:auto; border-radius:8px;"
+    ></video>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <script src="{{ url_for('static', filename='js/random_video.js') }}" defer></script>
+{% endblock %}

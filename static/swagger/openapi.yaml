@@ -1,0 +1,145 @@
+openapi: 3.0.3
+info:
+  title: Blacklist Checker API
+  version: 1.0.0
+
+paths:
+  /api/check:
+    get:
+      summary: Проверить, в черном списке ли игрок
+      parameters:
+        - in: query
+          name: nickname
+          required: true
+          schema:
+            type: string
+          description: Никнейм игрока
+      responses:
+        '200':
+          description: Результат проверки
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  in_blacklist:
+                    type: boolean
+                  nickname:
+                    type: string
+                  uuid:
+                    type: string
+                  reason:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+        '400':
+          description: Ошибка валидации запроса
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/fullist:
+    get:
+      summary: Получить полный список черного списка
+      responses:
+        '200':
+          description: Список всех игроков в черном списке
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BlacklistEntry'
+
+  /api/uuid/{nickname}:
+    get:
+      summary: Получить UUID по никнейму
+      parameters:
+        - in: path
+          name: nickname
+          required: true
+          schema:
+            type: string
+          description: Никнейм игрока
+      responses:
+        '200':
+          description: UUID найден
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  nickname:
+                    type: string
+                  uuid:
+                    type: string
+        '404':
+          description: Игрок не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Ошибка при запросе к Mojang API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/avatar/{user_uuid}:
+    get:
+      summary: Получить Data URI PNG‑аватара игрока
+      parameters:
+        - in: path
+          name: user_uuid
+          required: true
+          schema:
+            type: string
+          description: UUID игрока
+      responses:
+        '200':
+          description: Успешный ответ с аватаром в формате data:image/png;base64
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  uuid:
+                    type: string
+                  avatar_base64:
+                    type: string
+        '404':
+          description: Аватар не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Внутренняя ошибка при получении аватара
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+
+    BlacklistEntry:
+      type: object
+      properties:
+        nickname:
+          type: string
+        uuid:
+          type: string
+        reason:
+          type: string
+        created_at:
+          type: string
+          format: date-time

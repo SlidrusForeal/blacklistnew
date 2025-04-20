@@ -2,344 +2,48 @@
 *,
 *::before,
 *::after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-:root {
-    --color-bg: #1a1a1a;
-    --color-bg-secondary: #2c2c2c;
-    --color-text: #f1f1f1;
-    --color-accent: #6186ff;
-    --transition-speed: 0.3s;
-    --animation-speed: 1s;
-    --font-primary: 'Poppins', sans-serif;
-    --admin-bg: #2b2b2b;       /* Фон для админ панелей */
-    --admin-border: #444;      /* Цвет границы */
-    --admin-button: #6186ff;   /* Цвет кнопок */
-    --admin-button-hover: #75c1ff; /* Цвет при наведении */
-}
 
 body {
-    font-family: var(--font-primary);
-    background-color: var(--color-bg);
-    color: var(--color-text);
-    line-height: 1.6;
-    padding: 0;
-    overflow-x: hidden;
+  font-family: 'Poppins', sans-serif;
+  background-color: #1a1a1a;
+  color: #f1f1f1;
+  line-height: 1.6;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Подключите шрифты */
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/Poppins.woff2') format('woff2');
+  font-display: swap;
 }
 
 /* Анимации */
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 @keyframes slideInDown {
-    from {
-        transform: translateY(-100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
+  from { transform: translateY(-100%); opacity: 0; }
+  to   { transform: translateY(0);      opacity: 1; }
 }
 
 @keyframes slideInUp {
-    from {
-        transform: translateY(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);   opacity: 1; }
 }
 
 .animated {
-    animation: fadeIn var(--animation-speed) ease-in-out;
-}
-
-/* Шапка сайта */
-header {
-    background-color: var(--color-bg-secondary, #2c2c2c);
-    padding: 15px 20px;
-    margin-bottom: 30px;
-}
-
-ul {
-    list-style: none;
-}
-
-header nav ul {
-    display: flex;
-    justify-content: center;
-    list-style: none;
-    gap: 30px;
-    padding: 0;
-    margin: 0;
-}
-
-header nav ul li a {
-    text-decoration: none;
-    color: var(--color-text, #f1f1f1);
-    padding: 8px 12px;
-    border-radius: 4px;
-    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
-}
-
-header nav ul li a:hover {
-    background-color: var(--color-accent, #6186ff);
-    color: var(--color-bg, #1a1a1a);
-}
-
-header nav ul li a.active {
-    background-color: var(--color-accent);
-    color: var(--color-bg);
-}
-
-/* Основной контейнер */
-.container {
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: var(--color-bg-secondary, #2c2c2c);
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    animation: fadeIn var(--animation-speed) ease-in-out;
-}
-
-.container h1 {
-    font-size: 2rem;
-    text-align: center;
-    margin-bottom: 20px;
-    color: var(--color-text, #f1f1f1);
-}
-
-/* Чекер */
-.checker h1 {
-    font-size: 2.5rem;
-    text-align: center;
-    margin-bottom: 20px;
-    animation: slideInDown 0.5s ease-out;
-}
-
-a {
-    text-decoration: none;
-    color: var(--color-text, #f1f1f1);
-}
-
-.checker p {
-    text-align: center;
-    font-size: 1.2rem;
-    margin-bottom: 20px;
-}
-
-/* Группа ввода */
-.input-group {
-    position: relative;
-    margin-bottom: 20px;
-}
-
-.input-group input[type="text"] {
-    width: 100%;
-    padding: 15px;
-    border: none;
-    border-radius: 50px;
-    background-color: #3a3a3a;
-    color: var(--color-text);
-    font-size: 1rem;
-    transition: box-shadow var(--transition-speed) ease-in-out;
-}
-
-.input-group input[type="text"]:focus {
-    outline: none;
-    box-shadow: 0 0 10px var(--color-accent);
-}
-
-.suggestions-container {
-    position: absolute;
-    top: 110%;
-    left: 0;
-    right: 0;
-    background-color: var(--color-bg-secondary);
-    border: 1px solid #555;
-    border-top: none;
-    border-radius: 0 0 10px 10px;
-    z-index: 100;
-    max-height: 200px;
-    overflow-y: auto;
-}
-
-/* Кнопка чекера */
-.btn-check {
-    display: block;
-    width: 100%;
-    padding: 15px;
-    background-color: var(--color-accent);
-    color: var(--color-bg);
-    font-size: 1.1rem;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: background-color var(--transition-speed) ease-in-out, transform var(--transition-speed) ease-in-out;
-    animation: fadeIn var(--animation-speed) ease-in-out;
-}
-
-.btn-check:hover {
-    background-color: #75c1ff;
-    transform: translateY(-3px);
-}
-
-/* Результаты */
-.result-container {
-    margin-top: 30px;
-    padding: 20px;
-    background-color: var(--color-bg);
-    border-radius: 8px;
-    font-size: 1rem;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    animation: fadeIn var(--animation-speed) ease-in-out;
-}
-
-/* Уведомления */
-.notification {
-    visibility: hidden;
-    min-width: 250px;
-    background-color: var(--color-bg-secondary, #2c2c2c);
-    color: var(--color-text, #f1f1f1);
-    text-align: center;
-    border-radius: 4px;
-    padding: 15px;
-    position: fixed;
-    left: 50%;
-    bottom: 30px;
-    transform: translateX(-50%);
-    z-index: 100;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-    animation: fadeIn 0.5s ease-in-out;
-    transition: visibility 0.3s, opacity 0.3s;
-    opacity: 0;
-}
-
-.notification.active {
-    visibility: visible;
-    opacity: 1;
-}
-
-/* Футер */
-footer {
-    text-align: center;
-    margin-top: 40px;
-    font-size: 0.9rem;
-    color: #bbb;
-    animation: fadeIn var(--animation-speed) ease-in-out;
-}
-
-/* Контактная информация */
-.contact-info {
-    background-color: var(--color-bg);
-    padding: 20px;
-    border-radius: 8px;
-    margin-top: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.contact-info ul {
-    margin-top: 15px;
-    padding-left: 25px;
-}
-
-li {
-    transition: background-color 0.2s ease;
-    border-radius: 4px;
-}
-
-li:hover {
-    background-color: rgba(97, 134, 255, 0.05);
-}
-
-/* Анимация при клике */
-li:active {
-    transform: scale(0.98);
-    transition: transform 0.1s ease;
-}
-
-.contact-info li {
-    position: relative;
-    transition: all var(--transition-speed) ease;
-    cursor: pointer;
-    padding: 12px;
-    margin-bottom: 10px;
-    background-color: var(--color-bg-secondary);
-    border-left: 4px solid transparent;
-}
-
-.contact-info li:hover {
-    background-color: #4a4a4a;
-    border-left-color: var(--color-accent);
-    transform: translateX(8px);
-    box-shadow: 0 4px 15px rgba(97, 134, 255, 0.2);
-}
-
-.contact-info li:hover {
-    transform: translateX(10px);
-}
-
-.contact-info a {
-    color: var(--color-accent);
-    text-decoration: none;
-}
-
-.contact-info a:hover {
-    text-decoration: underline;
-}
-
-/* Черный список */
-#blacklist {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-#blacklist li {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 15px;
-    margin: 10px 0;
-    background-color: var(--color-bg);
-    border-radius: 6px;
-    animation: slideInUp 0.5s ease-out;
-    border-bottom: 1px solid #444;
-    color: var(--color-text, #f1f1f1);
-    transition: all var(--transition-speed) ease;
-    padding: 15px;
-    border: 1px solid transparent;
-}
-
-#blacklist li:hover {
-    background-color: #3a3a3a;
-    border-color: var(--color-accent);
-    box-shadow: 0 2px 8px rgba(97, 134, 255, 0.15);
-}
-
-#blacklist li::before {
-    content: "⛔";
-    font-size: 1.4em;
-}
-
-/* Контейнер чекера */
-.checker-container {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
+  animation: fadeIn 1s ease-in-out;
 }
 
 .checker-container p {
@@ -348,54 +52,255 @@ li:active {
     font-size: 1.1rem;
 }
 
-/* Основной контейнер с анимацией */
-main.container {
-    animation: fadeIn 0.8s ease-out;
+p {
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    unicode-bidi: isolate;
 }
 
-/* Адаптивный дизайн */
-@media (max-width: 768px) {
-    .container {
-        padding: 20px;
-        margin: 15px;
-    }
-
-    .nav-list {
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    .checker h1 {
-        font-size: 2rem;
-    }
-
-    .btn-check {
-        font-size: 1rem;
-        padding: 12px;
-    }
+/* Шапка сайта */
+header {
+  background-color: #2c2c2c;
+  padding: 15px 20px;
+  margin-bottom: 30px;
 }
 
-@media (max-width: 480px) {
-    .contact-info li {
-        font-size: 0.9rem;
-        word-break: break-all;
-    }
-
-    #blacklist li {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+header nav ul {
+  display: flex;
+  justify-content: space-around;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
+header nav ul li {
+  flex: 1;
+  text-align: center;
+}
+
+header nav ul li a {
+  display: block;
+  text-decoration: none;
+  color: #f1f1f1;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+
+header nav ul li a:hover,
+header nav ul li a.active {
+  background-color: #6186ff;
+  color: #1a1a1a;
+}
+
+/* Основной контейнер */
+.container {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #2c2c2c;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  animation: fadeIn 1s ease-in-out;
+}
+
+.container h1 {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 20px;
+  color: #f1f1f1;
+}
+
+/* Чекер */
+.checker h1 {
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 20px;
+  animation: slideInDown 0.5s ease-out;
+}
+
+.checker p {
+  text-align: center;
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.input-group input[type="text"],
+.input-group input[type="password"],
+.input-group select {
+  width: 100%;
+  padding: 15px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 50px;
+  background-color: #3a3a3a;
+  color: #f1f1f1;
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+  outline: none;
+  box-shadow: 0 0 10px #6186ff;
+}
+
+/* Кнопка чекера */
+.btn-check {
+  display: block;
+  width: 100%;
+  padding: 15px;
+  background-color: #6186ff;
+  color: #1a1a1a;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  animation: fadeIn 1s ease-in-out;
+}
+
+.btn-check:hover {
+  background-color: #75c1ff;
+  transform: translateY(-3px);
+}
+
+/* Результаты */
+.result-container {
+  margin-top: 30px;
+  padding: 20px;
+  background-color: #1a1a1a;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  animation: fadeIn 1s ease-in-out;
+}
+
+/* Уведомления */
+.notification {
+  visibility: hidden;
+  min-width: 250px;
+  background-color: #2c2c2c;
+  color: #f1f1f1;
+  text-align: center;
+  border-radius: 4px;
+  padding: 15px;
+  position: fixed;
+  left: 50%;
+  bottom: 30px;
+  transform: translateX(-50%);
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  animation: fadeIn 0.5s ease-in-out;
+  transition: visibility 0.3s, opacity 0.3s;
+  opacity: 0;
+}
+
+.notification.active {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  margin-top: 40px;
+  font-size: 0.9rem;
+  color: #bbb;
+  animation: fadeIn 1s ease-in-out;
+}
+
+/* Контактная информация */
+.contact-info {
+  background-color: #1a1a1a;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 20px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.contact-info ul {
+  margin-top: 15px;
+  padding-left: 25px;
+}
+
+.contact-info li {
+  position: relative;
+  cursor: pointer;
+  padding: 12px;
+  margin-bottom: 10px;
+  background-color: #2c2c2c;
+  border-left: 4px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.contact-info li:hover {
+  background-color: #4a4a4a;
+  border-left-color: #6186ff;
+  transform: translateX(8px);
+  box-shadow: 0 4px 15px rgba(97,134,255,0.2);
+}
+
+.contact-info a {
+  color: #6186ff;
+  text-decoration: none;
+}
+
+.contact-info a:hover {
+  text-decoration: underline;
+}
+
+/* Черный список */
+#blacklist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#blacklist li {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    margin: 10px 0;
+    background-color: #1a1a1a;
+    border-radius: 6px;
+    animation: slideInUp 0.5s ease-out;
+    border-bottom: 1px solid #444;
+    color: #6186ff #f1f1f1);
+    transition: all 0.3s ease;
+    padding: 15px;
+    border: 1px solid transparent;
+}
+
+#blacklist li:hover {
+  background-color: #3a3a3a;
+  border-color: #6186ff;
+  box-shadow: 0 2px 8px rgba(97,134,255,0.15);
+}
+
+#blacklist li::before {
+  content: "⛔";
+  font-size: 1.4em;
+}
+
+/* Поиск */
 #search-input {
   width: 100%;
   padding: 12px 20px;
   border: 1px solid #444;
   border-radius: 50px;
   background-color: #3a3a3a;
-  color: var(--color-text, #f1f1f1);
+  color: #f1f1f1;
   font-size: 1rem;
-  transition: box-shadow 0.3s ease-in-out, border-color 0.3s ease-in-out;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 #search-input::placeholder {
@@ -404,146 +309,214 @@ main.container {
 
 #search-input:focus {
   outline: none;
-  border-color: var(--color-accent, #6186ff);
-  box-shadow: 0 0 10px var(--color-accent, #6186ff);
+  border-color: #6186ff;
+  box-shadow: 0 0 10px #6186ff;
   background-color: #444;
 }
 
-/* Стили для админ панелей */
+/* Admin */
 .admin-container {
-    background-color: var(--admin-bg);
-    border: 1px solid var(--admin-border);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-    padding: 30px;
-    border-radius: 8px;
-    margin: 30px auto;
-    max-width: 900px;
+  background-color: #2b2b2b;
+  border: 1px solid #444;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  padding: 30px;
+  border-radius: 8px;
+  margin: 30px auto;
+  max-width: 900px;
 }
 
 .admin-container h1 {
-    font-size: 2.5rem;
-    text-align: center;
-    margin-bottom: 20px;
-    color: var(--color-text);
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 20px;
+  color: #f1f1f1;
 }
 
 .admin-container .input-group input,
 .admin-container .input-group select {
-    width: 100%;
+  width: 100%;
+  padding: 15px;
+  font-size: 1rem;
+  border: 1px solid #555;
+  border-radius: 4px;
+  background-color: #3a3a3a;
+  color: #f1f1f1;
+  margin-bottom: 15px;
+}
+
+.admin-container .btn-check {
+  background-color: #6186ff;
+  color: #1a1a1a;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.admin-container .btn-check:hover {
+  background-color: #75c1ff;
+  transform: translateY(-3px);
+}
+
+/* Video page */
+.shmok-video-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 40px auto;
+  max-width: 800px;
+  padding: 20px;
+  background-color: #2c2c2c;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  animation: fadeIn 1s ease-in-out;
+}
+
+.shmok-video-container video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.shmok-video-container video:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.7);
+}
+
+/* Адаптив */
+@media (max-width: 768px) {
+  .container,
+  .input-group,
+  .checker-container {
+    margin: 15px;
     padding: 15px;
-    font-size: 1rem;
-    border: 1px solid #555;
-    border-radius: 4px;
-    background-color: #3a3a3a;
-    color: var(--color-text);
-    margin-bottom: 15px;
+  }
 }
 
-.admin-container .btn-check {
-    background-color: var(--admin-button);
-    color: var(--color-bg);
-    padding: 12px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1.1rem;
-    transition: background-color 0.3s ease;
-}
-
-.admin-container .btn-check:hover {
-    background-color: var(--admin-button-hover);
-}
-
-.admin-container a.btn-check {
-    display: inline-block;
-    margin-top: 10px;
-    text-decoration: none;
-}
-/* Стили для кнопок в админ панели */
-.admin-container .btn-check {
-    background-color: #6186ff;  /* Яркий акцентный синий */
-    color: #ffffff;             /* Белый текст */
-    padding: 12px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1.1rem;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-}
-
-.admin-container .btn-check:hover {
-    background-color: #75c1ff;
-    transform: translateY(-3px);
-}
-
-/* Обновленные стили для админ-контейнера уже были приведены ранее */
-.admin-container {
-    background-color: var(--admin-bg);
-    border: 1px solid var(--admin-border);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-    padding: 30px;
-    border-radius: 8px;
-    margin: 30px auto;
-    max-width: 900px;
-}
-
-/* Кнопки в админ панели (уже описанные) */
-.admin-container .btn-check {
-    background-color: var(--admin-button);
-    color: #ffffff;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1.1rem;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-}
-
-.admin-container .btn-check:hover {
-    background-color: var(--admin-button-hover);
-}
-
-
-/* --------------------------------------------------
-   Отображение информации о игроке в fullist.html
-   -------------------------------------------------- */
-.player-info {
-    display: flex;
+@media (max-width: 480px) {
+  header nav ul {
     flex-direction: column;
-    justify-content: center;
-    flex: 1;
-    gap: 4px;
+  }
+  header nav ul li {
+    margin-bottom: 10px;
+  }
+  header nav ul li:last-child {
+    margin-bottom: 0;
+  }
+}
+
+a {
+    text-decoration: none;
+    color: #6186ff, #f1f1f1;
 }
 
 .player-info a {
     font-weight: bold;
     font-size: 1.1rem;
-    color: var(--color-accent);
+    color: #6186ff;
 }
 
-.player-info p {
-    font-size: 0.9rem;
-    color: #ccc;
-    margin: 0;
+/* ─────────────── Управление пользователями ─────────────── */
+.admin-container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background-color: #2c2c2c;
+  color: #f1f1f1;
 }
 
-/* --------------------------------------------------
-   Общие стили для password и select в .input-group
-   -------------------------------------------------- */
-.input-group input[type="password"],
-.input-group select {
-    width: 100%;
-    padding: 15px;
-    font-size: 1rem;
-    border: none;
-    border-radius: 50px;
-    background-color: #3a3a3a;
-    color: var(--color-text);
-    transition: box-shadow var(--transition-speed) ease-in-out;
+.admin-container thead tr {
+  background-color: #2b2b2b;
 }
 
-.input-group input[type="password"]:focus,
-.input-group select:focus {
-    outline: none;
-    box-shadow: 0 0 10px var(--color-accent);
+.admin-container th,
+.admin-container td {
+  padding: 10px;
+  border: 1px solid #444;
+  text-align: left;
+  font-size: 0.95rem;
+}
+
+.admin-container th {
+  font-weight: 600;
+}
+
+.admin-container td:last-child {
+  text-align: center;
+}
+
+/* Зебра для строк */
+.admin-container tbody tr:nth-child(odd) {
+  background-color: #1f1f1f;
+}
+.admin-container tbody tr:nth-child(even) {
+  background-color: #292929;
+}
+
+/* Ховер для строк */
+.admin-container tbody tr:hover {
+  background-color: #3a3a3a;
+}
+
+.table-responsive {
+  overflow-x: auto;
+  margin-top: 20px;
+}
+
+/* сама таблица */
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; /* фиксирует колонки */
+}
+
+.users-table th,
+.users-table td {
+  padding: 10px;
+  border: 1px solid #444; /* или ваш цвет */
+  text-align: left;
+  vertical-align: top;
+  white-space: normal;    /* разрешает перенос строк */
+  word-wrap: break-word;  /* устаревший, но для совместимости */
+  overflow-wrap: anywhere;/* переносит длинные слова */
+}
+
+/* конкретно для колонки с хэшем */
+.users-table .hash-cell {
+  max-width: 250px;       /* ваша желаемая ширина */
+  font-family: monospace; /* чтобы было видно, что это хэш */
+}
+
+/* Кнопка удаления */
+.btn-delete {
+  display: inline-block;
+  padding: 8px 16px;
+  background-color: #c0392b;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease;
+  text-decoration: none;
+}
+
+.btn-delete:hover {
+  background-color: #e74c3c;
+}
+
+.skeleton {
+  background: #eee;
+  height: 100px;
+  width: 100px;
+  animation: pulse 1.2s infinite ease-in-out;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1 }
+  50%      { opacity: 0.4 }
 }

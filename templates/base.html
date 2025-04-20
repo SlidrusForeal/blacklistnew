@@ -3,10 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  {# Child templates can override the page_title variable if desired #}
+  {# Child templates can override this #}
   {% set page_title = page_title|default("ЧС Сосмарка") %}
   <title>{{ page_title }}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy"
+      content="default-src 'self';
+               img-src 'self' data: https://minotar.net https://avatars.githubusercontent.com;
+               script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com;
+               style-src 'self' 'unsafe-inline';
+               connect-src 'self' https://api.mojang.com https://api.minecraftservices.com;
+               upgrade-insecure-requests;">
 
   <!-- SEO Meta Tags -->
   <meta name="description" content="Проверьте наличие вашего никнейма в черном списке Сосмаркской Империи. Мгновенная проверка и актуальные данные.">
@@ -14,7 +21,7 @@
   <meta name="robots" content="index, follow">
   <meta name="author" content="Сосмарк">
 
-  <!-- Open Graph Meta Tags -->
+  <!-- Open Graph -->
   <meta property="og:site_name" content="ЧС Сосмарка">
   <meta property="og:title" content="{{ page_title }}">
   <meta property="og:description" content="Проверьте наличие вашего никнейма в черном списке Сосмаркской Империи.">
@@ -23,14 +30,26 @@
   <meta property="og:image" content="{{ url_for('static', filename='icons/og-image.png') }}">
   <meta property="og:locale" content="ru_RU">
 
-  <!-- PWA and Icons -->
+  <!-- PWA & Icons -->
+  <meta name="theme-color" content="#1a1a1a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/apple-touch-icon.png') }}">
+  <link rel="apple-touch-startup-image" href="{{ url_for('static', filename='icons/apple-touch-icon.png') }}">
   <link rel="icon" href="{{ url_for('static', filename='icons/favicon.ico') }}" type="image/x-icon">
   <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
 
   <!-- CSS -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
+  <!-- preconnect для внешних хостов аватарок и шрифтов -->
+  <link rel="preconnect" href="https://minotar.net">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+
+  <!-- preload основного шрифта -->
+  <link rel="preload" href="{{ url_for('static', filename='fonts/Poppins.woff2') }}" as="font" type="font/woff2" crossorigin>
+  <script src="{{ url_for('static', filename='js/sw-register.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/confetti.browser.min.js') }}" defer></script>
   {% block head %}{% endblock %}
 </head>
 <body>
@@ -49,26 +68,19 @@
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       <div class="notification">
-      {% for category, message in messages %}
-        <p class="{{ category }}">{{ message }}</p>
-      {% endfor %}
+        {% for category, message in messages %}
+          <p class="{{ category }}">{{ message }}</p>
+        {% endfor %}
       </div>
     {% endif %}
   {% endwith %}
 
   {% block content %}{% endblock %}
 
-  <footer>
-    <p>&copy; <span id="year">{{ current_year() }}</span> Сосмарк. Все права защищены.</p>
+  <footer role="contentinfo">
+    <p>&copy; {{ current_year() }} Сосмарк. Все права защищены.</p>
   </footer>
 
-  <!-- Service Worker registration -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('{{ url_for("static", filename="service-worker.js") }}')
-        .then(reg => console.log("✅ Service Worker зарегистрирован", reg))
-        .catch(err => console.error("❌ Service Worker ошибка", err));
-    }
-  </script>
+  {% block scripts %}{% endblock %}
 </body>
 </html>

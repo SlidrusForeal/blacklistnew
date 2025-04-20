@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Карта NoSos{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='leaflet/leaflet.css') }}">
+  <script src="{{ url_for('static', filename='leaflet/leaflet.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/leaflet-heat.js') }}"></script>
+  <style>
+    .map-container { display: flex; gap: 20px; }
+    #map { flex: 1; height: 600px; background: #000; }
+    #sidebar { width: 300px; max-height: 600px; overflow-y: auto; background: #111; color: #fff; padding: 10px; border-radius: 8px; }
+    #sidebar h2 { margin-top: 0; }
+    #player-list { list-style: none; padding: 0; margin: 0; }
+    #player-list li { margin-bottom: 10px; font-size: 0.9rem; }
+    .leaflet-container { background: #000 !important; }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <h1>Карта игроков с модом NoSos</h1>
+  <div class="map-container">
+    <div id="map"></div>
+    <div id="sidebar">
+      <h2>Активные игроки</h2>
+      <ul id="player-list"></ul>
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const map = L.map('map', {
+    crs: L.CRS.Simple,
+    zoomControl: true,
+    attributionControl: false,
+    minZoom: -5,
+    maxZoom: 5
+  });
+  const WORLD = 5000;
+  const bounds = [[-WORLD, -WORLD], [WORLD, WORLD]];
+  map.fitBounds(bounds);
+  map.setMaxBounds(bounds);
+
+  function drawChunkGrid() {
+    const step = 16;
+    const style = { color: '#333', weight: 1, opacity: 0.3 };
+    for (let i = -WORLD; i <= WORLD; i += step) {
+      L.polyline([[i, -WORLD], [i, WORLD]], style).addTo(map);
+      L.polyline([[-WORLD, i], [WORLD, i]], style).addTo(map);
+    }
+  }
+
+  let markers = [], heatLayer;
+  function loadLocations() {
+    fetch("/api/locations/view")
+      .then(r => r.json())
+      .then(data => {
+        markers.forEach(m => map.removeLayer(m));
+        markers = [];
+        const heatPoints = [];
+        data.forEach(p => {
+          const lat = p.z, lng = p.x;
+          const m = L.circleMarker([lat, lng], { radius: 6, color: '#0f0', fillColor: '#0f0', fillOpacity: 0.7 })
+            .bindPopup(`UUID: ${p.uuid}<br>x:${p.x}, z:${p.z}`);
+          m.addTo(map);
+          markers.push(m);
+          heatPoints.push([lat, lng, 1]);
+        });
+        if (heatLayer) map.removeLayer(heatLayer);
+        heatLayer = L.heatLayer(heatPoints, { radius: 25, blur: 15, maxZoom: 5, gradient: {0.4:'blue',0.6:'lime',0.9:'red'} }).addTo(map);
+      });
+  }
+
+  drawChunkGrid();
+  loadLocations();
+  setInterval(loadLocations, 1000);
+</script>
+{% endblock %}

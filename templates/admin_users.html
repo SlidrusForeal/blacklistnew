@@ -1,36 +1,36 @@
 {% extends "base.html" %}
-
 {% block title %}Управление пользователями{% endblock %}
 
 {% block content %}
 <main class="container admin-container">
   <h1>Управление пользователями</h1>
-  
   <a href="{{ url_for('admin_panel') }}" class="btn-check">Назад в админ панель</a>
-  
+
   {% if users %}
-    <table style="width:100%; border-collapse: collapse; margin-top: 20px;">
+  <div class="table-responsive">
+    <table class="users-table">
       <thead>
-        <tr style="background-color: var(--admin-bg); color: var(--color-text);">
-          <th style="padding: 10px; border: 1px solid var(--admin-border);">ID</th>
-          <th style="padding: 10px; border: 1px solid var(--admin-border);">Логин</th>
-          <th style="padding: 10px; border: 1px solid var(--admin-border);">Роль</th>
-          <th style="padding: 10px; border: 1px solid var(--admin-border);">Пароль (хэш)</th>
-          <th style="padding: 10px; border: 1px solid var(--admin-border);">Действие</th>
+        <tr>
+          <th>ID</th>
+          <th>Логин</th>
+          <th>Роль</th>
+          <th>Пароль (хэш)</th>
+          <th>Действие</th>
         </tr>
       </thead>
       <tbody>
         {% for user in users %}
-        <tr style="background-color: var(--color-bg-secondary); color: var(--color-text);">
-          <td style="padding: 10px; border: 1px solid var(--admin-border);">{{ user.id }}</td>
-          <td style="padding: 10px; border: 1px solid var(--admin-border);">{{ user.username }}</td>
-          <td style="padding: 10px; border: 1px solid var(--admin-border);">{{ user.role }}</td>
-          <td style="padding: 10px; border: 1px solid var(--admin-border); word-break: break-all;">{{ user.password_hash }}</td>
-          <td style="padding: 10px; border: 1px solid var(--admin-border); text-align:center;">
-            {% if user.username != session.admin_user %}
-            <form method="POST" action="{{ url_for('delete_user', user_id=user.id) }}">
-              <button type="submit" class="btn-check" style="background-color: red;">Удалить</button>
-            </form>
+        <tr>
+          <td>{{ user.id }}</td>
+          <td>{{ user.username }}</td>
+          <td>{{ user.role }}</td>
+          <td class="hash-cell">{{ user.password_hash }}</td>
+          <td>
+            {% if user.username != current_user %}
+              <form method="POST" action="{{ url_for('delete_user', user_id=user.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn-delete">Удалить</button>
+              </form>
             {% else %}
               <span>Нельзя удалить</span>
             {% endif %}
@@ -39,9 +39,9 @@
         {% endfor %}
       </tbody>
     </table>
+  </div>
   {% else %}
     <p>Пользователи отсутствуют.</p>
   {% endif %}
-  
 </main>
 {% endblock %}

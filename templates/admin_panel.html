@@ -1,6 +1,4 @@
-{# templates/admin_panel.html #}
 {% extends "base.html" %}
-
 {% block title %}Админ панель{% endblock %}
 
 {% block content %}
@@ -8,18 +6,17 @@
   <h1>Админ панель</h1>
   <a href="{{ url_for('admin_logout') }}" class="btn-check">Выйти</a>
 
-  {% if session.admin_role == 'owner' %}
+  {% if current_role == 'owner' %}
     <p><a href="{{ url_for('admin_register') }}" class="btn-check">Регистрация нового пользователя</a></p>
     <p><a href="{{ url_for('admin_whitelist') }}" class="btn-check">Редактор whitelist</a></p>
     <p><a href="{{ url_for('admin_users') }}" class="btn-check">Управление пользователями</a></p>
     <form method="POST" action="{{ url_for('update_nicknames') }}" style="margin-top:20px;">
-      <!-- Скрытое поле CSRF -->
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <button type="submit" class="btn-check">Обновить ники</button>
     </form>
   {% endif %}
 
-  {% if session.admin_role in ['owner','admin'] %}
+  {% if current_role in ['owner','admin'] %}
     <h2>Добавить запись в черный список</h2>
     <form method="POST" action="{{ url_for('admin_panel') }}">
       {{ form.hidden_tag() }}
@@ -40,15 +37,18 @@
     {% for entry in entries %}
       <li>
         {{ entry.nickname }} – {{ entry.reason }}
-        {% if session.admin_role in ['owner','admin'] %}
+        {% if current_role in ['owner','admin'] %}
           <form method="POST" action="{{ url_for('delete_entry', entry_id=entry.id) }}" style="display:inline;">
-            <!-- Скрытое поле CSRF -->
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button type="submit" class="btn-check" style="background-color:red;">Удалить</button>
           </form>
+          <form method="POST" action="{{ url_for('update_nickname', entry_id=entry.id) }}" style="display:inline; margin-left:5px;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn-check">Обновить ник</button>
+          </form>
         {% endif %}
-        {% if session.admin_role in ['owner','admin','moderator'] %}
-          <a href="{{ url_for('update_reason', entry_id=entry.id) }}" class="btn-check">Изменить причину</a>
+        {% if current_role in ['owner','admin','moderator'] %}
+          <a href="{{ url_for('update_reason', entry_id=entry.id) }}" class="btn-check" style="margin-left:5px;">Изменить причину</a>
         {% endif %}
       </li>
     {% endfor %}

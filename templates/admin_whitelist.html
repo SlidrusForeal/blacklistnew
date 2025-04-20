@@ -1,6 +1,4 @@
-{# templates/admin_whitelist.html #}
 {% extends "base.html" %}
-
 {% block title %}Редактор whitelist{% endblock %}
 
 {% block content %}
@@ -8,15 +6,13 @@
   <h1>Редактор whitelist</h1>
   <a href="{{ url_for('admin_panel') }}" class="btn-check">Назад в админ панель</a>
 
-  <h2>Добавить/удалить UUID в whitelist</h2>
+  <h2>Добавить / удалить UUID</h2>
   <form method="POST" action="{{ url_for('admin_whitelist') }}">
     {{ form.hidden_tag() }}
     <div class="input-group">
-      {{ form.uuid(placeholder="Введите UUID") }}
+      {{ form.uuid(placeholder="UUID") }}
     </div>
-    <div class="input-group">
-      {{ form.action() }}
-    </div>
+    {{ form.action() }}
     {{ form.submit(class="btn-check") }}
   </form>
 
@@ -24,7 +20,14 @@
   {% if whitelist %}
     <ul>
       {% for u in whitelist %}
-        <li>{{ u }}</li>
+        <li>
+          {{ u }}
+          <form method="POST" action="{{ url_for('admin_whitelist') }}" style="display:inline;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="uuid" value="{{ u }}">
+            <button type="submit" name="action" value="delete" class="btn-check" style="background-color:red;">Удалить</button>
+          </form>
+        </li>
       {% endfor %}
     </ul>
   {% else %}
