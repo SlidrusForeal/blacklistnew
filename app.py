@@ -17,7 +17,7 @@ import requests
 from flask import (
     Flask, render_template, redirect,
     url_for, flash, request, abort,
-    jsonify, Response, make_response, g
+    jsonify, Response, make_response, g, send_from_directory
 )
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt, set_access_cookies, get_jwt_identity, unset_jwt_cookies, verify_jwt_in_request
 from flask_sqlalchemy import SQLAlchemy
@@ -45,7 +45,10 @@ app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 app.config['JWT_ACCESS_COOKIE_PATH'] = '/'
 app.config['JWT_COOKIE_CSRF_PROTECT'] = True
-app.config['GUTHUB_SECRET'] = os.getenv('WEBHOOK_SECRET')
+app.config['GITHUB_SECRET'] = os.getenv('WEBHOOK_SECRET', '')
+if not app.config['GITHUB_SECRET']:
+    raise RuntimeError("WEBHOOK_SECRET not set in .env")
+secret = app.config['GITHUB_SECRET'].encode('utf-8')
 
 # ─────────────── Настройка логирования ───────────────
 # Создаём папку для логов, если её нет
@@ -407,10 +410,25 @@ def offline():
 
 
 # ─────────────── Ошибки ───────────────
-for code in [400, 401, 403, 404, 500]:
-    @app.errorhandler(code)
-    def error_page(error, code=code):
-        return render_template(f"{code}.html"), code
+@app.errorhandler(400)
+def bad_request(error):
+    return render_template('400.html'), 400
+
+@app.errorhandler(401)
+def unauthorized(error):
+    return render_template('401.html'), 401
+
+@app.errorhandler(403)
+def forbidden(error):
+    return render_template('403.html'), 403
+
+@app.errorhandler(404)
+def not_found(error):
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def server_error(error):
+    return render_template('500.html'), 500
 
 
 # Контекстный процессор для получения текущего года
@@ -617,13 +635,31 @@ def delete_user(user_id):
 
 @app.before_request
 def block_sensitive_paths():
-    if request.path == '/.env':
-        abort(403)
-    if request.path.startswith('/asuka'):
-        abort(403)
-    if any(request.path.startswith(p) for p in ["/.git", "/.aws", "/wp-", "/.ht", "/config", "/settings"]):
+    p = request.path
+    forbidden = [
+        '/.env',
+        '/asuka',
+        '/.git', '/.aws', '/wp-', '/.ht', '/config', '/settings'
+    ]
+    # точное совпадение или префикс
+    if any(p == f or p.startswith(f) for f in forbidden):
         abort(403)
 
+@app.route('/sitemap.xml', methods=['GET'])
+def sitemap():
+    return send_from_directory(
+        os.path.join(app.root_path, ''),  # корень проекта
+        'sitemap.xml',
+        mimetype='application/xml'
+    )
+
+@app.route('/robots.txt', methods=['GET'])
+def robots():
+    return send_from_directory(
+        os.path.join(app.root_path, ''),  # корень проекта
+        'robots.txt',
+        mimetype='text/plain'
+    )
 
 @app.route('/dashboard')
 @app.route('/login')
@@ -880,19 +916,34 @@ def api_locations_report():
 
     return jsonify({"success": True}), 200
 
-@app.route('/github-webhook', methods=['POST'])
+@csrf.exempt
+@app.route('/github-webhook', methods=['GET', 'POST'])
 def hook():
-    # Получаем секрет из конфигурации
-    secret = app.config['GITHUB_SECRET'].encode('utf-8')
+    # GitHub Ping
+    if request.method == 'GET':
+        return 'pong', 200
 
-    signature = request.headers.get('X-Hub-Signature-256', '')
-    mac = 'sha256=' + hmac.new(secret, request.data, hashlib.sha256).hexdigest()
-    if not hmac.compare_digest(mac, signature):
+    # Проверяем подпись POST
+    secret = app.config['GITHUB_SECRET'].encode('utf-8')
+    data = request.get_data()
+    sig256 = request.headers.get('X-Hub-Signature-256', '')
+    sig1   = request.headers.get('X-Hub-Signature', '')
+
+    valid = False
+    if sig256.startswith('sha256='):
+        expected = 'sha256=' + hmac.new(secret, data, hashlib.sha256).hexdigest()
+        valid = hmac.compare_digest(expected, sig256)
+    elif sig1.startswith('sha1='):
+        expected = 'sha1=' + hmac.new(secret, data, hashlib.sha1).hexdigest()
+        valid = hmac.compare_digest(expected, sig1)
+
+    if not valid:
         abort(403)
 
-    # Всё ок — вызываем скрипт обновления
+    # Всё ок — запускаем скрипт из корня проекта
+    script_path = os.path.join(os.path.dirname(__file__), 'github‑webhook.sh')
     subprocess.Popen(
-        ['/usr/local/bin/github-webhook.sh'],
+        [script_path],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL
     )
