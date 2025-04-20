@@ -45,7 +45,10 @@ app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 app.config['JWT_ACCESS_COOKIE_PATH'] = '/'
 app.config['JWT_COOKIE_CSRF_PROTECT'] = True
-app.config['GUTHUB_SECRET'] = os.getenv('WEBHOOK_SECRET')
+app.config['GITHUB_SECRET'] = os.getenv('WEBHOOK_SECRET', '')
+if not app.config['GITHUB_SECRET']:
+    raise RuntimeError("WEBHOOK_SECRET not set in .env")
+secret = app.config['GITHUB_SECRET'].encode('utf-8')
 
 # ─────────────── Настройка логирования ───────────────
 # Создаём папку для логов, если её нет
@@ -880,17 +883,30 @@ def api_locations_report():
 
     return jsonify({"success": True}), 200
 
+# Кастомная ошибка 403
+@app.errorhandler(403)
+def forbidden(e):
+    return render_template('403.html'), 403
+
 @app.route('/github-webhook', methods=['POST'])
 def hook():
-    # Получаем секрет из конфигурации
-    secret = app.config['GITHUB_SECRET'].encode('utf-8')
+    data = request.data
+    # GitHub может прислать и sha256, и sha1
+    sig256 = request.headers.get('X-Hub-Signature-256', '')
+    sig1   = request.headers.get('X-Hub-Signature', '')
 
-    signature = request.headers.get('X-Hub-Signature-256', '')
-    mac = 'sha256=' + hmac.new(secret, request.data, hashlib.sha256).hexdigest()
-    if not hmac.compare_digest(mac, signature):
+    valid = False
+    if sig256.startswith('sha256='):
+        expected256 = 'sha256=' + hmac.new(secret, data, hashlib.sha256).hexdigest()
+        valid = hmac.compare_digest(expected256, sig256)
+    elif sig1.startswith('sha1='):
+        expected1 = 'sha1=' + hmac.new(secret, data, hashlib.sha1).hexdigest()
+        valid = hmac.compare_digest(expected1, sig1)
+
+    if not valid:
         abort(403)
 
-    # Всё ок — вызываем скрипт обновления
+    # Подпись верная — запускаем обновление
     subprocess.Popen(
         ['/usr/local/bin/github-webhook.sh'],
         stdout=subprocess.DEVNULL,
