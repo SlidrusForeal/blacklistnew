@@ -902,6 +902,7 @@ def api_locations_report():
 @app.errorhandler(403)
 def forbidden(e):
     return render_template('403.html'), 403
+<<<<<<< HEAD
 
 @csrf.exempt
 @app.route('/github-webhook', methods=['GET', 'POST'])
@@ -922,12 +923,38 @@ def hook():
     elif signature1.startswith('sha1='):
         expected = 'sha1=' + hmac.new(secret, data, hashlib.sha1).hexdigest()
         valid = hmac.compare_digest(expected, signature1)
+=======
+
+@app.route('/github-webhook', methods=['POST'])
+def hook():
+    data = request.data
+    # GitHub может прислать и sha256, и sha1
+    sig256 = request.headers.get('X-Hub-Signature-256', '')
+    sig1   = request.headers.get('X-Hub-Signature', '')
+
+    valid = False
+    if sig256.startswith('sha256='):
+        expected256 = 'sha256=' + hmac.new(secret, data, hashlib.sha256).hexdigest()
+        valid = hmac.compare_digest(expected256, sig256)
+    elif sig1.startswith('sha1='):
+        expected1 = 'sha1=' + hmac.new(secret, data, hashlib.sha1).hexdigest()
+        valid = hmac.compare_digest(expected1, sig1)
+>>>>>>> 47bcf6dca76aad8c9abfacd6fe723a0fbdf23a7c
 
     if not valid:
         abort(403)
 
+<<<<<<< HEAD
     subprocess.Popen(['/usr/local/bin/github-webhook.sh'],
                      stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+=======
+    # Подпись верная — запускаем обновление
+    subprocess.Popen(
+        ['/usr/local/bin/github-webhook.sh'],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL
+    )
+>>>>>>> 47bcf6dca76aad8c9abfacd6fe723a0fbdf23a7c
     return '', 204
     
 @app.after_request
