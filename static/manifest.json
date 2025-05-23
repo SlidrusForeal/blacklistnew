@@ -1,43 +1,40 @@
 {
   "name": "ЧС Сосмарка",
-  "short_name": "Сосмарк ЧС",
-  "description": "Проверка и просмотр Чёрного Списка Сосмаркской Империи",
+  "short_name": "ЧС",
+  "description": "Черный список Сосмаркской Империи",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#1a1a1a",
-  "theme_color": "#2b2b2b",
-  "lang": "ru-RU",
+  "background_color": "#ffffff",
+  "theme_color": "#1a1a1a",
   "icons": [
     {
-      "src": "/static/icons/android-chrome-192x192.png",
+      "src": "/static/icons/icon-192x192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "/static/icons/icon512_maskable.png",
+      "src": "/static/icons/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "/static/icons/icon512_rounded.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    },
-    {
-      "src": "/static/icons/apple-touch-icon.ico",
-      "sizes": "180x180",
-      "type": "image/x-icon"
-    },
-    {
-      "src": "/static/icons/favicon.ico",
-      "sizes": "48x48",
-      "type": "image/x-icon"
-    },
-    {
-      "src": "/static/icons/og-image.png",
-      "sizes": "1200x630",
-      "type": "image/png"
+      "purpose": "any maskable"
     }
-  ]
+  ],
+  "orientation": "portrait",
+  "prefer_related_applications": false,
+  "categories": ["utilities", "social"],
+  "shortcuts": [
+    {
+      "name": "Проверить никнейм",
+      "url": "/?source=pwa",
+      "description": "Проверить никнейм в черном списке"
+    },
+    {
+      "name": "Полный список",
+      "url": "/fullist?source=pwa",
+      "description": "Посмотреть полный черный список"
+    }
+  ],
+  "lang": "ru",
+  "dir": "ltr"
 }

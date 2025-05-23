@@ -99,7 +99,7 @@ LOG_CONFIG = {
 }
 logging.config.dictConfig(LOG_CONFIG)
 
-# также направляем werkzeug (Flask’s HTTP request log) в ту же систему
+# также направляем werkzeug (Flask's HTTP request log) в ту же систему
 logging.getLogger('werkzeug').handlers = logging.getLogger().handlers
 logging.getLogger('werkzeug').setLevel(logging.INFO)
 # ─────────────── Расширения ───────────────
@@ -716,23 +716,63 @@ def api_check():
 def admin_map():
     return render_template("admin_map.html")
 
-@app.route("/api/fullist", methods=["GET"])
+@app.route('/api/fullist')
 def api_full_blacklist():
-    """
-    Публичный JSON-эндпоинт, возвращает список всех записей из ЧС.
-    """
-    entries = BlacklistEntry.query.order_by(BlacklistEntry.created_at.desc()).all()
-    payload = []
+    try:
+        page = int(request.args.get('page', 1))
+        per_page = int(request.args.get('per_page', 20))
+        search_query = request.args.get('q', '').strip().lower()
 
-    for entry in entries:
-        payload.append({
-            "nickname": entry.nickname,
-            "uuid": entry.uuid,
-            "reason": entry.reason,
-            "created_at": entry.created_at.isoformat()
-        })
+        # Validate parameters
+        if page < 1:
+            page = 1
+        if per_page < 1 or per_page > 100:
+            per_page = 20
 
-    return Response(json.dumps(payload, ensure_ascii=False), mimetype="application/json")
+        # Base query
+        query = BlacklistEntry.query
+
+        # Apply search if provided
+        if search_query:
+            query = query.filter(
+                db.or_(
+                    BlacklistEntry.nickname.ilike(f'%{search_query}%'),
+                    BlacklistEntry.reason.ilike(f'%{search_query}%')
+                )
+            )
+
+        # Get total count for pagination
+        total_items = query.count()
+
+        # Get paginated results
+        items = query.order_by(BlacklistEntry.created_at.desc()) \
+                    .offset((page - 1) * per_page) \
+                    .limit(per_page) \
+                    .all()
+
+        # Convert to dictionary
+        result = {
+            'items': [{
+                'id': item.id,
+                'nickname': item.nickname,
+                'uuid': item.uuid,
+                'reason': item.reason,
+                'created_at': item.created_at.isoformat()
+            } for item in items],
+            'page': page,
+            'per_page': per_page,
+            'total_items': total_items,
+            'has_more': (page * per_page) < total_items
+        }
+
+        return jsonify(result)
+
+    except Exception as e:
+        app.logger.error(f"Error in api_full_blacklist: {str(e)}")
+        return jsonify({
+            'error': 'Internal server error',
+            'message': str(e)
+        }), 500
 
 
 @app.route("/api/uuid/<nickname>", methods=["GET"])
@@ -967,15 +1007,26 @@ def set_security_headers(response):
         "upgrade-insecure-requests;"
     )
     response.headers['Content-Security-Policy'] = csp
-    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
     response.headers['X-Content-Type-Options'] = 'nosniff'
-    response.headers['Referrer-Policy'] = 'no-referrer-when-downgrade'
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
     response.headers['Permissions-Policy'] = 'geolocation=(), microphone=()'
     response.headers['X-XSS-Protection'] = '1; mode=block'
     response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
     response.headers['Cross-Origin-Embedder-Policy'] = 'require-corp'
     response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains; preload'
-
+    
+    # Cache control headers
+    if request.path.startswith('/static/'):
+        # Cache static files for 1 year
+        response.headers['Cache-Control'] = 'public, max-age=31536000'
+    elif request.path.startswith('/api/'):
+        # No cache for API responses
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    else:
+        # Cache other pages for 1 hour
+        response.headers['Cache-Control'] = 'public, max-age=3600'
+    
     return response
 
 if __name__ == '__main__':

@@ -1,10 +1,59 @@
 {% extends "base.html" %}
-{% block title %}Оффлайн – ЧС Сосмарка{% endblock %}
+
+{% set page_title = "Нет подключения к интернету | ЧС Сосмарка" %}
+{% set page_description = "Страница недоступна - отсутствует подключение к интернету" %}
 
 {% block content %}
-<main class="container">
-  <h1>Вы оффлайн</h1>
-  <p>Похоже, у вас нет подключения к Интернету. Зайдите позже!</p>
-  <a href="{{ url_for('index') }}" class="btn-check">На главную</a>
-</main>
+<div class="offline-container">
+  <h1>Нет подключения к интернету</h1>
+  <p>Для работы с сайтом требуется подключение к интернету. Пожалуйста:</p>
+  <ul>
+    <li>Проверьте подключение к сети</li>
+    <li>Проверьте настройки интернета</li>
+    <li>Попробуйте перезагрузить страницу</li>
+  </ul>
+  <button onclick="window.location.reload()" class="reload-button">
+    Перезагрузить страницу
+  </button>
+</div>
+
+<style>
+  .offline-container {
+    text-align: center;
+    padding: 2rem;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .offline-container h1 {
+    color: var(--text-color);
+    margin-bottom: 1.5rem;
+  }
+
+  .offline-container ul {
+    text-align: left;
+    margin: 1.5rem auto;
+    max-width: 400px;
+  }
+
+  .offline-container li {
+    margin: 0.5rem 0;
+    color: var(--text-color);
+  }
+
+  .reload-button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+  }
+
+  .reload-button:hover {
+    background-color: var(--primary-color-dark);
+  }
+</style>
 {% endblock %}

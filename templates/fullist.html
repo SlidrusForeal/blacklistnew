@@ -1,28 +1,49 @@
 {% extends "base.html" %}
 
-{% block title %}ЧС Сосмарка – Полный список{% endblock %}
+{% set page_title = "Полный список | ЧС Сосмарка" %}
+{% set page_description = "Полный список записей в черном списке Сосмаркской Империи. Просматривайте все записи с подробной информацией." %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/fullist.css') }}">
+{% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="fullist-container">
   <h1>Полный список</h1>
-  <input type="text" id="search-input" placeholder="Поиск по нику...">
-  <ul id="blacklist">
-    {% for player in players %}
-      <li>
-        <img class="avatar skeleton" data-src="{{ url_for('avatar', user_uuid=player.uuid) }}" alt="{{ player.nickname }}">
-        <div class="player-info">
-          <a href="https://namemc.com/profile/{{ player.uuid }}" target="_blank" rel="noopener noreferrer">
-            {{ player.nickname }}
-          </a>
-          <p>Причина: {{ player.reason }}</p>
-        </div>
-      </li>
-    {% endfor %}
-  </ul>
+  
+  <div class="search-container">
+    <input type="text" 
+           id="searchInput" 
+           placeholder="Поиск по никнейму или причине..." 
+           aria-label="Поиск по списку"
+           class="search-input">
+  </div>
+
+  <div class="blacklist-entries" role="list">
+    <!-- Entries will be loaded dynamically -->
+  </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
-  {{ super() }}
-  <script src="{{ url_for('static', filename='js/filter-list.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/infinite-scroll.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const searchInput = document.getElementById('searchInput');
+  let searchTimeout;
+
+  searchInput.addEventListener('input', (e) => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+      const container = document.querySelector('.blacklist-entries');
+      const infiniteScroll = new InfiniteScroll(container, {
+        perPage: 20,
+        threshold: 200,
+        searchQuery: e.target.value
+      });
+      infiniteScroll.reset();
+    }, 300);
+  });
+});
+</script>
 {% endblock %}

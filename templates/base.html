@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  {# Child templates can override this #}
+  {# Child templates can override these #}
   {% set page_title = page_title|default("ЧС Сосмарка") %}
+  {% set page_description = page_description|default("Проверьте наличие вашего никнейма в черном списке Сосмаркской Империи. Мгновенная проверка и актуальные данные.") %}
   <title>{{ page_title }}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="Content-Security-Policy"
@@ -15,8 +16,11 @@
                connect-src 'self' https://api.mojang.com https://api.minecraftservices.com;
                upgrade-insecure-requests;">
 
+  <!-- Cache Control -->
+  <meta http-equiv="Cache-Control" content="max-age=31536000, public">
+  
   <!-- SEO Meta Tags -->
-  <meta name="description" content="Проверьте наличие вашего никнейма в черном списке Сосмаркской Империи. Мгновенная проверка и актуальные данные.">
+  <meta name="description" content="{{ page_description }}">
   <meta name="keywords" content="ЧС, черный список, Сосмарк, blacklist, проверка никнейма">
   <meta name="robots" content="index, follow">
   <meta name="author" content="Сосмарк">
@@ -24,14 +28,21 @@
   <!-- Open Graph -->
   <meta property="og:site_name" content="ЧС Сосмарка">
   <meta property="og:title" content="{{ page_title }}">
-  <meta property="og:description" content="Проверьте наличие вашего никнейма в черном списке Сосмаркской Империи.">
+  <meta property="og:description" content="{{ page_description }}">
   <meta property="og:type" content="website">
   <meta property="og:url" content="{{ request.url }}">
-  <meta property="og:image" content="{{ url_for('static', filename='icons/og-image.png') }}">
+  <meta property="og:image" content="{{ url_for('static', filename='icons/og-image.png', _external=True) }}">
   <meta property="og:locale" content="ru_RU">
 
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ page_title }}">
+  <meta name="twitter:description" content="{{ page_description }}">
+  <meta name="twitter:image" content="{{ url_for('static', filename='icons/og-image.png', _external=True) }}">
+
   <!-- PWA & Icons -->
-  <meta name="theme-color" content="#1a1a1a">
+  <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/apple-touch-icon.png') }}">
@@ -40,20 +51,42 @@
   <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
 
   <!-- CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
-  <!-- preconnect для внешних хостов аватарок и шрифтов -->
+  <!-- Preconnect & Preload -->
   <link rel="preconnect" href="https://minotar.net">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-
-  <!-- preload основного шрифта -->
   <link rel="preload" href="{{ url_for('static', filename='fonts/Poppins.woff2') }}" as="font" type="font/woff2" crossorigin>
+  
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "ЧС Сосмарка",
+      "url": "{{ request.url_root }}",
+      "description": "{{ page_description }}",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "{{ request.url_root }}?nickname={nickname}",
+        "query-input": "required name=nickname"
+      }
+    }
+  </script>
+
+  <!-- Service Worker -->
   <script src="{{ url_for('static', filename='js/sw-register.js') }}" defer></script>
   <script src="{{ url_for('static', filename='js/confetti.browser.min.js') }}" defer></script>
   {% block head %}{% endblock %}
 </head>
 <body>
-  <noscript>Для работы приложения требуется JavaScript</noscript>
+  <noscript>
+    <div class="error-message">Для работы приложения требуется JavaScript</div>
+  </noscript>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
 
   <header>
     <nav>
@@ -65,22 +98,61 @@
     </nav>
   </header>
 
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      <div class="notification">
-        {% for category, message in messages %}
-          <p class="{{ category }}">{{ message }}</p>
-        {% endfor %}
-      </div>
-    {% endif %}
-  {% endwith %}
+  <main class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="notification">
+          {% for category, message in messages %}
+            <p class="{{ category }}">{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
 
-  {% block content %}{% endblock %}
+    {% block content %}{% endblock %}
+  </main>
 
   <footer role="contentinfo">
     <p>&copy; {{ current_year() }} Сосмарк. Все права защищены.</p>
   </footer>
 
+  <!-- Core JavaScript -->
+  <script>
+    // Lazy loading for images
+    document.addEventListener('DOMContentLoaded', function() {
+      const lazyImages = document.querySelectorAll('img[loading="lazy"]');
+      lazyImages.forEach(img => {
+        img.classList.add('lazy-image');
+        img.addEventListener('load', () => img.classList.add('loaded'));
+      });
+    });
+
+    // Toast notification function
+    function showToast(message, type = 'info') {
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.textContent = message;
+      document.getElementById('toastContainer').appendChild(toast);
+      setTimeout(() => toast.remove(), 5000);
+    }
+
+    // Form validation
+    document.querySelectorAll('form').forEach(form => {
+      form.addEventListener('submit', function(e) {
+        if (!this.checkValidity()) {
+          e.preventDefault();
+          Array.from(this.elements).forEach(input => {
+            if (!input.validity.valid) {
+              const errorDiv = document.createElement('div');
+              errorDiv.className = 'error-message';
+              errorDiv.textContent = input.validationMessage;
+              input.parentNode.appendChild(errorDiv);
+            }
+          });
+        }
+      });
+    });
+  </script>
   {% block scripts %}{% endblock %}
 </body>
 </html>

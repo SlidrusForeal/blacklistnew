@@ -274,9 +274,8 @@ footer {
     border-radius: 6px;
     animation: slideInUp 0.5s ease-out;
     border-bottom: 1px solid #444;
-    color: #6186ff #f1f1f1);
+    color: #6186ff;
     transition: all 0.3s ease;
-    padding: 15px;
     border: 1px solid transparent;
 }
 

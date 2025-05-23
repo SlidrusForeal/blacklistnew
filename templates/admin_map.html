@@ -1,79 +1,205 @@
 {% extends "base.html" %}
 
-{% block title %}Карта NoSos{% endblock %}
+{% set page_title = "Карта игроков | ЧС Сосмарка" %}
+{% set page_description = "Интерактивная карта игроков с модом NoSos" %}
 
 {% block head %}
-  <link rel="stylesheet" href="{{ url_for('static', filename='leaflet/leaflet.css') }}">
-  <script src="{{ url_for('static', filename='leaflet/leaflet.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/leaflet-heat.js') }}"></script>
-  <style>
-    .map-container { display: flex; gap: 20px; }
-    #map { flex: 1; height: 600px; background: #000; }
-    #sidebar { width: 300px; max-height: 600px; overflow-y: auto; background: #111; color: #fff; padding: 10px; border-radius: 8px; }
-    #sidebar h2 { margin-top: 0; }
-    #player-list { list-style: none; padding: 0; margin: 0; }
-    #player-list li { margin-bottom: 10px; font-size: 0.9rem; }
-    .leaflet-container { background: #000 !important; }
-  </style>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin-map.css') }}">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
 {% endblock %}
 
 {% block content %}
-  <h1>Карта игроков с модом NoSos</h1>
-  <div class="map-container">
-    <div id="map"></div>
-    <div id="sidebar">
-      <h2>Активные игроки</h2>
-      <ul id="player-list"></ul>
+<div class="map-container">
+  <div id="map"></div>
+  <div id="sidebar">
+    <h2>Активные игроки</h2>
+    <div class="map-controls">
+      <button class="map-button" id="toggleHeatmap">Тепловая карта</button>
+      <button class="map-button" id="toggleGrid">Сетка</button>
+      <button class="map-button" id="centerMap">Центрировать</button>
     </div>
+    <ul id="player-list"></ul>
   </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-  const map = L.map('map', {
-    crs: L.CRS.Simple,
-    zoomControl: true,
-    attributionControl: false,
-    minZoom: -5,
-    maxZoom: 5
-  });
-  const WORLD = 5000;
-  const bounds = [[-WORLD, -WORLD], [WORLD, WORLD]];
-  map.fitBounds(bounds);
-  map.setMaxBounds(bounds);
+const MAP_CONFIG = {
+  WORLD_SIZE: 5000,
+  UPDATE_INTERVAL: 2000,
+  HEATMAP_CONFIG: {
+    radius: 25,
+    blur: 15,
+    maxZoom: 5,
+    gradient: {
+      0.4: 'blue',
+      0.6: 'lime',
+      0.9: 'red'
+    }
+  }
+};
 
-  function drawChunkGrid() {
+class PlayerMap {
+  constructor() {
+    this.markers = new Map();
+    this.heatLayer = null;
+    this.gridLayer = null;
+    this.heatmapEnabled = true;
+    this.gridEnabled = true;
+    
+    this.initMap();
+    this.initControls();
+    this.startUpdates();
+  }
+
+  initMap() {
+    const bounds = [[-MAP_CONFIG.WORLD_SIZE, -MAP_CONFIG.WORLD_SIZE], [MAP_CONFIG.WORLD_SIZE, MAP_CONFIG.WORLD_SIZE]];
+    
+    this.map = L.map('map', {
+      crs: L.CRS.Simple,
+      zoomControl: true,
+      attributionControl: false,
+      minZoom: -5,
+      maxZoom: 5
+    });
+
+    this.map.fitBounds(bounds);
+    this.map.setMaxBounds(bounds);
+    
+    this.drawChunkGrid();
+  }
+
+  initControls() {
+    document.getElementById('toggleHeatmap').addEventListener('click', () => this.toggleHeatmap());
+    document.getElementById('toggleGrid').addEventListener('click', () => this.toggleGrid());
+    document.getElementById('centerMap').addEventListener('click', () => this.centerMap());
+  }
+
+  drawChunkGrid() {
+    if (this.gridLayer) {
+      this.map.removeLayer(this.gridLayer);
+    }
+
+    this.gridLayer = L.layerGroup();
     const step = 16;
     const style = { color: '#333', weight: 1, opacity: 0.3 };
-    for (let i = -WORLD; i <= WORLD; i += step) {
-      L.polyline([[i, -WORLD], [i, WORLD]], style).addTo(map);
-      L.polyline([[-WORLD, i], [WORLD, i]], style).addTo(map);
+
+    for (let i = -MAP_CONFIG.WORLD_SIZE; i <= MAP_CONFIG.WORLD_SIZE; i += step) {
+      L.polyline([[i, -MAP_CONFIG.WORLD_SIZE], [i, MAP_CONFIG.WORLD_SIZE]], style).addTo(this.gridLayer);
+      L.polyline([[-MAP_CONFIG.WORLD_SIZE, i], [MAP_CONFIG.WORLD_SIZE, i]], style).addTo(this.gridLayer);
+    }
+
+    this.gridLayer.addTo(this.map);
+  }
+
+  toggleGrid() {
+    this.gridEnabled = !this.gridEnabled;
+    if (this.gridEnabled) {
+      this.gridLayer.addTo(this.map);
+    } else {
+      this.map.removeLayer(this.gridLayer);
     }
   }
 
-  let markers = [], heatLayer;
-  function loadLocations() {
+  toggleHeatmap() {
+    this.heatmapEnabled = !this.heatmapEnabled;
+    if (this.heatmapEnabled && this.heatLayer) {
+      this.heatLayer.addTo(this.map);
+    } else if (this.heatLayer) {
+      this.map.removeLayer(this.heatLayer);
+    }
+  }
+
+  centerMap() {
+    const bounds = [[-MAP_CONFIG.WORLD_SIZE, -MAP_CONFIG.WORLD_SIZE], [MAP_CONFIG.WORLD_SIZE, MAP_CONFIG.WORLD_SIZE]];
+    this.map.fitBounds(bounds);
+  }
+
+  updatePlayerList(players) {
+    const playerList = document.getElementById('player-list');
+    playerList.innerHTML = '';
+    
+    players.forEach(player => {
+      const li = document.createElement('li');
+      li.className = 'player-item';
+      li.innerHTML = `
+        <div>UUID: ${player.uuid}</div>
+        <div class="player-coords">X: ${player.x}, Y: ${player.y}, Z: ${player.z}</div>
+      `;
+      li.addEventListener('click', () => {
+        this.map.setView([player.z, player.x], 2);
+        this.markers.get(player.uuid).openPopup();
+      });
+      playerList.appendChild(li);
+    });
+  }
+
+  updateLocations() {
     fetch("/api/locations/view")
-      .then(r => r.json())
+      .then(response => response.json())
       .then(data => {
-        markers.forEach(m => map.removeLayer(m));
-        markers = [];
+        // Update markers
+        const currentUUIDs = new Set(data.map(p => p.uuid));
+        
+        // Remove old markers
+        for (const [uuid, marker] of this.markers.entries()) {
+          if (!currentUUIDs.has(uuid)) {
+            this.map.removeLayer(marker);
+            this.markers.delete(uuid);
+          }
+        }
+
+        // Update or add new markers
         const heatPoints = [];
-        data.forEach(p => {
-          const lat = p.z, lng = p.x;
-          const m = L.circleMarker([lat, lng], { radius: 6, color: '#0f0', fillColor: '#0f0', fillOpacity: 0.7 })
-            .bindPopup(`UUID: ${p.uuid}<br>x:${p.x}, z:${p.z}`);
-          m.addTo(map);
-          markers.push(m);
-          heatPoints.push([lat, lng, 1]);
+        data.forEach(player => {
+          const position = [player.z, player.x];
+          
+          if (this.markers.has(player.uuid)) {
+            this.markers.get(player.uuid).setLatLng(position);
+          } else {
+            const marker = L.circleMarker(position, {
+              radius: 6,
+              color: '#0f0',
+              fillColor: '#0f0',
+              fillOpacity: 0.7
+            }).bindPopup(`UUID: ${player.uuid}<br>X: ${player.x}, Y: ${player.y}, Z: ${player.z}`);
+            marker.addTo(this.map);
+            this.markers.set(player.uuid, marker);
+          }
+          
+          heatPoints.push([player.z, player.x, 1]);
         });
-        if (heatLayer) map.removeLayer(heatLayer);
-        heatLayer = L.heatLayer(heatPoints, { radius: 25, blur: 15, maxZoom: 5, gradient: {0.4:'blue',0.6:'lime',0.9:'red'} }).addTo(map);
+
+        // Update heatmap
+        if (this.heatLayer) {
+          this.map.removeLayer(this.heatLayer);
+        }
+        this.heatLayer = L.heatLayer(heatPoints, MAP_CONFIG.HEATMAP_CONFIG);
+        if (this.heatmapEnabled) {
+          this.heatLayer.addTo(this.map);
+        }
+
+        // Update player list
+        this.updatePlayerList(data);
+      })
+      .catch(error => {
+        console.error('Error fetching locations:', error);
+        showToast('Ошибка загрузки данных', 'error');
       });
   }
 
-  drawChunkGrid();
-  loadLocations();
-  setInterval(loadLocations, 1000);
+  startUpdates() {
+    this.updateLocations();
+    setInterval(() => this.updateLocations(), MAP_CONFIG.UPDATE_INTERVAL);
+  }
+}
+
+// Initialize the map when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+  window.playerMap = new PlayerMap();
+});
 </script>
 {% endblock %}
