@@ -30,6 +30,7 @@ import logging.config
 import subprocess
 import hmac
 import hashlib
+import uuid
 
 from config import (
     SECRET_KEY, WTF_CSRF_SECRET_KEY, JWT_SECRET_KEY, 
@@ -707,8 +708,20 @@ def log_request(response):
 
 @app.errorhandler(Exception)
 def handle_unexpected_error(error):
-    app.logger.exception('Unhandled exception:')
-    return render_template('500.html'), 500
+    """Handle any uncaught exception"""
+    error_id = str(uuid.uuid4())
+    app.logger.exception(f'Unhandled exception {error_id}:')
+    
+    # Log additional request information
+    app.logger.error(f"""
+    Error ID: {error_id}
+    URL: {request.url}
+    Method: {request.method}
+    IP: {request.remote_addr}
+    User Agent: {request.user_agent}
+    """)
+    
+    return render_template('500.html', error_id=error_id), 500
 
 
 @app.route("/swagger")
@@ -917,4 +930,9 @@ def set_security_headers(response):
     return response
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Ensure all required directories exist
+    for directory in ['logs', 'tmp']:
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+            
+    app.run(debug=False)

@@ -6,7 +6,13 @@
 <main class="container">
   <h1>500 – Ошибка сервера</h1>
   <p>Произошла внутренняя ошибка сервера. Мы уже работаем над решением проблемы.</p>
-  <a href="{{ url_for('index') }}" class="btn-check">На главную</a>
-  <a href="mailto:itsos@sosmark.ru" class="btn-check">Сообщить об ошибке</a>
+  {% if error_id %}
+  <p class="error-details">Код ошибки: {{ error_id }}</p>
+  {% endif %}
+  <p>Пожалуйста, включите этот код при обращении в техподдержку.</p>
+  <div class="action-buttons">
+    <a href="{{ url_for('index') }}" class="btn-check">На главную</a>
+    <a href="mailto:itsos@sosmark.ru?subject=Error%20{{ error_id }}" class="btn-check">Сообщить об ошибке</a>
+  </div>
 </main>
 {% endblock %}

@@ -1,12 +1,13 @@
-import sys
 import os
+import sys
 
-# Укажите путь к нужному интерпретатору (например, из виртуального окружения)
+# Add the application directory to the Python path
 INTERP = os.path.expanduser("/var/www/u3085459/data/flaskenv/bin/python")
 if sys.executable != INTERP:
     os.execl(INTERP, INTERP, *sys.argv)
 
-# Добавляем текущую рабочую директорию в PYTHONPATH
-sys.path.append(os.getcwd())
+# Add the application directory to the Python path
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
+# Import and create the application
 from app import app as application
