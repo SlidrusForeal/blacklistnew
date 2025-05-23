@@ -20,7 +20,6 @@ from flask import (
     jsonify, Response, make_response, g, send_from_directory
 )
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt, set_access_cookies, get_jwt_identity, unset_jwt_cookies, verify_jwt_in_request
-from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm, CSRFProtect
 from werkzeug.security import generate_password_hash, check_password_hash
 from wtforms import StringField, PasswordField, SelectField, SubmitField
@@ -32,23 +31,22 @@ import subprocess
 import hmac
 import hashlib
 
+from config import (
+    SECRET_KEY, WTF_CSRF_SECRET_KEY, JWT_SECRET_KEY, 
+    GITHUB_SECRET, SUPABASE_URL, SUPABASE_KEY
+)
+from supabase_client import db
+
 # ─────────────── Конфигурация Flask ───────────────
 load_dotenv()
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-app.config['WTF_CSRF_SECRET_KEY'] = os.getenv('WTF_CSRF_SECRET_KEY')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-# JWT конфигурация (куки)
-app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
+app.config['SECRET_KEY'] = SECRET_KEY
+app.config['WTF_CSRF_SECRET_KEY'] = WTF_CSRF_SECRET_KEY
+app.config['JWT_SECRET_KEY'] = JWT_SECRET_KEY
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 app.config['JWT_ACCESS_COOKIE_PATH'] = '/'
 app.config['JWT_COOKIE_CSRF_PROTECT'] = True
-app.config['GITHUB_SECRET'] = os.getenv('WEBHOOK_SECRET', '')
-if not app.config['GITHUB_SECRET']:
-    raise RuntimeError("WEBHOOK_SECRET not set in .env")
-secret = app.config['GITHUB_SECRET'].encode('utf-8')
+app.config['GITHUB_SECRET'] = GITHUB_SECRET
 
 # ─────────────── Настройка логирования ───────────────
 # Создаём папку для логов, если её нет
@@ -103,7 +101,6 @@ logging.config.dictConfig(LOG_CONFIG)
 logging.getLogger('werkzeug').handlers = logging.getLogger().handlers
 logging.getLogger('werkzeug').setLevel(logging.INFO)
 # ─────────────── Расширения ───────────────
-db = SQLAlchemy(app)
 csrf = CSRFProtect(app)
 jwt = JWTManager(app)
 
@@ -373,16 +370,17 @@ def index():
     result = None
     if form.validate_on_submit():
         name = form.nickname.data.strip()
-        entry = BlacklistEntry.query.filter(
-            db.func.lower(BlacklistEntry.nickname) == name.lower()
-        ).first()
+        entry = db.get_blacklist_entry(name)
         if entry:
             new_uuid = get_uuid_from_nickname(name)
-            if new_uuid and new_uuid.lower() != entry.uuid.lower():
-                entry.uuid = new_uuid
-                entry.nickname = name
-                db.session.commit()
-            result = {"message": f"{name}, вы в ЧС!", "reason": entry.reason, "color": "red"}
+            if new_uuid and new_uuid.lower() != entry['uuid'].lower():
+                db.update_blacklist_entry(entry['id'], {
+                    'uuid': new_uuid,
+                    'nickname': name
+                })
+                entry['uuid'] = new_uuid
+                entry['nickname'] = name
+            result = {"message": f"{name}, вы в ЧС!", "reason": entry['reason'], "color": "red"}
         else:
             result = {"message": f"{name}, вы не в ЧС!", "color": "green"}
     return render_template("index.html", form=form, result=result)
@@ -442,9 +440,9 @@ def inject_current_year():
 def admin_login():
     form = AdminLoginForm()
     if form.validate_on_submit():
-        user = AdminUser.query.filter_by(username=form.username.data).first()
-        if user and user.check_password(form.password.data):
-            access_token = create_access_token(identity=user.username, additional_claims={'role': user.role})
+        user = db.get_admin_user(form.username.data)
+        if user and check_password_hash(user['password_hash'], form.password.data):
+            access_token = create_access_token(identity=user['username'], additional_claims={'role': user['role']})
             resp = make_response(redirect(url_for('admin_panel')))
             set_access_cookies(resp, access_token)
             return resp
@@ -469,17 +467,16 @@ def admin_register():
         password = form.password.data
         role = form.role.data
 
-        if AdminUser.query.filter_by(username=username).first():
+        if db.get_admin_user(username):
             flash("Пользователь с таким именем уже существует.", "warning")
         else:
-            new_user = AdminUser(username=username, role=role)
-            new_user.set_password(password)
-            db.session.add(new_user)
-            db.session.commit()
-            flash("Пользователь успешно зарегистрирован.", "success")
-            return redirect(url_for("admin_panel"))
+            password_hash = generate_password_hash(password)
+            if db.create_admin_user(username, password_hash, role):
+                flash("Пользователь успешно зарегистрирован.", "success")
+                return redirect(url_for("admin_panel"))
+            else:
+                flash("Ошибка при создании пользователя.", "danger")
 
-    # при GET-запросе или ошибках валидации подставляем form в шаблон
     return render_template("admin_register.html", form=form)
 
 
@@ -490,147 +487,75 @@ def admin_panel():
     if form.validate_on_submit():
         nick = form.nickname.data.strip()
         reason = form.reason.data.strip()
-        if not get_uuid_from_nickname(nick):
+        uuid = get_uuid_from_nickname(nick)
+        
+        if not uuid:
             flash("Не удалось получить UUID.", "warning")
-        elif BlacklistEntry.query.filter_by(uuid=get_uuid_from_nickname(nick)).first():
+        elif db.get_blacklist_entry(nick):
             flash("Уже в черном списке.", "info")
         else:
-            entry = BlacklistEntry(
-                nickname=nick,
-                uuid=get_uuid_from_nickname(nick),
-                reason=reason
-            )
-            db.session.add(entry)
-            db.session.commit()
-            flash("Запись добавлена в ЧС.", "success")
-            return redirect(url_for('admin_panel'))
-    entries = BlacklistEntry.query.order_by(BlacklistEntry.nickname).all()
+            if db.add_blacklist_entry(nick, uuid, reason):
+                flash("Запись добавлена в ЧС.", "success")
+                return redirect(url_for('admin_panel'))
+            else:
+                flash("Ошибка при добавлении записи.", "danger")
+    
+    entries = db.get_all_blacklist_entries()['items']
     return render_template("admin_panel.html", form=form, entries=entries)
-
-
-# Обновление никнеймов (доступ только для владельца)
-@app.route("/admin/update_nicknames", methods=["POST"])
-@role_required("owner", "admin")
-def update_nicknames():
-    entries = BlacklistEntry.query.all()
-    updated_count = 0
-
-    for entry in entries:
-        # Берём UUID из поля entry.uuid
-        new_name = get_name_from_uuid(entry.uuid)
-        if new_name and new_name.strip().lower() != entry.nickname.strip().lower():
-            entry.nickname = new_name
-            updated_count += 1
-        # Смягчаем нагрузку на API
-        time.sleep(1)
-
-    db.session.commit()
-    flash(f"Обновлены никнеймы для {updated_count} записей.", "success")
-    return redirect(url_for('admin_panel'))
-
-
-@app.route("/admin/update_nickname/<int:entry_id>", methods=["POST"])
-@role_required("owner", "admin")
-def update_nickname(entry_id):
-    entry = BlacklistEntry.query.get_or_404(entry_id)
-    new_name = get_name_from_uuid(entry.uuid)
-    if new_name and new_name.strip().lower() != entry.nickname.strip().lower():
-        entry.nickname = new_name
-        db.session.commit()
-        flash(f"Запись #{entry_id}: никнейм обновлён на '{new_name}'.", "success")
-    else:
-        flash(f"Запись #{entry_id}: изменений не найдено.", "info")
-    return redirect(url_for('admin_panel'))
 
 
 @app.route("/admin/update_reason/<int:entry_id>", methods=["GET", "POST"])
 @role_required("owner", "admin", "moderator")
 def update_reason(entry_id):
-    entry = BlacklistEntry.query.get_or_404(entry_id)
-    form = UpdateReasonForm(reason=entry.reason)
+    entry = db.get_blacklist_entry_by_id(entry_id)
+    if not entry:
+        abort(404)
+        
+    form = UpdateReasonForm(reason=entry['reason'])
     if form.validate_on_submit():
-        if form.reason.data.strip() != entry.reason:
-            entry.reason = form.reason.data.strip()
-            db.session.commit()
-            flash("Причина изменена.", "success")
+        new_reason = form.reason.data.strip()
+        if new_reason != entry['reason']:
+            if db.update_blacklist_entry(entry_id, {'reason': new_reason}):
+                flash("Причина изменена.", "success")
+            else:
+                flash("Ошибка при обновлении причины.", "danger")
         else:
             flash("Новая причина совпадает со старой.", "info")
         return redirect(url_for('admin_panel'))
     return render_template("update_reason.html", form=form, entry=entry)
 
 
-@app.route("/admin/whitelist", methods=["GET", "POST"])
-@role_required("owner")
-def admin_whitelist():
-    form = WhitelistForm()
-    if form.validate_on_submit():
-        wl = json.load(open("uuid_list.json", "r", encoding="utf-8"))
-        u = form.uuid.data.strip()
-        if form.action.data == 'add':
-            if u not in wl:
-                wl.append(u)
-                flash("UUID добавлен в whitelist.", "success")
-            else:
-                flash("UUID уже в whitelist.", "info")
-        else:
-            if u in wl:
-                wl.remove(u)
-                flash("UUID удалён из whitelist.", "success")
-            else:
-                flash("UUID не найден в whitelist.", "warning")
-        json.dump(wl, open("uuid_list.json", "w", encoding="utf-8"), indent=2)
-        return redirect(url_for('admin_whitelist'))
-    wl_current = json.load(open("uuid_list.json", "r", encoding="utf-8"))
-    return render_template("admin_whitelist.html", form=form, whitelist=wl_current)
-
-
-@app.route('/avatar/<user_uuid>.png')
-def avatar(user_uuid):
-    url = f"https://minotar.net/helm/{user_uuid}/100.png"
-    resp = requests.get(url, timeout=5)
-    if resp.status_code != 200:
-        abort(resp.status_code)
-    out = make_response(resp.content)
-    out.headers['Content-Type'] = 'image/png'
-    out.headers['Cache-Control'] = 'public, max-age=86400'
-    return out
-
-
-@app.route("/sw.js")
-def service_worker():
-    return app.send_static_file("service-worker.js")
-
-
-# Удаление записи из черного списка (доступ для owner и admin)
 @app.route("/admin/delete/<int:entry_id>", methods=["POST"])
 @role_required("owner", "admin")
 def delete_entry(entry_id):
-    entry = BlacklistEntry.query.get_or_404(entry_id)
-    db.session.delete(entry)
-    db.session.commit()
-    flash("Запись удалена из ЧС.", "success")
+    if db.delete_blacklist_entry(entry_id):
+        flash("Запись удалена из ЧС.", "success")
+    else:
+        flash("Ошибка при удалении записи.", "danger")
     return redirect(url_for('admin_panel'))
 
 
-# Список пользователей (admin panel) – доступ только для owner
 @app.route("/admin/users", methods=["GET"])
 @role_required("owner")
 def admin_users():
-    users = AdminUser.query.order_by(AdminUser.username).all()
+    users = db.get_all_admin_users()
     return render_template('admin_users.html', users=users)
 
-# Удаление пользователя (только для владельца)
 @app.route("/admin/delete_user/<int:user_id>", methods=["POST"])
 @role_required("owner")
 def delete_user(user_id):
     current = get_jwt_identity()
-    u = AdminUser.query.get_or_404(user_id)
-    if u.username == current:
+    user = db.get_admin_user_by_id(user_id)
+    if not user:
+        abort(404)
+        
+    if user['username'] == current:
         flash("Нельзя удалить себя.", "warning")
     else:
-        db.session.delete(u)
-        db.session.commit()
-        flash("Пользователь удалён.", "success")
+        if db.delete_admin_user(user_id):
+            flash("Пользователь удалён.", "success")
+        else:
+            flash("Ошибка при удалении пользователя.", "danger")
     return redirect(url_for('admin_users'))
 
 @app.before_request
@@ -677,33 +602,29 @@ def shmok():
 
 @app.route('/api/check', methods=['GET'])
 def api_check():
-    r"""
-    Эндпоинт: проверяет ник в черном списке.
-    Возвращает реальный UTF-8 JSON без \u-эскейпов.
-    """
     nickname = request.args.get('nickname', '').strip()
     if not nickname:
         payload = {'error': 'Параметр nickname обязателен и не может быть пустым'}
         text = json.dumps(payload, ensure_ascii=False)
         return Response(text, status=400, mimetype='application/json')
 
-    entry = BlacklistEntry.query.filter(
-        db.func.lower(BlacklistEntry.nickname) == nickname.lower()
-    ).first()
-
+    entry = db.get_blacklist_entry(nickname)
     if entry:
         new_uuid = get_uuid_from_nickname(nickname)
-        if new_uuid and new_uuid.lower() != entry.uuid.lower():
-            entry.uuid = new_uuid
-            entry.nickname = nickname
-            db.session.commit()
+        if new_uuid and new_uuid.lower() != entry['uuid'].lower():
+            db.update_blacklist_entry(entry['id'], {
+                'uuid': new_uuid,
+                'nickname': nickname
+            })
+            entry['uuid'] = new_uuid
+            entry['nickname'] = nickname
 
         payload = {
             'in_blacklist': True,
-            'nickname': entry.nickname,
-            'uuid': entry.uuid,
-            'reason': entry.reason,
-            'created_at': entry.created_at.isoformat()
+            'nickname': entry['nickname'],
+            'uuid': entry['uuid'],
+            'reason': entry['reason'],
+            'created_at': entry['created_at']
         }
     else:
         payload = {'in_blacklist': False}
@@ -729,42 +650,8 @@ def api_full_blacklist():
         if per_page < 1 or per_page > 100:
             per_page = 20
 
-        # Base query
-        query = BlacklistEntry.query
-
-        # Apply search if provided
-        if search_query:
-            query = query.filter(
-                db.or_(
-                    BlacklistEntry.nickname.ilike(f'%{search_query}%'),
-                    BlacklistEntry.reason.ilike(f'%{search_query}%')
-                )
-            )
-
-        # Get total count for pagination
-        total_items = query.count()
-
-        # Get paginated results
-        items = query.order_by(BlacklistEntry.created_at.desc()) \
-                    .offset((page - 1) * per_page) \
-                    .limit(per_page) \
-                    .all()
-
-        # Convert to dictionary
-        result = {
-            'items': [{
-                'id': item.id,
-                'nickname': item.nickname,
-                'uuid': item.uuid,
-                'reason': item.reason,
-                'created_at': item.created_at.isoformat()
-            } for item in items],
-            'page': page,
-            'per_page': per_page,
-            'total_items': total_items,
-            'has_more': (page * per_page) < total_items
-        }
-
+        # Get paginated results with search
+        result = db.get_all_blacklist_entries(page, per_page, search_query)
         return jsonify(result)
 
     except Exception as e:
