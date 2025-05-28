@@ -60,43 +60,17 @@ class SupabaseClient:
             logger.error(f"Error deleting blacklist entry: {e}")
             return False
 
-    def get_all_blacklist_entries(self, page: int = 1, per_page: int = 20, search: str = None, 
-                                  sort_by: str = 'created_at', sort_order: str = 'desc',
-                                  date_from: Optional[str] = None, date_to: Optional[str] = None) -> Dict[str, Any]:
+    def get_all_blacklist_entries(self, page: int = 1, per_page: int = 20, search: str = None) -> Dict[str, Any]:
         try:
-            query = self.client.table('blacklist_entry').select('*', count='exact')
+            query = self.client.table('blacklist_entry').select('*', count='exact') 
             
             if search:
                 query = query.or_(f'nickname.ilike.%{search}%,reason.ilike.%{search}%')
-
-            # Date range filtering
-            if date_from:
-                try:
-                    # Ensure date_from is a valid ISO format string if not already
-                    # For simplicity, assuming it comes in a compatible format or add parsing/validation
-                    query = query.gte('created_at', date_from)
-                except Exception as e:
-                    logger.warning(f"Invalid date_from format: {date_from} - {e}")
-            if date_to:
-                try:
-                    # Add time to date_to to include the whole day if it's just a date
-                    # For example, if date_to is YYYY-MM-DD, make it YYYY-MM-DD 23:59:59.999
-                    # Or expect full ISO timestamps. For now, using it as is.
-                    query = query.lte('created_at', date_to)
-                except Exception as e:
-                    logger.warning(f"Invalid date_to format: {date_to} - {e}")
             
             # Pagination
             start_index = (page - 1) * per_page
-            query = query.range(start_index, start_index + per_page - 1)
-
-            # Sorting
-            allowed_sort_columns = ['nickname', 'reason', 'created_at']
-            if sort_by not in allowed_sort_columns:
-                sort_by = 'created_at' # Default to a safe column
-            
-            is_descending = sort_order.lower() == 'desc'
-            query = query.order(sort_by, desc=is_descending)
+            # Default sorting by created_at descending, as was implicit before detailed sort options
+            query = query.range(start_index, start_index + per_page - 1).order('created_at', desc=True) 
             
             result = query.execute()
             

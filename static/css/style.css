@@ -217,6 +217,16 @@ footer {
   animation: fadeIn 1s ease-in-out;
 }
 
+/* Footer link styling to match contact links */
+footer.footer .text-muted a {
+    color: #6186ff;
+    text-decoration: none;
+}
+
+footer.footer .text-muted a:hover {
+    text-decoration: underline; /* Optional: add underline on hover for better UX */
+}
+
 /* Контактная информация */
 .contact-info {
   background-color: #2c2c2c;

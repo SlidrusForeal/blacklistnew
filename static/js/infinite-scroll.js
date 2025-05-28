@@ -3,9 +3,12 @@ class InfiniteScroll {
     this.container = container;
     this.options = {
       perPage: options.perPage || 20,
-      threshold: options.threshold || 100,
+      threshold: options.threshold || 100, // Pixels from bottom to trigger load
       loadingTemplate: options.loadingTemplate || '<div class="loading">Загрузка...</div>',
-      ...options
+      searchQuery: options.searchQuery || '',
+      noMoreResultsIndicator: options.noMoreResultsIndicator, // Element for "no more results"
+      loadingIndicator: options.loadingIndicator, // Element for loading spinner
+      initialPageContentElement: options.initialPageContentElement // Element to show "no results" on initial load
     };
     
     this.page = 1;
@@ -16,62 +19,89 @@ class InfiniteScroll {
   }
   
   init() {
-    // Create loading element
-    this.loadingEl = document.createElement('div');
-    this.loadingEl.innerHTML = this.options.loadingTemplate;
-    this.loadingEl.style.display = 'none';
-    this.container.appendChild(this.loadingEl);
+    // Use provided loading indicator or create one
+    this.actualLoadingEl = this.options.loadingIndicator;
+    if (!this.actualLoadingEl && this.container) { // Ensure container exists for appending
+        const loadingElDiv = document.createElement('div');
+        loadingElDiv.innerHTML = this.options.loadingTemplate;
+        this.actualLoadingEl = loadingElDiv.firstChild;
+        if (this.actualLoadingEl) this.container.appendChild(this.actualLoadingEl);
+    }
+    if (this.actualLoadingEl) this.actualLoadingEl.style.display = 'none';
+    if (this.options.noMoreResultsIndicator) this.options.noMoreResultsIndicator.style.display = 'none';
     
-    // Add scroll listener
     window.addEventListener('scroll', this.handleScroll.bind(this));
-    
-    // Initial load
-    this.loadMore();
+    this.loadMore(); // Initial load
   }
   
   handleScroll() {
-    if (this.loading || !this.hasMore) return;
+    if (this.loading || !this.hasMore || !this.container) return;
     
     const scrollPos = window.innerHeight + window.scrollY;
-    const threshold = document.documentElement.offsetHeight - this.options.threshold;
-    
-    if (scrollPos >= threshold) {
+    // Check if container is tall enough to scroll, or if body scroll is sufficient
+    const containerBottom = this.container.offsetTop + this.container.offsetHeight;
+    const triggerPoint = Math.max(document.documentElement.offsetHeight - this.options.threshold, containerBottom - this.options.threshold);
+
+    if (scrollPos >= triggerPoint) {
       this.loadMore();
     }
   }
   
   async loadMore() {
+    if (this.loading || !this.hasMore) return;
+
+    this.loading = true;
+    if (this.actualLoadingEl) this.actualLoadingEl.style.display = 'block';
+    if (this.options.noMoreResultsIndicator) this.options.noMoreResultsIndicator.style.display = 'none';
+    
     try {
-      this.loading = true;
-      this.loadingEl.style.display = 'block';
+      let apiUrl = `/api/fullist?page=${this.page}&per_page=${this.options.perPage}`;
+      if (this.options.searchQuery) {
+        apiUrl += `&q=${encodeURIComponent(this.options.searchQuery)}`;
+      }
       
-      const response = await fetch(`/api/fullist?page=${this.page}&per_page=${this.options.perPage}`);
+      const response = await fetch(apiUrl);
+      if (!response.ok) {
+        throw new Error(`HTTP error ${response.status}`);
+      }
       const data = await response.json();
       
       if (data.items && data.items.length > 0) {
         await this.renderItems(data.items);
         this.page++;
         this.hasMore = data.has_more;
+        if (!this.hasMore && this.options.noMoreResultsIndicator) {
+            this.options.noMoreResultsIndicator.style.display = 'block';
+        }
       } else {
         this.hasMore = false;
+        if (this.page === 1 && this.options.initialPageContentElement) { 
+            this.options.initialPageContentElement.innerHTML = '<p class="text-center text-muted">Записи не найдены.</p>';
+        }
+        if (this.options.noMoreResultsIndicator) this.options.noMoreResultsIndicator.style.display = 'block';
       }
     } catch (error) {
       console.error('Failed to load more items:', error);
-      showToast('Ошибка загрузки данных', 'error');
+      if (this.options.initialPageContentElement) { 
+          this.options.initialPageContentElement.innerHTML = '<p class="text-center text-danger">Не удалось загрузить список. Попробуйте позже.</p>';
+      }
+      // Optionally, display a toast or specific error message to the user here
+      // showToast('Ошибка загрузки данных', 'error'); // If you have a showToast function
     } finally {
       this.loading = false;
-      this.loadingEl.style.display = 'none';
+      if (this.actualLoadingEl) this.actualLoadingEl.style.display = 'none';
     }
   }
   
   async renderItems(items) {
+    if (!this.container) return;
     const fragment = document.createDocumentFragment();
     
     for (const item of items) {
       const element = document.createElement('div');
-      element.className = 'blacklist-entry';
+      element.className = 'blacklist-entry'; // This class should exist in your CSS
       
-      let avatarSrc = '/static/icons/favicon.ico'; // Placeholder/fallback avatar
+      let avatarSrc = 'https://minotar.net/helm/MHF_Steve/50.png'; // Default fallback avatar
       try {
         const avatarResponse = await fetch(`/api/avatar/${item.uuid}`);
         if (avatarResponse.ok) {
@@ -81,30 +111,44 @@ class InfiniteScroll {
           }
         }
       } catch (e) {
-        console.error(`Failed to load avatar for ${item.nickname}:`, e);
+        console.warn(`Failed to load avatar for ${item.nickname}:`, e);
       }
       
+      // Structure based on the original, simple blacklist entry style
       element.innerHTML = `
         <div class="entry-header">
-          <img src="${avatarSrc}" alt="${item.nickname}" class="avatar" loading="lazy">
+          <img src="${avatarSrc}" alt="${item.nickname}" class="avatar" loading="lazy" style="width:50px; height:50px; margin-right:10px; border-radius:5px;">
           <h3>${item.nickname}</h3>
         </div>
         <div class="entry-details">
-          <p class="reason">${item.reason}</p>
-          <p class="date">${new Date(item.created_at).toLocaleDateString('ru-RU')}</p>
+          <p class="reason" style="margin: 5px 0;">Причина: ${item.reason || 'Не указана'}</p>
+          <p class="uuid" style="font-size:0.8em; color: #ccc;">UUID: ${item.uuid}</p>
+          <p class="date" style="font-size:0.8em; color: #ccc;">Добавлено: ${item.created_at ? new Date(item.created_at).toLocaleDateString('ru-RU') : 'N/A'}</p>
         </div>
       `;
       fragment.appendChild(element);
     }
     
-    this.container.insertBefore(fragment, this.loadingEl);
+    // Append before the loading element if it's a child of the container
+    if (this.actualLoadingEl && this.actualLoadingEl.parentNode === this.container) {
+        this.container.insertBefore(fragment, this.actualLoadingEl);
+    } else {
+        this.container.appendChild(fragment);
+    }
   }
   
   reset() {
     this.page = 1;
     this.hasMore = true;
-    this.container.innerHTML = '';
-    this.init();
+    this.loading = false; // Reset loading state
+    if (this.container) this.container.innerHTML = ''; // Clear previous items
+    // Re-add loading indicator if it was cleared
+    if (this.actualLoadingEl && this.actualLoadingEl.parentNode !== this.container && this.container) {
+        this.container.appendChild(this.actualLoadingEl);
+    }
+    if (this.options.noMoreResultsIndicator) this.options.noMoreResultsIndicator.style.display = 'none';
+
+    this.loadMore(); // Fetch the first page with new (or reset) query
   }
 }
 

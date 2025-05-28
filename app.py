@@ -807,40 +807,7 @@ def api_full_blacklist():
         per_page = int(request.args.get('per_page', 20))
         search_query = request.args.get('q', '').strip().lower()
         
-        # New parameters for sorting and filtering
-        sort_by = request.args.get('sort_by', 'created_at').strip().lower()
-        sort_order = request.args.get('sort_order', 'desc').strip().lower()
-        date_from = request.args.get('date_from', None)
-        date_to = request.args.get('date_to', None)
-
-        # Validate sort_order
-        if sort_order not in ['asc', 'desc']:
-            sort_order = 'desc' # Default to descending
-        
-        # Validate sort_by to prevent injection, though Supabase client might handle it
-        # For an extra layer, ensure it's one of the allowed columns if needed here, 
-        # but it's also handled in supabase_client.py
-        allowed_sort_columns = ['nickname', 'reason', 'created_at']
-        if sort_by not in allowed_sort_columns:
-            sort_by = 'created_at'
-
-        # Basic validation for date formats ( YYYY-MM-DD )
-        # More robust validation might be needed depending on expected input
-        if date_from:
-            try:
-                datetime.strptime(date_from, '%Y-%m-%d')
-            except ValueError:
-                # Invalid date format, ignore or return error
-                app.logger.warning(f"Invalid date_from format received: {date_from}")
-                date_from = None # Or return a 400 error
-        if date_to:
-            try:
-                datetime.strptime(date_to, '%Y-%m-%d')
-                # To include the whole day, adjust date_to to end of day for lte comparison
-                date_to = f"{date_to}T23:59:59.999999Z"
-            except ValueError:
-                app.logger.warning(f"Invalid date_to format received: {date_to}")
-                date_to = None # Or return a 400 error
+        # Parameters for sorting and filtering are removed
 
         # Validate parameters
         if page < 1:
@@ -848,10 +815,8 @@ def api_full_blacklist():
         if per_page < 1 or per_page > 100:
             per_page = 20
 
-        # Get paginated results with search, sort, and date filters
-        result = db.get_all_blacklist_entries(page=page, per_page=per_page, search=search_query,
-                                             sort_by=sort_by, sort_order=sort_order, 
-                                             date_from=date_from, date_to=date_to)
+        # Get paginated results with search
+        result = db.get_all_blacklist_entries(page=page, per_page=per_page, search=search_query)
         return jsonify(result)
 
     except Exception as e:
@@ -1089,10 +1054,10 @@ def set_security_headers(response):
     csp = (
         "default-src 'self'; "
         "frame-src 'self' https://*; "
-        "connect-src 'self' https://api.mojang.com https://api.namemc.com https://minotar.net; "
+        "connect-src 'self' https://api.mojang.com https://api.namemc.com https://minotar.net https://api.minecraftservices.com; "
         "img-src 'self' data: https://minotar.net https://avatars.githubusercontent.com; "
         "media-src 'self' data: blob: https://minotar.net; "
-        "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; "
+        "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; "
         "worker-src 'self' blob:; "
         "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; "
         "font-src 'self' data:; "
