@@ -1221,7 +1221,7 @@ def set_security_headers(response):
         "connect-src 'self' https://api.mojang.com https://api.namemc.com https://minotar.net https://api.minecraftservices.com; "
         "img-src 'self' data: https://minotar.net https://avatars.githubusercontent.com; "
         "media-src 'self' data: blob: https://minotar.net; "
-        "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js; "
+        "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; "
         "worker-src 'self' blob:; "
         "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; "
         "font-src 'self' data:; "
