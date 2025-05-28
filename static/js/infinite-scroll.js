@@ -8,7 +8,11 @@ class InfiniteScroll {
       searchQuery: options.searchQuery || '',
       noMoreResultsIndicator: options.noMoreResultsIndicator, // Element for "no more results"
       loadingIndicator: options.loadingIndicator, // Element for loading spinner
-      initialPageContentElement: options.initialPageContentElement // Element to show "no results" on initial load
+      initialPageContentElement: options.initialPageContentElement, // Element to show "no results" on initial load
+      sortBy: options.sortBy || '',
+      sortOrder: options.sortOrder || '',
+      dateFrom: options.dateFrom || '',
+      dateTo: options.dateTo || ''
     };
     
     this.page = 1;
@@ -58,6 +62,18 @@ class InfiniteScroll {
       let apiUrl = `/api/fullist?page=${this.page}&per_page=${this.options.perPage}`;
       if (this.options.searchQuery) {
         apiUrl += `&q=${encodeURIComponent(this.options.searchQuery)}`;
+      }
+      if (this.options.sortBy) {
+        apiUrl += `&sort_by=${encodeURIComponent(this.options.sortBy)}`;
+      }
+      if (this.options.sortOrder) {
+        apiUrl += `&sort_order=${encodeURIComponent(this.options.sortOrder)}`;
+      }
+      if (this.options.dateFrom) {
+        apiUrl += `&date_from=${encodeURIComponent(this.options.dateFrom)}`;
+      }
+      if (this.options.dateTo) {
+        apiUrl += `&date_to=${encodeURIComponent(this.options.dateTo)}`;
       }
       
       const response = await fetch(apiUrl);
@@ -166,177 +182,55 @@ document.addEventListener('DOMContentLoaded', function () {
     const dateToInput = document.getElementById('dateTo');
     const applyFiltersBtn = document.getElementById('applyFiltersBtn');
 
-    let currentPage = 1;
-    const perPage = 20;
-    let isLoading = false;
-    let hasMore = true;
-    let currentSearchQuery = '';
-    
-    // Store current filter values
-    let currentSortBy = 'created_at';
-    let currentSortOrder = 'desc';
-    let currentDateFrom = '';
-    let currentDateTo = '';
-
-    async function fetchBlacklist(page, query = '', sortBy = 'created_at', sortOrder = 'desc', dateFrom = '', dateTo = '') {
-        if (isLoading || !hasMore) return;
-        isLoading = true;
-        loadingIndicator.style.display = 'block';
-        noMoreResultsIndicator.style.display = 'none';
-
-        try {
-            let apiUrl = `/api/fullist?page=${page}&per_page=${perPage}`;
-            if (query) {
-                apiUrl += `&q=${encodeURIComponent(query)}`;
-            }
-            if (sortBy) {
-                apiUrl += `&sort_by=${encodeURIComponent(sortBy)}`;
-            }
-            if (sortOrder) {
-                apiUrl += `&sort_order=${encodeURIComponent(sortOrder)}`;
-            }
-            if (dateFrom) {
-                apiUrl += `&date_from=${encodeURIComponent(dateFrom)}`;
-            }
-            if (dateTo) {
-                apiUrl += `&date_to=${encodeURIComponent(dateTo)}`;
-            }
-
-            const response = await fetch(apiUrl);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const data = await response.json();
-
-            if (data.items && data.items.length > 0) {
-                data.items.forEach(item => {
-                    const entryDiv = document.createElement('div');
-                    entryDiv.className = 'list-group-item list-group-item-action flex-column align-items-start';
-                    
-                    const headerDiv = document.createElement('div');
-                    headerDiv.className = 'd-flex w-100 justify-content-between';
-                    
-                    const nicknameH5 = document.createElement('h5');
-                    nicknameH5.className = 'mb-1';
-                    nicknameH5.textContent = item.nickname;
-                    
-                    const createdAtSmall = document.createElement('small');
-                    createdAtSmall.textContent = item.created_at ? new Date(item.created_at).toLocaleDateString() : 'N/A';
-                    
-                    headerDiv.appendChild(nicknameH5);
-                    headerDiv.appendChild(createdAtSmall);
-                    
-                    const reasonP = document.createElement('p');
-                    reasonP.className = 'mb-1';
-                    reasonP.textContent = `Причина: ${item.reason || 'Не указана'}`;
-                    
-                    const uuidSmall = document.createElement('small');
-                    uuidSmall.textContent = `UUID: ${item.uuid}`;
-                    uuidSmall.className = 'text-muted';
-
-                    // Avatar
-                    const avatarImg = document.createElement('img');
-                    avatarImg.alt = item.nickname + " avatar";
-                    avatarImg.style.width = '50px';
-                    avatarImg.style.height = '50px';
-                    avatarImg.style.marginRight = '15px';
-                    avatarImg.loading = 'lazy';
-                    
-                    // Fetch avatar data
-                    fetch(`/api/avatar/${item.uuid}`)
-                        .then(res => res.json())
-                        .then(avatarData => {
-                            if (avatarData && avatarData.avatar_base64) {
-                                avatarImg.src = avatarData.avatar_base64;
-                            } else {
-                                avatarImg.src = 'https://minotar.net/helm/MHF_Steve/50.png'; // Fallback
-                            }
-                        })
-                        .catch(() => {
-                            avatarImg.src = 'https://minotar.net/helm/MHF_Steve/50.png'; // Fallback on error
-                        });
-
-                    const contentDiv = document.createElement('div');
-                    contentDiv.className = 'd-flex align-items-center';
-                    contentDiv.appendChild(avatarImg);
-                    
-                    const textDiv = document.createElement('div');
-                    textDiv.appendChild(headerDiv);
-                    textDiv.appendChild(reasonP);
-                    textDiv.appendChild(uuidSmall);
-                    contentDiv.appendChild(textDiv);
-
-                    entryDiv.appendChild(contentDiv);
-                    blacklistContainer.appendChild(entryDiv);
-                });
-                currentPage++;
-                hasMore = data.has_more;
-                if (!hasMore) {
-                    noMoreResultsIndicator.style.display = 'block';
-                }
-            } else {
-                hasMore = false;
-                if (page === 1) { // Only show if it's the first page and no results
-                    blacklistContainer.innerHTML = '<p class="text-center text-muted">Записи не найдены.</p>';
-                }
-                noMoreResultsIndicator.style.display = 'block';
-            }
-        } catch (error) {
-            console.error('Failed to fetch blacklist:', error);
-            blacklistContainer.innerHTML = '<p class="text-center text-danger">Не удалось загрузить список. Попробуйте позже.</p>';
-        }
-        isLoading = false;
-        loadingIndicator.style.display = 'none';
+    if (!blacklistContainer) {
+        console.error('Blacklist container not found. Infinite scroll will not be initialized.');
+        return;
     }
 
-    function resetAndLoad() {
-        currentPage = 1;
-        hasMore = true;
-        blacklistContainer.innerHTML = ''; 
-        noMoreResultsIndicator.style.display = 'none';
-        // Get current values from controls
-        currentSearchQuery = searchInput.value.trim();
-        currentSortBy = sortBySelect.value;
-        currentSortOrder = sortOrderSelect.value;
-        currentDateFrom = dateFromInput.value;
-        currentDateTo = dateToInput.value;
-        fetchBlacklist(currentPage, currentSearchQuery, currentSortBy, currentSortOrder, currentDateFrom, currentDateTo);
-    }
-
-    // Initial load
-    fetchBlacklist(currentPage, currentSearchQuery, currentSortBy, currentSortOrder, currentDateFrom, currentDateTo);
-
-    // Scroll event for infinite loading
-    window.addEventListener('scroll', () => {
-        if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 200 && !isLoading && hasMore) {
-            fetchBlacklist(currentPage, currentSearchQuery, currentSortBy, currentSortOrder, currentDateFrom, currentDateTo);
-        }
+    const infiniteScroller = new InfiniteScroll(blacklistContainer, {
+        perPage: 20,
+        loadingIndicator: loadingIndicator,
+        noMoreResultsIndicator: noMoreResultsIndicator,
+        initialPageContentElement: blacklistContainer // Or a specific element if you have one for "no results"
     });
 
-    // Search input event
+    // Search functionality
     let searchTimeout;
-    searchInput.addEventListener('input', () => {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            resetAndLoad();
-        }, 500); // Debounce search
-    });
-
-    // Apply filters button event
-    if (applyFiltersBtn) { // Ensure button exists
-        applyFiltersBtn.addEventListener('click', () => {
-            resetAndLoad();
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                infiniteScroller.options.searchQuery = searchInput.value;
+                infiniteScroller.reset(); 
+            }, 300); // Debounce search
         });
     }
-    
-    // Also trigger resetAndLoad if any of the select/date inputs change directly (optional)
-    [sortBySelect, sortOrderSelect, dateFromInput, dateToInput].forEach(element => {
-        if (element) { // Check if element exists before adding listener
-            element.addEventListener('change', () => {
-                // If you want immediate reload on change, call resetAndLoad().
-                // Otherwise, user relies on the "Apply" button.
-                // For this setup, we rely on the Apply button, so this can be empty or a visual cue.
-            });
-        }
-    });
+
+    // Filter and Sort functionality
+    function applyAndReset() {
+        infiniteScroller.options.sortBy = sortBySelect ? sortBySelect.value : 'created_at';
+        infiniteScroller.options.sortOrder = sortOrderSelect ? sortOrderSelect.value : 'desc';
+        infiniteScroller.options.dateFrom = dateFromInput ? dateFromInput.value : '';
+        infiniteScroller.options.dateTo = dateToInput ? dateToInput.value : '';
+        infiniteScroller.reset();
+    }
+
+    if (applyFiltersBtn) {
+        applyFiltersBtn.addEventListener('click', applyAndReset);
+    }
+
+    // Initial load with default sort/filter if elements exist
+    if (sortBySelect || sortOrderSelect || dateFromInput || dateToInput) {
+        // Call applyAndReset to set initial options and load if filter elements are present
+        // This ensures that if there are default values in the select/input fields,
+        // they are used for the first load. However, the InfiniteScroll constructor
+        // already calls loadMore(), so we might just need to set the options.
+        infiniteScroller.options.sortBy = sortBySelect ? sortBySelect.value : 'created_at';
+        infiniteScroller.options.sortOrder = sortOrderSelect ? sortOrderSelect.value : 'desc';
+        infiniteScroller.options.dateFrom = dateFromInput ? dateFromInput.value : '';
+        infiniteScroller.options.dateTo = dateToInput ? dateToInput.value : '';
+        // No need to call reset() here if the constructor's loadMore() is sufficient
+        // and we are okay with the very first load not having these filters yet.
+        // If filters must apply on first load, then a reset() might be needed AFTER constructor.
+    }
 }); 
