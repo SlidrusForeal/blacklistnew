@@ -1,5 +1,5 @@
 from supabase import create_client, Client
-from datetime import datetime
+from datetime import datetime, timedelta
 from config import SUPABASE_URL, SUPABASE_KEY, SUPABASE_SERVICE_KEY
 from typing import Optional, List, Dict, Any
 import logging
@@ -62,30 +62,38 @@ class SupabaseClient:
 
     def get_all_blacklist_entries(self, page: int = 1, per_page: int = 20, search: str = None) -> Dict[str, Any]:
         try:
-            query = self.client.table('blacklist_entry').select('*')
+            query = self.client.table('blacklist_entry').select('*', count='exact') 
             
             if search:
                 query = query.or_(f'nickname.ilike.%{search}%,reason.ilike.%{search}%')
             
-            # Get total count
-            count_result = query.execute()
-            total_items = len(count_result.data)
+            # Pagination
+            start_index = (page - 1) * per_page
+            # Default sorting by created_at descending, as was implicit before detailed sort options
+            query = query.range(start_index, start_index + per_page - 1).order('created_at', desc=True) 
             
-            # Get paginated results
-            start = (page - 1) * per_page
-            query = query.range(start, start + per_page - 1).order('created_at', desc=True)
             result = query.execute()
+            
+            total_items = result.count if hasattr(result, 'count') and result.count is not None else 0
             
             return {
                 'items': result.data,
                 'page': page,
                 'per_page': per_page,
-                'total_items': total_items,
+                'total_items': total_items, 
                 'has_more': (page * per_page) < total_items
             }
         except Exception as e:
             logger.error(f"Error getting blacklist entries: {e}")
             return {'items': [], 'page': page, 'per_page': per_page, 'total_items': 0, 'has_more': False}
+
+    def get_total_blacklist_entries_count(self) -> int:
+        try:
+            result = self.client.table('blacklist_entry').select('id', count='exact').execute()
+            return result.count if hasattr(result, 'count') and result.count is not None else 0
+        except Exception as e:
+            logger.error(f"Error getting total blacklist entries count: {e}")
+            return 0
 
     # Admin user operations
     def get_admin_user(self, username: str) -> Optional[Dict[str, Any]]:
@@ -134,6 +142,82 @@ class SupabaseClient:
         except Exception as e:
             logger.error(f"Error deleting admin user: {e}")
             return False
+
+    # Audit Log Operations
+    def add_audit_log(self, admin_username: str, action_type: str, target_type: Optional[str] = None, target_identifier: Optional[str] = None, details: Optional[str] = None) -> bool:
+        try:
+            data = {
+                'timestamp': datetime.utcnow().isoformat(),
+                'admin_username': admin_username,
+                'action_type': action_type,
+                'target_type': target_type,
+                'target_identifier': target_identifier,
+                'details': details
+            }
+            # Use admin_client as audit logs are sensitive and should always be writable
+            result = self.admin_client.table('audit_log').insert(data).execute()
+            return bool(result.data)
+        except Exception as e:
+            logger.error(f"Error adding audit log: {e}")
+            return False
+
+    def get_audit_logs(self, page: int = 1, per_page: int = 50) -> Dict[str, Any]:
+        try:
+            query = self.admin_client.table('audit_log').select('*', count='exact')
+            
+            start = (page - 1) * per_page
+            query = query.range(start, start + per_page - 1).order('timestamp', desc=True)
+            
+            result = query.execute()
+            
+            total_items = result.count if hasattr(result, 'count') and result.count is not None else 0
+            
+            return {
+                'items': result.data,
+                'page': page,
+                'per_page': per_page,
+                'total_items': total_items,
+                'has_more': (page * per_page) < total_items
+            }
+        except Exception as e:
+            logger.error(f"Error getting audit logs: {e}")
+            return {'items': [], 'page': page, 'per_page': per_page, 'total_items': 0, 'has_more': False}
+
+    # Check Log Operations
+    def add_check_log(self, check_source: str) -> bool:
+        try:
+            data = {
+                'timestamp': datetime.utcnow().isoformat(),
+                'check_source': check_source 
+            }
+            # Using admin_client as this is an internal logging mechanism
+            # If RLS is set up on check_log to allow anon inserts, self.client could be used.
+            # For now, admin_client is safer.
+            result = self.admin_client.table('check_log').insert(data).execute()
+            return bool(result.data) # Or check for errors in result.error
+        except Exception as e:
+            logger.error(f"Error adding check log: {e}")
+            return False
+
+    def count_total_checks(self) -> int:
+        try:
+            result = self.admin_client.table('check_log').select('id', count='exact').execute()
+            return result.count if hasattr(result, 'count') and result.count is not None else 0
+        except Exception as e:
+            logger.error(f"Error counting total checks: {e}")
+            return 0
+
+    def count_checks_last_24_hours(self) -> int:
+        try:
+            time_24_hours_ago = (datetime.utcnow() - timedelta(days=1)).isoformat()
+            result = self.admin_client.table('check_log') \
+                         .select('id', count='exact') \
+                         .gte('timestamp', time_24_hours_ago) \
+                         .execute()
+            return result.count if hasattr(result, 'count') and result.count is not None else 0
+        except Exception as e:
+            logger.error(f"Error counting checks in last 24 hours: {e}")
+            return 0
 
 # Create a global instance
 db = SupabaseClient() 

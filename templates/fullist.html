@@ -10,17 +10,23 @@
 {% block content %}
 <div class="fullist-container">
   <h1>Полный список</h1>
-  
+
   <div class="search-container">
-    <input type="text" 
-           id="searchInput" 
-           placeholder="Поиск по никнейму или причине..." 
+    <input type="text"
+           id="searchInput"
+           placeholder="Поиск по никнейму или причине..."
            aria-label="Поиск по списку"
            class="search-input">
   </div>
 
-  <div class="blacklist-entries" role="list">
+  <div id="blacklistContainer" class="blacklist-entries" role="list">
     <!-- Entries will be loaded dynamically -->
+  </div>
+  <div id="loadingIndicator" style="display: none; text-align: center; margin: 20px;">
+      <p>Загрузка...</p>
+  </div>
+  <div id="noMoreResultsIndicator" style="display: none; text-align: center; margin: 20px; color: grey;">
+      <p>Больше нет записей.</p>
   </div>
 </div>
 {% endblock %}
@@ -30,20 +36,60 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const searchInput = document.getElementById('searchInput');
-  let searchTimeout;
+  const blacklistContainer = document.getElementById('blacklistContainer'); // Ensure this ID matches
+  const loadingIndicator = document.getElementById('loadingIndicator');
+  const noMoreResultsIndicator = document.getElementById('noMoreResultsIndicator');
 
-  searchInput.addEventListener('input', (e) => {
-    clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(() => {
-      const container = document.querySelector('.blacklist-entries');
-      const infiniteScroll = new InfiniteScroll(container, {
-        perPage: 20,
-        threshold: 200,
-        searchQuery: e.target.value
-      });
-      infiniteScroll.reset();
-    }, 300);
-  });
+  let globalInfiniteScrollInstance;
+
+  function initializeInfiniteScroll(searchQuery = '') {
+    if (globalInfiniteScrollInstance) {
+      // If an instance exists, we might need to reset it or ensure it handles new search query
+      // For simplicity with the old class, we might just clear container and make a new one.
+      // However, the provided old JS class has a .reset() method which should be used.
+      // globalInfiniteScrollInstance.options.searchQuery = searchQuery; // Assuming the class can pick this up or reset uses it
+      // globalInfiniteScrollInstance.reset();
+      // The old code actually made a new instance, which is fine.
+    }
+    
+    // Clear previous content if any, before initializing new scroll
+    if (blacklistContainer) { // Check if container exists
+        // blacklistContainer.innerHTML = ''; // The reset method in the old class should handle this
+    }
+
+
+    globalInfiniteScrollInstance = new InfiniteScroll(blacklistContainer, {
+      perPage: 20,
+      threshold: 200,
+      searchQuery: searchQuery,
+      loadingTemplate: '<div class="loading-spinner"><div class="spinner"></div><p>Загрузка записей...</p></div>', // Example template
+      noMoreResultsIndicator: noMoreResultsIndicator, // Pass the indicator
+      loadingIndicator: loadingIndicator, // Pass the loading indicator
+      initialPageContentElement: blacklistContainer // Pass container to show 'no results'
+    });
+  }
+  
+  initializeInfiniteScroll(); // Initial load without search query
+
+  let searchTimeout;
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        // Instead of creating a new InfiniteScroll instance every time,
+        // we should ideally have a method on the existing instance to reset and fetch with a new query.
+        // The old InfiniteScroll class has a 'reset' method, let's use that.
+        // We'll need to update the searchQuery for the instance.
+        if (globalInfiniteScrollInstance) {
+            globalInfiniteScrollInstance.options.searchQuery = e.target.value.trim();
+            globalInfiniteScrollInstance.reset();
+        } else {
+            // Fallback if instance wasn't created, though it should have been
+            initializeInfiniteScroll(e.target.value.trim());
+        }
+      }, 500); // Debounce
+    });
+  }
 });
 </script>
 {% endblock %}

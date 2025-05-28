@@ -7,3 +7,4 @@ WTForms==3.0.1
 psycopg2-binary>=2.9.6,<2.10
 supabase==1.0.3
 werkzeug==2.2.3
+flask_jwt_extended==4.7.0

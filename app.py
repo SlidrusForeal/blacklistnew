@@ -51,8 +51,8 @@ app.config['GITHUB_SECRET'] = GITHUB_SECRET
 
 # ─────────────── Настройка логирования ───────────────
 # Создаём папку для логов, если её нет
-if not os.path.exists('logs'):
-    os.mkdir('logs')
+# if not os.path.exists('logs'):
+#     os.mkdir('logs')
 
 LOG_CONFIG = {
     'version': 1,
@@ -71,26 +71,27 @@ LOG_CONFIG = {
             'formatter': 'default',
             'level': 'INFO'
         },
-        'info_file': {
-            'class': 'logging.handlers.TimedRotatingFileHandler',
-            'filename': 'logs/info.log',
-            'when': 'midnight',
-            'backupCount': 7,
-            'formatter': 'default',
-            'level': 'INFO'
-        },
-        'error_file': {
-            'class': 'logging.handlers.TimedRotatingFileHandler',
-            'filename': 'logs/error.log',
-            'when': 'midnight',
-            'backupCount': 30,
-            'formatter': 'default',
-            'level': 'ERROR'
-        }
+        # 'info_file': {
+        #     'class': 'logging.handlers.TimedRotatingFileHandler',
+        #     'filename': 'logs/info.log',
+        #     'when': 'midnight',
+        #     'backupCount': 7,
+        #     'formatter': 'default',
+        #     'level': 'INFO'
+        # },
+        # 'error_file': {
+        #     'class': 'logging.handlers.TimedRotatingFileHandler',
+        #     'filename': 'logs/error.log',
+        #     'when': 'midnight',
+        #     'backupCount': 30,
+        #     'formatter': 'default',
+        #     'level': 'ERROR'
+        # }
     },
     'loggers': {
         '': {
-            'handlers': ['console', 'info_file', 'error_file'],
+            # 'handlers': ['console', 'info_file', 'error_file'],
+            'handlers': ['console'],
             'level': 'INFO',
             'propagate': True
         }
@@ -334,6 +335,27 @@ def save_whitelist(data):
         app.logger.error(f"Ошибка сохранения whitelist: {str(e)}")
 
 
+# --- Helper for Audit Logging ---
+def log_admin_action(action_type: str, target_type: Optional[str] = None, target_identifier: Optional[str] = None, details: Optional[str] = None):
+    try:
+        # Ensure we are in a request context with a JWT
+        verify_jwt_in_request(optional=True) # Use optional to avoid error if called outside a protected route, though it should be.
+        current_user_identity = get_jwt_identity()
+        if current_user_identity:
+            db.add_audit_log(
+                admin_username=current_user_identity,
+                action_type=action_type,
+                target_type=target_type,
+                target_identifier=str(target_identifier) if target_identifier is not None else None,
+                details=details
+            )
+        else:
+            app.logger.warning("Attempted to log admin action without a JWT identity (e.g. user not logged in or no token).")
+    except Exception as e:
+        # Log an error if audit logging fails, but don't let it break the main action
+        app.logger.error(f"Failed to log admin action '{action_type}': {e}")
+
+
 # --- Маршруты публичного сайта ---
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -354,6 +376,7 @@ def index():
             result = {"message": f"{name}, вы в ЧС!", "reason": entry['reason'], "color": "red"}
         else:
             result = {"message": f"{name}, вы не в ЧС!", "color": "green"}
+        db.add_check_log(check_source='main_page_check') # Log the check
     return render_template("index.html", form=form, result=result)
 
 
@@ -442,6 +465,7 @@ def admin_register():
         else:
             password_hash = generate_password_hash(password)
             if db.create_admin_user(username, password_hash, role):
+                log_admin_action("CREATE_ADMIN_USER", target_type="admin_user", target_identifier=username, details=f"Role: {role}")
                 flash("Пользователь успешно зарегистрирован.", "success")
                 return redirect(url_for("admin_panel"))
             else:
@@ -457,14 +481,19 @@ def admin_panel():
     if form.validate_on_submit():
         nick = form.nickname.data.strip()
         reason = form.reason.data.strip()
-        uuid = get_uuid_from_nickname(nick)
+        uuid_val = get_uuid_from_nickname(nick) # Renamed to avoid conflict with uuid module
         
-        if not uuid:
+        if not uuid_val:
             flash("Не удалось получить UUID.", "warning")
-        elif db.get_blacklist_entry(nick):
+        elif db.get_blacklist_entry(nick): # Checks by nickname, which could lead to issues if nickname changed.
             flash("Уже в черном списке.", "info")
         else:
-            if db.add_blacklist_entry(nick, uuid, reason):
+            # It might be better to check by UUID if it's the primary identifier
+            existing_by_uuid = db.client.table('blacklist_entry').select('id').eq('uuid', uuid_val).execute()
+            if existing_by_uuid.data:
+                flash(f"Пользователь с UUID {uuid_val} уже в черном списке.", "info")
+            elif db.add_blacklist_entry(nick, uuid_val, reason):
+                log_admin_action("ADD_BLACKLIST", target_type="blacklist_entry", target_identifier=nick, details=f"UUID: {uuid_val}, Reason: {reason}")
                 flash("Запись добавлена в ЧС.", "success")
                 return redirect(url_for('admin_panel'))
             else:
@@ -481,11 +510,14 @@ def update_reason(entry_id):
     if not entry:
         abort(404)
         
-    form = UpdateReasonForm(reason=entry['reason'])
+    original_reason = entry['reason']
+    form = UpdateReasonForm(reason=original_reason)
+
     if form.validate_on_submit():
         new_reason = form.reason.data.strip()
-        if new_reason != entry['reason']:
+        if new_reason != original_reason:
             if db.update_blacklist_entry(entry_id, {'reason': new_reason}):
+                log_admin_action("UPDATE_BLACKLIST_REASON", target_type="blacklist_entry", target_identifier=str(entry_id), details=f"Old: '{original_reason}', New: '{new_reason}'")
                 flash("Причина изменена.", "success")
             else:
                 flash("Ошибка при обновлении причины.", "danger")
@@ -498,10 +530,15 @@ def update_reason(entry_id):
 @app.route("/admin/delete/<int:entry_id>", methods=["POST"])
 @role_required("owner", "admin")
 def delete_entry(entry_id):
-    if db.delete_blacklist_entry(entry_id):
-        flash("Запись удалена из ЧС.", "success")
+    entry_to_delete = db.get_blacklist_entry_by_id(entry_id) # Get details before deleting for logging
+    if entry_to_delete:
+        if db.delete_blacklist_entry(entry_id):
+            log_admin_action("DELETE_BLACKLIST", target_type="blacklist_entry", target_identifier=str(entry_id), details=f"Nickname: {entry_to_delete.get('nickname')}, UUID: {entry_to_delete.get('uuid')}")
+            flash("Запись удалена из ЧС.", "success")
+        else:
+            flash("Ошибка при удалении записи.", "danger")
     else:
-        flash("Ошибка при удалении записи.", "danger")
+        flash("Запись не найдена для удаления.", "warning")
     return redirect(url_for('admin_panel'))
 
 
@@ -514,15 +551,16 @@ def admin_users():
 @app.route("/admin/delete_user/<int:user_id>", methods=["POST"])
 @role_required("owner")
 def delete_user(user_id):
-    current = get_jwt_identity()
-    user = db.get_admin_user_by_id(user_id)
-    if not user:
+    current_user_identity = get_jwt_identity() # Renamed from current to avoid conflict
+    user_to_delete = db.get_admin_user_by_id(user_id) # Get details before deleting
+    if not user_to_delete:
         abort(404)
         
-    if user['username'] == current:
+    if user_to_delete['username'] == current_user_identity:
         flash("Нельзя удалить себя.", "warning")
     else:
         if db.delete_admin_user(user_id):
+            log_admin_action("DELETE_ADMIN_USER", target_type="admin_user", target_identifier=user_to_delete['username'])
             flash("Пользователь удалён.", "success")
         else:
             flash("Ошибка при удалении пользователя.", "danger")
@@ -538,7 +576,11 @@ def admin_whitelist():
         uuid_to_modify = form.uuid.data.strip()
         action = form.action.data
 
+<<<<<<< HEAD
         if not uuid_to_modify: # Добавим проверку, что UUID не пустой
+=======
+        if not uuid_to_modify: 
+>>>>>>> 3a2030e8a93208f3e3cf84526f7350abff580ee1
             flash("UUID не может быть пустым.", "warning")
             return redirect(url_for('admin_whitelist'))
 
@@ -546,6 +588,10 @@ def admin_whitelist():
             if uuid_to_modify not in whitelist:
                 whitelist.append(uuid_to_modify)
                 save_whitelist(whitelist)
+<<<<<<< HEAD
+=======
+                log_admin_action("ADD_WHITELIST", target_type="whitelist_entry", target_identifier=uuid_to_modify)
+>>>>>>> 3a2030e8a93208f3e3cf84526f7350abff580ee1
                 flash(f"UUID {uuid_to_modify} добавлен в whitelist.", "success")
             else:
                 flash(f"UUID {uuid_to_modify} уже в whitelist.", "info")
@@ -553,19 +599,31 @@ def admin_whitelist():
             if uuid_to_modify in whitelist:
                 whitelist.remove(uuid_to_modify)
                 save_whitelist(whitelist)
+<<<<<<< HEAD
+=======
+                log_admin_action("DELETE_WHITELIST", target_type="whitelist_entry", target_identifier=uuid_to_modify)
+>>>>>>> 3a2030e8a93208f3e3cf84526f7350abff580ee1
                 flash(f"UUID {uuid_to_modify} удален из whitelist.", "success")
             else:
                 flash(f"UUID {uuid_to_modify} не найден в whitelist.", "warning")
         return redirect(url_for('admin_whitelist'))
     
+<<<<<<< HEAD
     # Для POST-запросов от кнопок "Удалить" в списке
     if request.method == "POST" and not form.is_submitted(): # Проверяем, что это не сабмит основной формы
+=======
+    if request.method == "POST" and not form.is_submitted(): 
+>>>>>>> 3a2030e8a93208f3e3cf84526f7350abff580ee1
         uuid_to_delete = request.form.get("uuid")
         action_delete = request.form.get("action")
         if uuid_to_delete and action_delete == "delete":
             if uuid_to_delete in whitelist:
                 whitelist.remove(uuid_to_delete)
                 save_whitelist(whitelist)
+<<<<<<< HEAD
+=======
+                log_admin_action("DELETE_WHITELIST", target_type="whitelist_entry", target_identifier=uuid_to_delete, details="Deleted via button in list")
+>>>>>>> 3a2030e8a93208f3e3cf84526f7350abff580ee1
                 flash(f"UUID {uuid_to_delete} удален из whitelist (через кнопку).", "success")
             else:
                 flash(f"UUID {uuid_to_delete} не найден в whitelist.", "warning")
@@ -575,15 +633,26 @@ def admin_whitelist():
 
 @app.route("/admin/update_nicknames", methods=["POST"])
 @role_required("owner")
+<<<<<<< HEAD
 def update_nicknames_route(): # Переименовал функцию, чтобы не конфликтовать с возможными другими
     if request.method == "POST":
         try:
             all_entries_data = db.get_all_blacklist_entries(page=1, per_page=10000) # Получаем все записи (или достаточно много)
+=======
+def update_nicknames_route(): 
+    if request.method == "POST":
+        try:
+            all_entries_data = db.get_all_blacklist_entries(page=1, per_page=10000) 
+>>>>>>> 3a2030e8a93208f3e3cf84526f7350abff580ee1
             entries = all_entries_data.get('items', [])
             
             updated_count = 0
             failed_fetch_count = 0
             no_change_count = 0
+<<<<<<< HEAD
+=======
+            log_details = []
+>>>>>>> 3a2030e8a93208f3e3cf84526f7350abff580ee1
 
             if not entries:
                 flash("Черный список пуст. Нечего обновлять.", "info")
@@ -599,22 +668,46 @@ def update_nicknames_route(): # Переименовал функцию, что�
                     failed_fetch_count += 1
                     continue
 
+<<<<<<< HEAD
                 new_nickname = get_name_from_uuid(current_uuid) # Используем существующую функцию
+=======
+                new_nickname = get_name_from_uuid(current_uuid) 
+>>>>>>> 3a2030e8a93208f3e3cf84526f7350abff580ee1
 
                 if new_nickname:
                     if new_nickname.lower() != old_nickname.lower():
                         if db.update_blacklist_entry(entry_id, {'nickname': new_nickname}):
                             updated_count += 1
+<<<<<<< HEAD
                             app.logger.info(f"Updated nickname for UUID {current_uuid} from {old_nickname} to {new_nickname}")
                         else:
                             app.logger.error(f"Failed to update nickname in DB for UUID {current_uuid}")
                             failed_fetch_count += 1 # Считаем как ошибку, если БД не обновилась
+=======
+                            log_details.append(f"Updated: {old_nickname} (UUID: {current_uuid}) -> {new_nickname}")
+                            app.logger.info(f"Updated nickname for UUID {current_uuid} from {old_nickname} to {new_nickname}")
+                        else:
+                            app.logger.error(f"Failed to update nickname in DB for UUID {current_uuid}")
+                            failed_fetch_count += 1 
+>>>>>>> 3a2030e8a93208f3e3cf84526f7350abff580ee1
                     else:
                         no_change_count +=1
                 else:
                     app.logger.warning(f"Could not fetch new nickname for UUID {current_uuid} (was {old_nickname}).")
                     failed_fetch_count += 1
             
+<<<<<<< HEAD
+=======
+            if updated_count > 0 or failed_fetch_count > 0: # Log only if there were changes or errors
+                log_admin_action(
+                    "UPDATE_ALL_NICKNAMES",
+                    details=(
+                        f"Updated: {updated_count}, Failed: {failed_fetch_count}, No change: {no_change_count}. "
+                        f"Changes: {'; '.join(log_details) if log_details else 'None'}"
+                    )
+                )
+
+>>>>>>> 3a2030e8a93208f3e3cf84526f7350abff580ee1
             flash_messages = []
             if updated_count > 0:
                 flash_messages.append(f"Обновлено никнеймов: {updated_count}.")
@@ -709,7 +802,8 @@ def api_check():
         }
     else:
         payload = {'in_blacklist': False}
-
+    
+    db.add_check_log(check_source='api_check') # Log the check
     text = json.dumps(payload, ensure_ascii=False)
     return Response(text, status=200, mimetype='application/json')
 
@@ -718,12 +812,44 @@ def api_check():
 def admin_map():
     return render_template("admin_map.html")
 
+@app.route("/admin/audit_log", methods=["GET"])
+@role_required("owner")
+def admin_audit_log():
+    page = request.args.get('page', 1, type=int)
+    per_page = 20 # Or make this configurable
+    
+    logs_data = db.get_audit_logs(page=page, per_page=per_page)
+    
+    return render_template("admin_audit_log.html", 
+                           logs=logs_data.get('items', []),
+                           page=logs_data.get('page'),
+                           per_page=logs_data.get('per_page'),
+                           total_items=logs_data.get('total_items'),
+                           has_more=logs_data.get('has_more'))
+
+@app.route("/statistics", methods=["GET"])
+def statistics_page():
+    total_blacklist_entries = db.get_total_blacklist_entries_count()
+    total_checks = db.count_total_checks()
+    checks_last_24_hours = db.count_checks_last_24_hours()
+    
+    # Placeholder for blacklist growth data - this would require more complex historical data storage
+    blacklist_growth_data = [] 
+
+    return render_template("statistics.html",
+                           total_blacklist_entries=total_blacklist_entries,
+                           total_checks=total_checks,
+                           checks_last_24_hours=checks_last_24_hours,
+                           blacklist_growth_data=blacklist_growth_data)
+
 @app.route('/api/fullist')
 def api_full_blacklist():
     try:
         page = int(request.args.get('page', 1))
         per_page = int(request.args.get('per_page', 20))
         search_query = request.args.get('q', '').strip().lower()
+        
+        # Parameters for sorting and filtering are removed
 
         # Validate parameters
         if page < 1:
@@ -732,7 +858,7 @@ def api_full_blacklist():
             per_page = 20
 
         # Get paginated results with search
-        result = db.get_all_blacklist_entries(page, per_page, search_query)
+        result = db.get_all_blacklist_entries(page=page, per_page=per_page, search=search_query)
         return jsonify(result)
 
     except Exception as e:
@@ -970,10 +1096,10 @@ def set_security_headers(response):
     csp = (
         "default-src 'self'; "
         "frame-src 'self' https://*; "
-        "connect-src 'self' https://api.mojang.com https://api.namemc.com https://minotar.net; "
+        "connect-src 'self' https://api.mojang.com https://api.namemc.com https://minotar.net https://api.minecraftservices.com; "
         "img-src 'self' data: https://minotar.net https://avatars.githubusercontent.com; "
         "media-src 'self' data: blob: https://minotar.net; "
-        "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; "
+        "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; "
         "worker-src 'self' blob:; "
         "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; "
         "font-src 'self' data:; "
@@ -1007,8 +1133,8 @@ def set_security_headers(response):
 
 if __name__ == '__main__':
     # Ensure all required directories exist
-    for directory in ['logs', 'tmp']:
-        if not os.path.exists(directory):
-            os.makedirs(directory)
+    # for directory in ['logs', 'tmp']:
+    #     if not os.path.exists(directory):
+    #         os.makedirs(directory)
             
     app.run(debug=False)

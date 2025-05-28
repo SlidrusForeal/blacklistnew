@@ -3,9 +3,16 @@ class InfiniteScroll {
     this.container = container;
     this.options = {
       perPage: options.perPage || 20,
-      threshold: options.threshold || 100,
+      threshold: options.threshold || 100, // Pixels from bottom to trigger load
       loadingTemplate: options.loadingTemplate || '<div class="loading">Загрузка...</div>',
-      ...options
+      searchQuery: options.searchQuery || '',
+      noMoreResultsIndicator: options.noMoreResultsIndicator, // Element for "no more results"
+      loadingIndicator: options.loadingIndicator, // Element for loading spinner
+      initialPageContentElement: options.initialPageContentElement, // Element to show "no results" on initial load
+      sortBy: options.sortBy || '',
+      sortOrder: options.sortOrder || '',
+      dateFrom: options.dateFrom || '',
+      dateTo: options.dateTo || ''
     };
     
     this.page = 1;
@@ -16,62 +23,110 @@ class InfiniteScroll {
   }
   
   init() {
-    // Create loading element
-    this.loadingEl = document.createElement('div');
-    this.loadingEl.innerHTML = this.options.loadingTemplate;
-    this.loadingEl.style.display = 'none';
-    this.container.appendChild(this.loadingEl);
+    // Use provided loading indicator or create one
+    this.actualLoadingEl = this.options.loadingIndicator;
+    if (!this.actualLoadingEl && this.container) { // Ensure container exists for appending
+        const loadingElDiv = document.createElement('div');
+        loadingElDiv.innerHTML = this.options.loadingTemplate;
+        this.actualLoadingEl = loadingElDiv.firstChild;
+        if (this.actualLoadingEl) this.container.appendChild(this.actualLoadingEl);
+    }
+    if (this.actualLoadingEl) this.actualLoadingEl.style.display = 'none';
+    if (this.options.noMoreResultsIndicator) this.options.noMoreResultsIndicator.style.display = 'none';
     
-    // Add scroll listener
     window.addEventListener('scroll', this.handleScroll.bind(this));
-    
-    // Initial load
-    this.loadMore();
+    this.loadMore(); // Initial load
   }
   
   handleScroll() {
-    if (this.loading || !this.hasMore) return;
+    if (this.loading || !this.hasMore || !this.container) return;
     
     const scrollPos = window.innerHeight + window.scrollY;
-    const threshold = document.documentElement.offsetHeight - this.options.threshold;
-    
-    if (scrollPos >= threshold) {
+    // Check if container is tall enough to scroll, or if body scroll is sufficient
+    const containerBottom = this.container.offsetTop + this.container.offsetHeight;
+    const triggerPoint = Math.max(document.documentElement.offsetHeight - this.options.threshold, containerBottom - this.options.threshold);
+
+    if (scrollPos >= triggerPoint) {
       this.loadMore();
     }
   }
   
   async loadMore() {
+    if (this.loading || !this.hasMore) return;
+
+    this.loading = true;
+    if (this.actualLoadingEl) this.actualLoadingEl.style.display = 'block';
+    if (this.options.noMoreResultsIndicator) this.options.noMoreResultsIndicator.style.display = 'none';
+    
     try {
-      this.loading = true;
-      this.loadingEl.style.display = 'block';
+      let apiUrl = `/api/fullist?page=${this.page}&per_page=${this.options.perPage}`;
+      if (this.options.searchQuery) {
+        apiUrl += `&q=${encodeURIComponent(this.options.searchQuery)}`;
+      }
+      if (this.options.sortBy) {
+        apiUrl += `&sort_by=${encodeURIComponent(this.options.sortBy)}`;
+      }
+      if (this.options.sortOrder) {
+        apiUrl += `&sort_order=${encodeURIComponent(this.options.sortOrder)}`;
+      }
+      if (this.options.dateFrom) {
+        apiUrl += `&date_from=${encodeURIComponent(this.options.dateFrom)}`;
+      }
+      if (this.options.dateTo) {
+        apiUrl += `&date_to=${encodeURIComponent(this.options.dateTo)}`;
+      }
       
-      const response = await fetch(`/api/fullist?page=${this.page}&per_page=${this.options.perPage}`);
+      const response = await fetch(apiUrl);
+      if (!response.ok) {
+        throw new Error(`HTTP error ${response.status}`);
+      }
       const data = await response.json();
       
       if (data.items && data.items.length > 0) {
         await this.renderItems(data.items);
         this.page++;
         this.hasMore = data.has_more;
+        if (!this.hasMore && this.options.noMoreResultsIndicator) {
+            this.options.noMoreResultsIndicator.style.display = 'block';
+        }
       } else {
         this.hasMore = false;
+        if (this.page === 1 && this.options.initialPageContentElement) { 
+            this.options.initialPageContentElement.innerHTML = '<p class="text-center text-muted">Записи не найдены.</p>';
+        }
+        if (this.options.noMoreResultsIndicator) this.options.noMoreResultsIndicator.style.display = 'block';
       }
     } catch (error) {
       console.error('Failed to load more items:', error);
-      showToast('Ошибка загрузки данных', 'error');
+      if (this.options.initialPageContentElement) { 
+          this.options.initialPageContentElement.innerHTML = '<p class="text-center text-danger">Не удалось загрузить список. Попробуйте позже.</p>';
+      }
+      // Optionally, display a toast or specific error message to the user here
+      // showToast('Ошибка загрузки данных', 'error'); // If you have a showToast function
     } finally {
       this.loading = false;
-      this.loadingEl.style.display = 'none';
+      if (this.actualLoadingEl) this.actualLoadingEl.style.display = 'none';
     }
   }
   
   async renderItems(items) {
+<<<<<<< HEAD
+=======
+    if (!this.container) return;
+>>>>>>> 3a2030e8a93208f3e3cf84526f7350abff580ee1
     const fragment = document.createDocumentFragment();
     
     for (const item of items) {
       const element = document.createElement('div');
+<<<<<<< HEAD
       element.className = 'blacklist-entry';
       
       let avatarSrc = '/static/icons/favicon.ico'; // Placeholder/fallback avatar
+=======
+      element.className = 'blacklist-entry'; // This class should exist in your CSS
+      
+      let avatarSrc = 'https://minotar.net/helm/MHF_Steve/50.png'; // Default fallback avatar
+>>>>>>> 3a2030e8a93208f3e3cf84526f7350abff580ee1
       try {
         const avatarResponse = await fetch(`/api/avatar/${item.uuid}`);
         if (avatarResponse.ok) {
@@ -81,46 +136,119 @@ class InfiniteScroll {
           }
         }
       } catch (e) {
+<<<<<<< HEAD
         console.error(`Failed to load avatar for ${item.nickname}:`, e);
       }
       
       element.innerHTML = `
         <div class="entry-header">
           <img src="${avatarSrc}" alt="${item.nickname}" class="avatar" loading="lazy">
+=======
+        console.warn(`Failed to load avatar for ${item.nickname}:`, e);
+      }
+      
+      // Structure based on the original, simple blacklist entry style
+      element.innerHTML = `
+        <div class="entry-header">
+          <img src="${avatarSrc}" alt="${item.nickname}" class="avatar" loading="lazy" style="width:50px; height:50px; margin-right:10px; border-radius:5px;">
+>>>>>>> 3a2030e8a93208f3e3cf84526f7350abff580ee1
           <h3>${item.nickname}</h3>
         </div>
         <div class="entry-details">
-          <p class="reason">${item.reason}</p>
-          <p class="date">${new Date(item.created_at).toLocaleDateString('ru-RU')}</p>
+          <p class="reason" style="margin: 5px 0;">Причина: ${item.reason || 'Не указана'}</p>
+          <p class="uuid" style="font-size:0.8em; color: #ccc;">UUID: ${item.uuid}</p>
+          <p class="date" style="font-size:0.8em; color: #ccc;">Добавлено: ${item.created_at ? new Date(item.created_at).toLocaleDateString('ru-RU') : 'N/A'}</p>
         </div>
       `;
       fragment.appendChild(element);
     }
     
-    this.container.insertBefore(fragment, this.loadingEl);
+    // Append before the loading element if it's a child of the container
+    if (this.actualLoadingEl && this.actualLoadingEl.parentNode === this.container) {
+        this.container.insertBefore(fragment, this.actualLoadingEl);
+    } else {
+        this.container.appendChild(fragment);
+    }
   }
   
   reset() {
     this.page = 1;
     this.hasMore = true;
-    this.container.innerHTML = '';
-    this.init();
+    this.loading = false; // Reset loading state
+    if (this.container) this.container.innerHTML = ''; // Clear previous items
+    // Re-add loading indicator if it was cleared
+    if (this.actualLoadingEl && this.actualLoadingEl.parentNode !== this.container && this.container) {
+        this.container.appendChild(this.actualLoadingEl);
+    }
+    if (this.options.noMoreResultsIndicator) this.options.noMoreResultsIndicator.style.display = 'none';
+
+    this.loadMore(); // Fetch the first page with new (or reset) query
   }
 }
 
 // Initialize infinite scroll when the page loads
-document.addEventListener('DOMContentLoaded', () => {
-  const container = document.querySelector('.blacklist-entries');
-  if (container) {
-    new InfiniteScroll(container, {
-      perPage: 20,
-      threshold: 200,
-      loadingTemplate: `
-        <div class="loading-spinner">
-          <div class="spinner"></div>
-          <p>Загрузка записей...</p>
-        </div>
-      `
+document.addEventListener('DOMContentLoaded', function () {
+    const blacklistContainer = document.getElementById('blacklistContainer');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const noMoreResultsIndicator = document.getElementById('noMoreResultsIndicator');
+    const searchInput = document.getElementById('searchInput');
+    
+    // New filter/sort controls
+    const sortBySelect = document.getElementById('sortBy');
+    const sortOrderSelect = document.getElementById('sortOrder');
+    const dateFromInput = document.getElementById('dateFrom');
+    const dateToInput = document.getElementById('dateTo');
+    const applyFiltersBtn = document.getElementById('applyFiltersBtn');
+
+    if (!blacklistContainer) {
+        console.error('Blacklist container not found. Infinite scroll will not be initialized.');
+        return;
+    }
+
+    const infiniteScroller = new InfiniteScroll(blacklistContainer, {
+        perPage: 20,
+        loadingIndicator: loadingIndicator,
+        noMoreResultsIndicator: noMoreResultsIndicator,
+        initialPageContentElement: blacklistContainer // Or a specific element if you have one for "no results"
     });
-  }
+
+    // Search functionality
+    let searchTimeout;
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                infiniteScroller.options.searchQuery = searchInput.value;
+                infiniteScroller.reset(); 
+            }, 300); // Debounce search
+        });
+    }
+
+    // Filter and Sort functionality
+    function applyAndReset() {
+        infiniteScroller.options.sortBy = sortBySelect ? sortBySelect.value : 'created_at';
+        infiniteScroller.options.sortOrder = sortOrderSelect ? sortOrderSelect.value : 'desc';
+        infiniteScroller.options.dateFrom = dateFromInput ? dateFromInput.value : '';
+        infiniteScroller.options.dateTo = dateToInput ? dateToInput.value : '';
+        infiniteScroller.reset();
+    }
+
+    if (applyFiltersBtn) {
+        applyFiltersBtn.addEventListener('click', applyAndReset);
+    }
+
+    // Initial load with default sort/filter if elements exist
+    if (sortBySelect || sortOrderSelect || dateFromInput || dateToInput) {
+        // Call applyAndReset to set initial options and load if filter elements are present
+        // This ensures that if there are default values in the select/input fields,
+        // they are used for the first load. However, the InfiniteScroll constructor
+        // already calls loadMore(), so we might just need to set the options.
+        infiniteScroller.options.sortBy = sortBySelect ? sortBySelect.value : 'created_at';
+        infiniteScroller.options.sortOrder = sortOrderSelect ? sortOrderSelect.value : 'desc';
+        infiniteScroller.options.dateFrom = dateFromInput ? dateFromInput.value : '';
+        infiniteScroller.options.dateTo = dateToInput ? dateToInput.value : '';
+        // No need to call reset() here if the constructor's loadMore() is sufficient
+        // and we are okay with the very first load not having these filters yet.
+        // If filters must apply on first load, then a reset() might be needed AFTER constructor.
+    }
 }); 
