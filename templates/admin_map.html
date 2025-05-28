@@ -11,17 +11,27 @@
 {% endblock %}
 
 {% block content %}
-<div class="map-container">
-  <div id="map"></div>
-  <div id="sidebar">
-    <h2>Активные игроки</h2>
-    <div class="map-controls">
-      <button class="map-button" id="toggleHeatmap">Тепловая карта</button>
-      <button class="map-button" id="toggleGrid">Сетка</button>
-      <button class="map-button" id="centerMap">Центрировать</button>
+<div class="container mt-4">
+    <h1 class="mb-4">Карта расположений пользователей (за последний час)</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div id="locationMap"></div>
+
+    <div class="mt-3">
+        <p><small>Карта автоматически обновляется каждые 30 секунд.</small></p>
+        <a href="{{ url_for('admin_panel') }}" class="btn btn-secondary">Назад в админ-панель</a>
     </div>
-    <ul id="player-list"></ul>
-  </div>
+
 </div>
 {% endblock %}
 
@@ -58,7 +68,7 @@ class PlayerMap {
   initMap() {
     const bounds = [[-MAP_CONFIG.WORLD_SIZE, -MAP_CONFIG.WORLD_SIZE], [MAP_CONFIG.WORLD_SIZE, MAP_CONFIG.WORLD_SIZE]];
     
-    this.map = L.map('map', {
+    this.map = L.map('locationMap', {
       crs: L.CRS.Simple,
       zoomControl: true,
       attributionControl: false,
@@ -138,7 +148,7 @@ class PlayerMap {
   }
 
   updateLocations() {
-    fetch("/api/locations/view")
+    fetch("{{ url_for('api_locations_view') }}")
       .then(response => response.json())
       .then(data => {
         // Update markers

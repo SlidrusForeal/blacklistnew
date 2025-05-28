@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Статистика сайта{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Статистика сайта</h1>
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="card text-center">
+                <div class="card-header">
+                    Общее количество записей в ЧС
+                </div>
+                <div class="card-body">
+                    <h2 class="card-title">{{ total_blacklist_entries }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card text-center">
+                <div class="card-header">
+                    Всего проверок выполнено
+                </div>
+                <div class="card-body">
+                    <h2 class="card-title">{{ total_checks }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card text-center">
+                <div class="card-header">
+                    Проверок за последние 24 часа
+                </div>
+                <div class="card-body">
+                    <h2 class="card-title">{{ checks_last_24_hours }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="mt-5 mb-3">Рост черного списка</h2>
+    {% if blacklist_growth_data %}
+        {# Placeholder for a chart. You would typically use a JS charting library here like Chart.js or D3.js #}
+        {# For now, just displaying the raw data if any #}
+        <p>Данные о росте ЧС (требуется интеграция с библиотекой графиков):</p>
+        <pre>{{ blacklist_growth_data | tojson(indent=2) }}</pre>
+    {% else %}
+        <p>Данные о росте черного списка пока недоступны. Эта функция требует дополнительной настройки для сбора исторических данных.</p>
+    {% endif %}
+
+    <div class="mt-4">
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">На главную</a>
+    </div>
+
+</div>
+
+{# If you plan to use Chart.js, for example:
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Example: var ctx = document.getElementById('blacklistGrowthChart').getContext('2d');
+    // ... chart configuration using blacklist_growth_data ...
+</script>
+#}
+{% endblock %} 

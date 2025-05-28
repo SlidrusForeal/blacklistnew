@@ -8,20 +8,53 @@
 {% endblock %}
 
 {% block content %}
-<div class="fullist-container">
-  <h1>Полный список</h1>
-  
-  <div class="search-container">
-    <input type="text" 
-           id="searchInput" 
-           placeholder="Поиск по никнейму или причине..." 
-           aria-label="Поиск по списку"
-           class="search-input">
-  </div>
+<div class="container mt-4">
+    <h1 class="mb-4">Полный черный список</h1>
 
-  <div class="blacklist-entries" role="list">
-    <!-- Entries will be loaded dynamically -->
-  </div>
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <input type="text" id="searchInput" class="form-control" placeholder="Поиск по нику или причине...">
+        </div>
+    </div>
+
+    <div class="row mb-4 g-3 align-items-center">
+        <div class="col-md-3">
+            <label for="sortBy" class="form-label">Сортировать по:</label>
+            <select id="sortBy" class="form-select">
+                <option value="created_at" selected>Дате добавления</option>
+                <option value="nickname">Никнейму</option>
+                <option value="reason">Причине</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label for="sortOrder" class="form-label">Порядок:</label>
+            <select id="sortOrder" class="form-select">
+                <option value="desc" selected>Убыванию</option>
+                <option value="asc">Возрастанию</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="dateFrom" class="form-label">Дата от:</label>
+            <input type="date" id="dateFrom" class="form-control">
+        </div>
+        <div class="col-md-3">
+            <label for="dateTo" class="form-label">Дата до:</label>
+            <input type="date" id="dateTo" class="form-control">
+        </div>
+        <div class="col-md-1 d-flex align-items-end">
+            <button id="applyFiltersBtn" class="btn btn-primary">Применить</button>
+        </div>
+    </div>
+
+    <div id="blacklistContainer" class="list-group"> 
+        <!-- Записи будут загружены сюда -->
+    </div>
+    <div id="loadingIndicator" style="display: none; text-align: center; margin: 20px;">
+        <p>Загрузка...</p>
+    </div>
+    <div id="noMoreResultsIndicator" style="display: none; text-align: center; margin: 20px; color: grey;">
+        <p>Больше нет записей.</p>
+    </div>
 </div>
 {% endblock %}
 
