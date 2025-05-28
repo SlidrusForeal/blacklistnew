@@ -7,10 +7,10 @@
   <p><a href="{{ url_for('admin_panel') }}" class="btn-check">&larr; Назад в админ панель</a></p>
 
   <section class="admin-section">
-    <h2>Добавить / удалить UUID</h2>
+  <h2>Добавить / удалить UUID</h2>
     <form method="POST" action="{{ url_for('admin_whitelist') }}" class="form-inline">
-      {{ form.hidden_tag() }}
-      <div class="input-group">
+    {{ form.hidden_tag() }}
+    <div class="input-group">
         {{ form.uuid.label(class="form-label") }}
         {{ form.uuid(placeholder="Введите UUID", class="form-control") }}
       </div>
@@ -20,28 +20,28 @@
       </div>
       <div class="input-group">
         {{ form.submit(class="btn-check btn-primary") }}
-      </div>
-    </form>
+    </div>
+  </form>
   </section>
 
   <section class="admin-section">
-    <h2>Текущий whitelist</h2>
-    {% if whitelist %}
+  <h2>Текущий whitelist</h2>
+  {% if whitelist %}
       <ul class="whitelist-list">
-        {% for u in whitelist %}
+      {% for u in whitelist %}
           <li class="whitelist-item">
             <span>{{ u }}</span>
             <form method="POST" action="{{ url_for('admin_whitelist') }}" class="form-inline-item">
-              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-              <input type="hidden" name="uuid" value="{{ u }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="uuid" value="{{ u }}">
               <button type="submit" name="action" value="delete" class="btn-check btn-danger btn-sm">Удалить</button>
-            </form>
-          </li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      <p>Whitelist пуст.</p>
-    {% endif %}
+          </form>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Whitelist пуст.</p>
+  {% endif %}
   </section>
 </main>
 {% endblock %}

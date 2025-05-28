@@ -156,19 +156,14 @@ class InfiniteScroll {
   reset() {
     this.page = 1;
     this.hasMore = true;
-    this.loading = false; 
-    if (this.container) {
-        this.container.innerHTML = ''; // Clear previous items
-        // Re-append the loading indicator if it was originally managed by the class
-        // and not provided as an external element.
-        if (this.options.loadingTemplate && !this.options.loadingIndicator && this.actualLoadingEl) {
-             this.container.appendChild(this.actualLoadingEl);
-        }
+    this.loading = false; // Reset loading state
+    if (this.container) this.container.innerHTML = ''; // Clear previous items
+    // Re-add loading indicator if it was cleared
+    if (this.actualLoadingEl && this.actualLoadingEl.parentNode !== this.container && this.container) {
+        this.container.appendChild(this.actualLoadingEl);
     }
-    // Ensure indicators are in the correct initial state before loading new data.
-    if (this.actualLoadingEl) this.actualLoadingEl.style.display = 'none'; 
     if (this.options.noMoreResultsIndicator) this.options.noMoreResultsIndicator.style.display = 'none';
-    
+
     this.loadMore(); // Fetch the first page with new (or reset) query
   }
 }
