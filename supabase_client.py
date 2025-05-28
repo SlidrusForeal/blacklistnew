@@ -38,7 +38,7 @@ class SupabaseClient:
                 'reason': reason,
                 'created_at': datetime.utcnow().isoformat()
             }
-            result = self.client.table('blacklist_entry').insert(data).execute()
+            result = self.admin_client.table('blacklist_entry').insert(data).execute()
             return bool(result.data)
         except Exception as e:
             logger.error(f"Error adding blacklist entry: {e}")
@@ -46,7 +46,7 @@ class SupabaseClient:
 
     def update_blacklist_entry(self, entry_id: int, data: Dict[str, Any]) -> bool:
         try:
-            result = self.client.table('blacklist_entry').update(data).eq('id', entry_id).execute()
+            result = self.admin_client.table('blacklist_entry').update(data).eq('id', entry_id).execute()
             return bool(result.data)
         except Exception as e:
             logger.error(f"Error updating blacklist entry: {e}")
@@ -54,7 +54,7 @@ class SupabaseClient:
 
     def delete_blacklist_entry(self, entry_id: int) -> bool:
         try:
-            result = self.client.table('blacklist_entry').delete().eq('id', entry_id).execute()
+            result = self.admin_client.table('blacklist_entry').delete().eq('id', entry_id).execute()
             return bool(result.data)
         except Exception as e:
             logger.error(f"Error deleting blacklist entry: {e}")

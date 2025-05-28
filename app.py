@@ -116,37 +116,6 @@ _session.mount("https://", _adapter)
 _session.mount("http://", _adapter)
 
 
-# ─────────────── Модели ───────────────
-# SQLAlchemy models are no longer used, SupabaseClient is used instead.
-
-# class BlacklistEntry(db.Model): # OLD SQLAlchemy Model
-#     __tablename__ = 'blacklist_entry'
-#     id = db.Column(db.Integer, primary_key=True)
-#     nickname = db.Column(db.String(64), nullable=False)
-#     uuid = db.Column(db.String(36), unique=True, nullable=False)
-#     reason = db.Column(db.String(256), nullable=False)
-#     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-#
-#     def __repr__(self):
-#         return f"<BlacklistEntry {self.nickname} ({self.uuid})>"
-#
-#
-# class AdminUser(db.Model): # OLD SQLAlchemy Model
-#     __tablename__ = 'admin_user'
-#     id = db.Column(db.Integer, primary_key=True)
-#     username = db.Column(db.String(64), unique=True, nullable=False)
-#     password_hash = db.Column(db.String(256), nullable=False)
-#     role = db.Column(db.String(16), nullable=False)  # owner, admin, moderator
-#
-#     def set_password(self, password):
-#         self.password_hash = generate_password_hash(password)
-#     def check_password(self, password):
-#         return check_password_hash(self.password_hash, password)
-#
-#     def __repr__(self):
-#         return f"<AdminUser {self.username} ({self.role})>"
-
-
 # ─────────────── Формы ───────────────
 class CheckForm(FlaskForm):
     nickname = StringField('Никнейм', validators=[DataRequired(), Length(max=64)])
@@ -558,6 +527,117 @@ def delete_user(user_id):
         else:
             flash("Ошибка при удалении пользователя.", "danger")
     return redirect(url_for('admin_users'))
+
+@app.route("/admin/whitelist", methods=["GET", "POST"])
+@role_required("owner")
+def admin_whitelist():
+    form = WhitelistForm()
+    whitelist = load_whitelist()
+
+    if form.validate_on_submit():
+        uuid_to_modify = form.uuid.data.strip()
+        action = form.action.data
+
+        if not uuid_to_modify: # Добавим проверку, что UUID не пустой
+            flash("UUID не может быть пустым.", "warning")
+            return redirect(url_for('admin_whitelist'))
+
+        if action == "add":
+            if uuid_to_modify not in whitelist:
+                whitelist.append(uuid_to_modify)
+                save_whitelist(whitelist)
+                flash(f"UUID {uuid_to_modify} добавлен в whitelist.", "success")
+            else:
+                flash(f"UUID {uuid_to_modify} уже в whitelist.", "info")
+        elif action == "delete":
+            if uuid_to_modify in whitelist:
+                whitelist.remove(uuid_to_modify)
+                save_whitelist(whitelist)
+                flash(f"UUID {uuid_to_modify} удален из whitelist.", "success")
+            else:
+                flash(f"UUID {uuid_to_modify} не найден в whitelist.", "warning")
+        return redirect(url_for('admin_whitelist'))
+    
+    # Для POST-запросов от кнопок "Удалить" в списке
+    if request.method == "POST" and not form.is_submitted(): # Проверяем, что это не сабмит основной формы
+        uuid_to_delete = request.form.get("uuid")
+        action_delete = request.form.get("action")
+        if uuid_to_delete and action_delete == "delete":
+            if uuid_to_delete in whitelist:
+                whitelist.remove(uuid_to_delete)
+                save_whitelist(whitelist)
+                flash(f"UUID {uuid_to_delete} удален из whitelist (через кнопку).", "success")
+            else:
+                flash(f"UUID {uuid_to_delete} не найден в whitelist.", "warning")
+            return redirect(url_for('admin_whitelist'))
+
+    return render_template("admin_whitelist.html", form=form, whitelist=whitelist)
+
+@app.route("/admin/update_nicknames", methods=["POST"])
+@role_required("owner")
+def update_nicknames_route(): # Переименовал функцию, чтобы не конфликтовать с возможными другими
+    if request.method == "POST":
+        try:
+            all_entries_data = db.get_all_blacklist_entries(page=1, per_page=10000) # Получаем все записи (или достаточно много)
+            entries = all_entries_data.get('items', [])
+            
+            updated_count = 0
+            failed_fetch_count = 0
+            no_change_count = 0
+
+            if not entries:
+                flash("Черный список пуст. Нечего обновлять.", "info")
+                return redirect(url_for('admin_panel'))
+
+            for entry in entries:
+                current_uuid = entry.get('uuid')
+                old_nickname = entry.get('nickname')
+                entry_id = entry.get('id')
+
+                if not current_uuid or not entry_id:
+                    app.logger.warning(f"Skipping entry due to missing uuid or id: {entry}")
+                    failed_fetch_count += 1
+                    continue
+
+                new_nickname = get_name_from_uuid(current_uuid) # Используем существующую функцию
+
+                if new_nickname:
+                    if new_nickname.lower() != old_nickname.lower():
+                        if db.update_blacklist_entry(entry_id, {'nickname': new_nickname}):
+                            updated_count += 1
+                            app.logger.info(f"Updated nickname for UUID {current_uuid} from {old_nickname} to {new_nickname}")
+                        else:
+                            app.logger.error(f"Failed to update nickname in DB for UUID {current_uuid}")
+                            failed_fetch_count += 1 # Считаем как ошибку, если БД не обновилась
+                    else:
+                        no_change_count +=1
+                else:
+                    app.logger.warning(f"Could not fetch new nickname for UUID {current_uuid} (was {old_nickname}).")
+                    failed_fetch_count += 1
+            
+            flash_messages = []
+            if updated_count > 0:
+                flash_messages.append(f"Обновлено никнеймов: {updated_count}.")
+            if failed_fetch_count > 0:
+                flash_messages.append(f"Не удалось обновить/проверить никнеймов: {failed_fetch_count}.")
+            if no_change_count > 0 and updated_count == 0 and failed_fetch_count == 0:
+                 flash_messages.append("Все никнеймы актуальны.")
+            elif no_change_count > 0:
+                 flash_messages.append(f"Остались без изменений: {no_change_count}.")
+
+            if not flash_messages:
+                 flash("Обновление никнеймов завершено, но нечего было делать или не удалось найти записи.", "info")
+            else:
+                flash(" ".join(flash_messages), "success" if updated_count > 0 else "warning")
+
+        except Exception as e:
+            app.logger.error(f"Error during nickname update process: {e}")
+            flash("Произошла ошибка в процессе обновления никнеймов.", "danger")
+        
+        return redirect(url_for('admin_panel'))
+    else:
+        # GET запросы не должны обрабатываться этим маршрутом напрямую
+        return redirect(url_for('admin_panel'))
 
 @app.before_request
 def block_sensitive_paths():
