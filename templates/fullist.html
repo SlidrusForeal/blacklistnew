@@ -6,7 +6,7 @@
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/fullist.css') }}">
 {# Import Supabase JS library #}
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (SUPABASE_URL && SUPABASE_ANON_KEY && SUPABASE_URL !== 'None' && SUPABASE_ANON_KEY !== 'None') {
     try {
-        supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         console.log("Supabase client initialized for fullist.");
     } catch (e) {
         console.error("Error initializing Supabase client for fullist:", e);

@@ -2,8 +2,8 @@
 {% block title %}Статистика Сайта | ЧС Сосмарка{% endblock %}
 
 {% block head %}
-  {{ super() }} {# Include anystyles from base.html #}
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  {{ super() }} {# Include styles from base.html #}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
   <style>
     .stat-card {
       background-color: #2a2a2e;
@@ -204,13 +204,19 @@
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            position: 'top'
+                            position: 'right',
+                            labels: {
+                                color: defaultFontColor,
+                                font: {
+                                    size: 12
+                                }
+                            }
                         }
                     }
                 }
             });
         } else if (topReasonsCtx) {
-             topReasonsCtx.parentElement.innerHTML += '<p class="text-muted text-center">Данных для графика причин пока нет.</p>';
+            topReasonsCtx.parentElement.innerHTML += '<p class="text-muted text-center">Нет данных для отображения топ причин.</p>';
         } else {
             console.error("Element with ID 'topReasonsChart' not found.");
         }
