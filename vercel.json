@@ -16,14 +16,16 @@
     {
       "src": "sw.js",
       "use": "@vercel/static"
+    },
+    {
+      "src": "static/manifest.json",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
     { "src": "/static/(.*)", "dest": "static/$1" },
-    { "src": "/(.*)", "dest": "app.py" },
-    {
-      "src": "/sw.js",
-      "dest": "/sw.js"
-    }
+    { "src": "/sw.js", "dest": "/sw.js" },
+    { "src": "/manifest.json", "dest": "/static/manifest.json" },
+    { "src": "/(.*)", "dest": "app.py" }
   ]
 } 

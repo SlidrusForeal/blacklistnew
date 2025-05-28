@@ -1,23 +1,21 @@
 {
-  "name": "ЧС Сосмарка",
-  "short_name": "ЧС",
-  "description": "Черный список Сосмаркской Империи",
+  "name": "Blacklist Sosmark",
+  "short_name": "Blacklist",
+  "description": "Система проверки игроков на наличие в черном списке",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#1a1a1a",
+  "theme_color": "#000000",
   "icons": [
     {
-      "src": "/static/icons/android-chrome-192x192.png",
+      "src": "/static/img/icon-192x192.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     },
     {
-      "src": "/static/icons/icon512_maskable.png",
+      "src": "/static/img/icon-512x512.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
   ],
   "orientation": "portrait",
