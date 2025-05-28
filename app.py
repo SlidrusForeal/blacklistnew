@@ -51,8 +51,8 @@ app.config['GITHUB_SECRET'] = GITHUB_SECRET
 
 # ─────────────── Настройка логирования ───────────────
 # Создаём папку для логов, если её нет
-if not os.path.exists('logs'):
-    os.mkdir('logs')
+# if not os.path.exists('logs'):
+#     os.mkdir('logs')
 
 LOG_CONFIG = {
     'version': 1,
@@ -71,26 +71,27 @@ LOG_CONFIG = {
             'formatter': 'default',
             'level': 'INFO'
         },
-        'info_file': {
-            'class': 'logging.handlers.TimedRotatingFileHandler',
-            'filename': 'logs/info.log',
-            'when': 'midnight',
-            'backupCount': 7,
-            'formatter': 'default',
-            'level': 'INFO'
-        },
-        'error_file': {
-            'class': 'logging.handlers.TimedRotatingFileHandler',
-            'filename': 'logs/error.log',
-            'when': 'midnight',
-            'backupCount': 30,
-            'formatter': 'default',
-            'level': 'ERROR'
-        }
+        # 'info_file': {
+        #     'class': 'logging.handlers.TimedRotatingFileHandler',
+        #     'filename': 'logs/info.log',
+        #     'when': 'midnight',
+        #     'backupCount': 7,
+        #     'formatter': 'default',
+        #     'level': 'INFO'
+        # },
+        # 'error_file': {
+        #     'class': 'logging.handlers.TimedRotatingFileHandler',
+        #     'filename': 'logs/error.log',
+        #     'when': 'midnight',
+        #     'backupCount': 30,
+        #     'formatter': 'default',
+        #     'level': 'ERROR'
+        # }
     },
     'loggers': {
         '': {
-            'handlers': ['console', 'info_file', 'error_file'],
+            # 'handlers': ['console', 'info_file', 'error_file'],
+            'handlers': ['console'],
             'level': 'INFO',
             'propagate': True
         }
