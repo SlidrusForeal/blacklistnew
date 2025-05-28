@@ -539,153 +539,106 @@ a.btn.btn-secondary:focus {
 
 /* Admin Whitelist Styles */
 .admin-section {
-  background-color: var(--background-color-light, #f9f9f9); /* Чуть отличный фон для секций */
+  background-color: #3a3a3a; /* Darker section background */
+  color: #f1f1f1; /* Light text for the section */
   padding: 1.5rem;
   margin-bottom: 2rem;
   border-radius: 8px;
-  border: 1px solid var(--border-color, #e0e0e0);
+  border: 1px solid #555; /* Darker border */
 }
 
 .admin-section h2 {
   margin-top: 0;
   margin-bottom: 1.5rem;
-  border-bottom: 1px solid var(--border-color, #e0e0e0);
+  border-bottom: 1px solid #555; /* Darker border */
   padding-bottom: 0.75rem;
+  color: #f1f1f1; /* Ensure h2 text is light */
 }
 
-/* Стили для форм, если не определены глобально */
-.form-label {
+/* Стили для форм, если не определены глобально, specifically for .admin-section */
+.admin-section .form-label {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
+  color: #f1f1f1; /* Light label text */
 }
 
-.form-control,
-.form-select {
+.admin-section .form-control,
+.admin-section .form-select {
   display: block;
   width: 100%;
   padding: 0.5rem 0.75rem;
   font-size: 1rem;
   line-height: 1.5;
-  color: var(--text-color, #212529);
-  background-color: var(--input-bg, #fff);
+  color: #f1f1f1; /* Light text in input */
+  background-color: #2c2c2c; /* Dark input background */
   background-clip: padding-box;
-  border: 1px solid var(--border-color, #ced4da);
+  border: 1px solid #555; /* Darker border for inputs */
   border-radius: 0.25rem;
   transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
 
-.form-control:focus,
-.form-select:focus {
-  border-color: var(--primary-color, #80bdff);
+.admin-section .form-control:focus,
+.admin-section .form-select:focus {
+  border-color: #6186ff; /* Primary color for focus */
   outline: 0;
-  box-shadow: 0 0 0 0.2rem rgba(var(--primary-color-rgb, 0, 123, 255), 0.25);
+  box-shadow: 0 0 0 0.2rem rgba(97, 134, 255, 0.25); /* Primary color shadow */
+  background-color: #3a3a3a; /* Slightly lighter dark bg on focus */
 }
 
-.input-group {
+/* Ensure input-group within admin-section does not add conflicting styles if any */
+.admin-section .input-group {
   margin-bottom: 1rem;
 }
 
 /* Для формы в одну строку (если нужно) */
-.form-inline {
+.admin-section .form-inline {
   display: flex;
-  flex-wrap: wrap; /* Позволяет переносить элементы на новую строку на маленьких экранах */
-  align-items: flex-end; /* Выравнивание по нижней границе для элементов разной высоты */
-  gap: 1rem; /* Пространство между элементами */
+  flex-wrap: wrap; 
+  align-items: flex-end; 
+  gap: 1rem; 
 }
 
-.form-inline .input-group {
-  flex-grow: 1; /* Позволяет элементам расти и занимать доступное пространство */
-  margin-bottom: 0; /* Убираем нижний отступ, так как есть gap */
+.admin-section .form-inline .input-group {
+  flex-grow: 1; 
+  margin-bottom: 0; 
 }
 
-.form-inline .input-group:last-child {
-  flex-grow: 0; /* Кнопка не должна растягиваться */
+.admin-section .form-inline .input-group:last-child {
+  flex-grow: 0; 
 }
 
 /* Whitelist List Styles */
-.whitelist-list {
+.admin-section .whitelist-list {
   list-style-type: none;
   padding-left: 0;
 }
 
-.whitelist-item {
+.admin-section .whitelist-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 1rem;
-  border: 1px solid var(--border-color, #e0e0e0);
+  border: 1px solid #555; /* Darker border */
   border-radius: 4px;
   margin-bottom: 0.5rem;
-  background-color: var(--background-color, #fff);
+  background-color: #2c2c2c; /* Dark item background */
+  color: #f1f1f1; /* Ensure text within item is light */
 }
 
-.whitelist-item span {
-  font-family: monospace; /* UUID лучше смотрятся моноширинным шрифтом */
-  word-break: break-all; /* Перенос длинных UUID */
+.admin-section .whitelist-item span {
+  font-family: monospace; 
+  word-break: break-all; 
   margin-right: 1rem;
+  color: #f1f1f1; /* Explicitly set span color to light */
 }
 
-.form-inline-item {
-  margin-left: auto; /* Прижимает кнопку к правому краю, если нужно*/
+.admin-section .form-inline-item {
+  margin-left: auto; 
 }
 
 /* Уточнение для кнопок, если .btn-check не покрывает все */
-.btn-primary {
-  background-color: var(--primary-color, #007bff);
-  border-color: var(--primary-color, #007bff);
-  color: #fff;
-}
-.btn-primary:hover {
-  background-color: var(--primary-color-dark, #0056b3);
-  border-color: var(--primary-color-dark, #0056b3);
-}
-
-.btn-danger {
-  background-color: var(--danger-color, #dc3545);
-  border-color: var(--danger-color, #dc3545);
-  color: #fff;
-}
-.btn-danger:hover {
-  background-color: var(--danger-color-dark, #c82333);
-  border-color: var(--danger-color-dark, #c82333);
-}
-
-.btn-sm {
-  padding: 0.25rem 0.5rem;
-  font-size: 0.875rem;
-  line-height: 1.5;
-  border-radius: 0.2rem;
-}
-
-/* Custom Form Control Styles (similar to search-input) */
-.form-control-custom {
-  display: block; /* или inline-block, если нужно */
-  width: 100%;
-  padding: 0.75rem 1rem; /* ~12px 16px */
-  font-size: 1rem;
-  font-family: inherit; /* Наследование шрифта */
-  line-height: 1.6;
-  color: var(--text-color, #f1f1f1);
-  background-color: var(--input-bg, #3a3a3a); /* Можно взять цвет от существующих инпутов или --background-color */
-  background-clip: padding-box;
-  border: 2px solid var(--border-color, #555); /* Как у search-input, но можно взять #444 от существующих */
-  border-radius: 8px; /* Как у search-input */
-  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-}
-
-.form-control-custom::placeholder {
-  color: var(--placeholder-color, #bbb);
-  opacity: 1; /* Firefox */
-}
-
-.form-control-custom:focus {
-  color: var(--text-color, #f1f1f1);
-  background-color: var(--input-focus-bg, #444); /* Можно взять от search-input:focus или существующего */
-  border-color: var(--primary-color, #6186ff);
-  outline: 0;
-  box-shadow: 0 0 0 0.2rem rgba(var(--primary-color-rgb, 97, 134, 255), 0.25); /* Фокус как у search-input */
-}
+/* These button styles seem fine as they are mostly self-contained or use explicit colors */
 
 /* == LEGACY FULLIST STYLES (CARD-BASED) START == */
 @keyframes fullistEntryFadeIn { /* Renamed from fadeIn to avoid conflict */

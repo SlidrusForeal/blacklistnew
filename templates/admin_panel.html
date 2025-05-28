@@ -10,10 +10,7 @@
     <p><a href="{{ url_for('admin_register') }}" class="btn-check">Регистрация нового пользователя</a></p>
     <p><a href="{{ url_for('admin_whitelist') }}" class="btn-check">Редактор whitelist</a></p>
     <p><a href="{{ url_for('admin_users') }}" class="btn-check">Управление пользователями</a></p>
-<<<<<<< HEAD
-=======
     <p><a href="{{ url_for('admin_audit_log') }}" class="btn-check">Журнал аудита</a></p>
->>>>>>> 3a2030e8a93208f3e3cf84526f7350abff580ee1
     <form method="POST" action="{{ url_for('update_nicknames_route') }}" style="margin-top:20px;">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <button type="submit" class="btn-check">Обновить ники</button>

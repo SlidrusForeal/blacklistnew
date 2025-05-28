@@ -8,31 +8,44 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/admin-map.css') }}">
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+  <style>
+    #activityMap {
+      height: 600px; /* Adjust as needed */
+      width: 100%;
+      border: 1px solid #555;
+      border-radius: 5px;
+      margin-top: 20px;
+    }
+    .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+        background-color: #3a3a3a; /* Dark background for popups */
+        color: #f1f1f1; /* Light text for popups */
+        box-shadow: 0 3px 14px rgba(0,0,0,0.4);
+    }
+    .leaflet-popup-content {
+        color: #f1f1f1; /* Ensure text inside content is light */
+    }
+    .leaflet-popup-close-button {
+        color: #f1f1f1 !important; /* Make close button visible */
+    }
+    .leaflet-container {
+        background: #2c2c2c; /* Dark background for the map tiles area */
+    }
+  </style>
 {% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h1 class="mb-4">Карта расположений пользователей (за последний час)</h1>
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-
-    <div id="locationMap"></div>
-
-    <div class="mt-3">
-        <p><small>Карта автоматически обновляется каждые 30 секунд.</small></p>
-        <a href="{{ url_for('admin_panel') }}" class="btn btn-secondary">Назад в админ-панель</a>
-    </div>
-
-</div>
+<main class="container admin-container">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Карта активностей</h1>
+    <a href="{{ url_for('admin_panel') }}" class="btn btn-secondary">&larr; Назад в админ панель</a>
+  </div>
+  
+  <section class="admin-section">
+    <h2>Активность пользователей</h2>
+    <p>На этой карте отображаются последние известные местоположения пользователей (за последний час).</p>
+    <div id="activityMap"></div>
+  </section>
+</main>
 {% endblock %}
 
 {% block scripts %}
@@ -68,7 +81,7 @@ class PlayerMap {
   initMap() {
     const bounds = [[-MAP_CONFIG.WORLD_SIZE, -MAP_CONFIG.WORLD_SIZE], [MAP_CONFIG.WORLD_SIZE, MAP_CONFIG.WORLD_SIZE]];
     
-    this.map = L.map('locationMap', {
+    this.map = L.map('activityMap', {
       crs: L.CRS.Simple,
       zoomControl: true,
       attributionControl: false,
