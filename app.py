@@ -1008,8 +1008,8 @@ def set_security_headers(response):
 
 if __name__ == '__main__':
     # Ensure all required directories exist
-    for directory in ['logs', 'tmp']:
-        if not os.path.exists(directory):
-            os.makedirs(directory)
+    # for directory in ['logs', 'tmp']:
+    #     if not os.path.exists(directory):
+    #         os.makedirs(directory)
             
     app.run(debug=False)
