@@ -8,13 +8,15 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/admin-map.css') }}">
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+  {# Import Supabase JS library - make sure this matches your setup #}
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     #activityMap {
       height: 600px; /* Adjust as needed */
       width: 100%;
       border: 1px solid #555;
       border-radius: 5px;
-      margin-top: 20px;
+      margin-top: 10px; /* Reduced margin */
     }
     .leaflet-popup-content-wrapper, .leaflet-popup-tip {
         background-color: #3a3a3a; /* Dark background for popups */
@@ -30,6 +32,51 @@
     .leaflet-container {
         background: #2c2c2c; /* Dark background for the map tiles area */
     }
+    .map-controls {
+      margin-bottom: 15px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .player-list-container {
+        max-height: 200px;
+        overflow-y: auto;
+        border: 1px solid #444;
+        padding: 10px;
+        border-radius: 4px;
+        background-color: #2c2c2c;
+        margin-top: 10px;
+    }
+    .player-item {
+        padding: 8px;
+        border-bottom: 1px solid #3a3a3a;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .player-item:last-child {
+        border-bottom: none;
+    }
+    .player-item:hover {
+        background-color: #38414a;
+    }
+    .player-avatar {
+        width: 24px;
+        height: 24px;
+        border-radius: 3px;
+        object-fit: cover;
+    }
+    .player-info {
+        flex-grow: 1;
+    }
+    .player-nickname {
+        font-weight: bold;
+    }
+    .player-coords {
+        font-size: 0.85em;
+        color: #bbb;
+    }
   </style>
 {% endblock %}
 
@@ -41,41 +88,74 @@
   </div>
   
   <section class="admin-section">
-    <h2>Активность пользователей</h2>
-    <p>На этой карте отображаются последние известные местоположения пользователей (за последний час).</p>
+    <div class="map-controls">
+      <button id="toggleHeatmap" class="btn btn-sm btn-info">Тепловая карта (Вкл)</button>
+      <button id="toggleGrid" class="btn btn-sm btn-info">Сетка чанков (Вкл)</button>
+      <button id="centerMap" class="btn btn-sm btn-primary">Центрировать</button>
+    </div>
+    <p>На этой карте отображаются последние известные местоположения пользователей (за последний час). Данные обновляются в реальном времени.</p>
     <div id="activityMap"></div>
+
+    <h3 class="mt-4">Активные игроки (последний час):</h3>
+    <div id="player-list-container" class="player-list-container">
+      <ul id="player-list" class="list-unstyled mb-0">
+        <li id="no-players-message">Загрузка игроков...</li>
+      </ul>
+  </div>
   </section>
 </main>
 {% endblock %}
 
 {% block scripts %}
 <script>
-const MAP_CONFIG = {
-  WORLD_SIZE: 5000,
-  UPDATE_INTERVAL: 2000,
-  HEATMAP_CONFIG: {
-    radius: 25,
-    blur: 15,
-    maxZoom: 5,
-    gradient: {
-      0.4: 'blue',
-      0.6: 'lime',
-      0.9: 'red'
+// Supabase client setup - REPLACE WITH YOUR ACTUAL VALUES
+const SUPABASE_URL = '{{ SUPABASE_URL }}'; 
+const SUPABASE_ANON_KEY = '{{ SUPABASE_KEY }}';
+
+// Ensure SUPABASE_URL and SUPABASE_ANON_KEY are available.
+// If they are not in Flask's config, you'll need to pass them some other way or hardcode for client-side.
+// For now, assuming they are in flask config and exposed.
+// If not, this will fail. A better way for client-side is to have these in a JS config or environment variables.
+let supabase = null;
+if (SUPABASE_URL && SUPABASE_ANON_KEY && SUPABASE_URL !== 'None' && SUPABASE_ANON_KEY !== 'None') {
+    try {
+        supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log("Supabase client initialized for map.");
+    } catch (e) {
+        console.error("Error initializing Supabase client for map:", e);
+        alert("Не удалось инициализировать клиент Supabase для карты. Функциональность карты будет ограничена.");
     }
+} else {
+    console.warn("Supabase URL or Anon Key not configured for client-side map. Realtime updates will not work.");
+    alert("Supabase URL или Anon Key не настроены для карты. Обновления в реальном времени не будут работать.");
+}
+
+
+const MAP_CONFIG = {
+  WORLD_SIZE: 3000, // Default world size, can be adjusted
+  UPDATE_INTERVAL: 60000, // Interval for full data refresh (e.g., 60 seconds)
+  INITIAL_ZOOM: 0,
+  HEATMAP_CONFIG: {
+    radius: 20,
+    blur: 15,
+    maxZoom: 4, // Heatmap might be too intense at high zoom
+    gradient: { 0.4: 'blue', 0.65: 'lime', 0.9: 'red' }
   }
 };
 
 class PlayerMap {
-  constructor() {
-    this.markers = new Map();
+  constructor(supabaseClient) {
+    this.supabase = supabaseClient;
+    this.markers = new Map(); // uuid -> { marker, data }
     this.heatLayer = null;
     this.gridLayer = null;
     this.heatmapEnabled = true;
     this.gridEnabled = true;
+    this.playerData = new Map(); // uuid -> player data from API
     
     this.initMap();
     this.initControls();
-    this.startUpdates();
+    this.fetchInitialData(); // Fetch initial data, then subscribe to realtime
   }
 
   initMap() {
@@ -84,15 +164,16 @@ class PlayerMap {
     this.map = L.map('activityMap', {
       crs: L.CRS.Simple,
       zoomControl: true,
-      attributionControl: false,
-      minZoom: -5,
+      attributionControl: false, // No attribution needed for simple CRS
+      minZoom: -4, // Adjusted zoom levels
       maxZoom: 5
     });
 
     this.map.fitBounds(bounds);
-    this.map.setMaxBounds(bounds);
+    this.map.setMaxBounds(bounds); // Prevent panning outside world
+    this.map.setView([0, 0], MAP_CONFIG.INITIAL_ZOOM);
     
-    this.drawChunkGrid();
+    if (this.gridEnabled) this.drawChunkGrid();
   }
 
   initControls() {
@@ -102,127 +183,350 @@ class PlayerMap {
   }
 
   drawChunkGrid() {
-    if (this.gridLayer) {
-      this.map.removeLayer(this.gridLayer);
-    }
-
+    if (this.gridLayer) this.map.removeLayer(this.gridLayer);
     this.gridLayer = L.layerGroup();
-    const step = 16;
-    const style = { color: '#333', weight: 1, opacity: 0.3 };
+    const step = 16; // Chunk size
+    const style = { color: '#444', weight: 1, opacity: 0.5 };
 
     for (let i = -MAP_CONFIG.WORLD_SIZE; i <= MAP_CONFIG.WORLD_SIZE; i += step) {
       L.polyline([[i, -MAP_CONFIG.WORLD_SIZE], [i, MAP_CONFIG.WORLD_SIZE]], style).addTo(this.gridLayer);
       L.polyline([[-MAP_CONFIG.WORLD_SIZE, i], [MAP_CONFIG.WORLD_SIZE, i]], style).addTo(this.gridLayer);
     }
-
     this.gridLayer.addTo(this.map);
   }
 
   toggleGrid() {
     this.gridEnabled = !this.gridEnabled;
+    document.getElementById('toggleGrid').textContent = `Сетка чанков (${this.gridEnabled ? 'Вкл' : 'Выкл'})`;
     if (this.gridEnabled) {
-      this.gridLayer.addTo(this.map);
+      if (!this.gridLayer) this.drawChunkGrid();
+      else this.gridLayer.addTo(this.map);
     } else {
-      this.map.removeLayer(this.gridLayer);
+      if (this.gridLayer) this.map.removeLayer(this.gridLayer);
     }
   }
 
   toggleHeatmap() {
     this.heatmapEnabled = !this.heatmapEnabled;
+    document.getElementById('toggleHeatmap').textContent = `Тепловая карта (${this.heatmapEnabled ? 'Вкл' : 'Выкл'})`;
     if (this.heatmapEnabled && this.heatLayer) {
       this.heatLayer.addTo(this.map);
     } else if (this.heatLayer) {
       this.map.removeLayer(this.heatLayer);
     }
+    // If enabling and no data yet, it will be added when data arrives
   }
 
   centerMap() {
-    const bounds = [[-MAP_CONFIG.WORLD_SIZE, -MAP_CONFIG.WORLD_SIZE], [MAP_CONFIG.WORLD_SIZE, MAP_CONFIG.WORLD_SIZE]];
-    this.map.fitBounds(bounds);
+    this.map.setView([0, 0], MAP_CONFIG.INITIAL_ZOOM);
   }
 
-  updatePlayerList(players) {
-    const playerList = document.getElementById('player-list');
-    playerList.innerHTML = '';
+  updatePlayerList(currentPlayersData) {
+    const playerListElement = document.getElementById('player-list');
+    const noPlayersMessage = document.getElementById('no-players-message');
+    playerListElement.innerHTML = ''; // Clear existing
+
+    const sortedPlayers = Array.from(currentPlayersData.values()).sort((a, b) => {
+        // Sort by nickname, then by UUID if nickname is unknown or same
+        const nickA = a.nickname || 'zzz'; // Put unknown last
+        const nickB = b.nickname || 'zzz';
+        if (nickA.toLowerCase() < nickB.toLowerCase()) return -1;
+        if (nickA.toLowerCase() > nickB.toLowerCase()) return 1;
+        return (a.uuid || '').localeCompare(b.uuid || '');
+    });
+
+    if (sortedPlayers.length === 0) {
+        noPlayersMessage.style.display = 'block';
+        playerListElement.appendChild(noPlayersMessage);
+        return;
+    }
     
-    players.forEach(player => {
+    noPlayersMessage.style.display = 'none';
+
+    sortedPlayers.forEach(player => {
       const li = document.createElement('li');
       li.className = 'player-item';
-      li.innerHTML = `
-        <div>UUID: ${player.uuid}</div>
-        <div class="player-coords">X: ${player.x}, Y: ${player.y}, Z: ${player.z}</div>
-      `;
+      li.dataset.uuid = player.uuid;
+
+      const avatarImg = document.createElement('img');
+      avatarImg.className = 'player-avatar';
+      avatarImg.src = player.avatar_base64 || '{{ url_for("static", filename="icons/default-avatar.png") }}'; // Add a default avatar
+      avatarImg.alt = player.nickname || player.uuid;
+
+      const infoDiv = document.createElement('div');
+      infoDiv.className = 'player-info';
+      
+      const nicknameSpan = document.createElement('span');
+      nicknameSpan.className = 'player-nickname';
+      nicknameSpan.textContent = player.nickname || player.uuid.substring(0, 8) + '...';
+      
+      const coordsSpan = document.createElement('span');
+      coordsSpan.className = 'player-coords';
+      coordsSpan.textContent = ` X: ${player.x}, Y: ${player.y}, Z: ${player.z}`; // In-game Z is map Y
+
+      infoDiv.appendChild(nicknameSpan);
+      infoDiv.appendChild(coordsSpan);
+      li.appendChild(avatarImg);
+      li.appendChild(infoDiv);
+      
       li.addEventListener('click', () => {
-        this.map.setView([player.z, player.x], 2);
-        this.markers.get(player.uuid).openPopup();
+        this.map.setView([player.z, player.x], 3); // Leaflet Y, Leaflet X
+        const markerData = this.markers.get(player.uuid);
+        if (markerData && markerData.marker) {
+            markerData.marker.openPopup();
+        }
       });
-      playerList.appendChild(li);
+      playerListElement.appendChild(li);
     });
   }
+  
+  _getPopupContent(player) {
+    return `
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <img src="${player.avatar_base64 || '{{ url_for("static", filename="icons/default-avatar.png") }}'}" alt="${player.nickname || 'Avatar'}" style="width: 32px; height: 32px; border-radius: 3px;">
+            <div>
+                <strong>${player.nickname || player.uuid}</strong><br>
+                X: ${player.x}, Y: ${player.y}, Z: ${player.z}<br>
+                <small>Обновлено: ${new Date(player.timestamp).toLocaleTimeString()}</small>
+            </div>
+        </div>
+    `;
+  }
 
-  updateLocations() {
-    fetch("{{ url_for('api_locations_view') }}")
-      .then(response => response.json())
-      .then(data => {
-        // Update markers
-        const currentUUIDs = new Set(data.map(p => p.uuid));
-        
-        // Remove old markers
-        for (const [uuid, marker] of this.markers.entries()) {
-          if (!currentUUIDs.has(uuid)) {
-            this.map.removeLayer(marker);
+  _updateOrAddMarker(player) {
+    const position = [player.z, player.x]; // Leaflet: Lat (Y from Z), Lng (X from X)
+    const popupContent = this._getPopupContent(player);
+
+    if (this.markers.has(player.uuid)) {
+      const markerData = this.markers.get(player.uuid);
+      markerData.marker.setLatLng(position);
+      markerData.marker.setPopupContent(popupContent);
+      markerData.data = player; // Update stored data
+    } else {
+      const iconHtml = player.avatar_base64 ? `<img src="${player.avatar_base64}" style="width:24px; height:24px; border-radius:50%; border: 1px solid #fff;" />` : 'P';
+      const customIcon = L.divIcon({
+          html: iconHtml,
+          className: 'leaflet-custom-icon', // Add for potential styling
+          iconSize: [24, 24],
+          iconAnchor: [12, 12], // Center of the icon
+          popupAnchor: [0, -12] // Popup above the icon
+      });
+
+      const marker = L.marker(position, { icon: customIcon })
+        .bindPopup(popupContent);
+      
+      marker.addTo(this.map);
+      this.markers.set(player.uuid, { marker: marker, data: player });
+    }
+  }
+
+  _removeMarker(uuid) {
+    if (this.markers.has(uuid)) {
+      this.map.removeLayer(this.markers.get(uuid).marker);
             this.markers.delete(uuid);
           }
         }
 
-        // Update or add new markers
+  _updateHeatmap() {
+    if (this.heatLayer) this.map.removeLayer(this.heatLayer);
         const heatPoints = [];
+    this.markers.forEach(markerData => {
+      // Leaflet: Lat (Y from Z), Lng (X from X), Intensity
+      heatPoints.push([markerData.data.z, markerData.data.x, 0.5]); 
+    });
+    
+    this.heatLayer = L.heatLayer(heatPoints, MAP_CONFIG.HEATMAP_CONFIG);
+    if (this.heatmapEnabled && heatPoints.length > 0) {
+      this.heatLayer.addTo(this.map);
+    }
+  }
+  
+  // Processes a single location entry (either from initial fetch or realtime update)
+  _processLocationEntry(entry) {
+    if (!entry || !entry.uuid || typeof entry.x !== 'number' || typeof entry.y !== 'number' || typeof entry.z !== 'number') {
+        console.warn("Skipping invalid location entry:", entry);
+        return false; // Indicate that this entry was skipped
+    }
+    this.playerData.set(entry.uuid, entry);
+    this._updateOrAddMarker(entry);
+    return true; // Indicate success
+  }
+
+
+  fetchInitialData() {
+    fetch("{{ url_for('api_locations_view') }}")
+      .then(response => {
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        return response.json();
+      })
+      .then(data => {
+        console.log("Initial locations data:", data);
+        this.playerData.clear(); // Clear old data
+        const activeUUIDs = new Set();
+
         data.forEach(player => {
-          const position = [player.z, player.x];
-          
-          if (this.markers.has(player.uuid)) {
-            this.markers.get(player.uuid).setLatLng(position);
-          } else {
-            const marker = L.circleMarker(position, {
-              radius: 6,
-              color: '#0f0',
-              fillColor: '#0f0',
-              fillOpacity: 0.7
-            }).bindPopup(`UUID: ${player.uuid}<br>X: ${player.x}, Y: ${player.y}, Z: ${player.z}`);
-            marker.addTo(this.map);
-            this.markers.set(player.uuid, marker);
+          if (this._processLocationEntry(player)) {
+              activeUUIDs.add(player.uuid);
           }
-          
-          heatPoints.push([player.z, player.x, 1]);
         });
 
-        // Update heatmap
-        if (this.heatLayer) {
-          this.map.removeLayer(this.heatLayer);
+        // Remove markers for players no longer in the fetched (recent) data
+        for (const uuid of this.markers.keys()) {
+            if (!activeUUIDs.has(uuid)) {
+                this._removeMarker(uuid);
+                this.playerData.delete(uuid); // Also remove from internal data store
+            }
         }
-        this.heatLayer = L.heatLayer(heatPoints, MAP_CONFIG.HEATMAP_CONFIG);
-        if (this.heatmapEnabled) {
-          this.heatLayer.addTo(this.map);
-        }
+        
+        this._updateHeatmap();
+        this.updatePlayerList(this.playerData);
 
-        // Update player list
-        this.updatePlayerList(data);
+        if (this.supabase) {
+            this.subscribeToRealtimeUpdates();
+        } else {
+            console.warn("Supabase client not available. Realtime updates disabled. Falling back to polling.");
+            setInterval(() => this.fetchInitialData(), MAP_CONFIG.UPDATE_INTERVAL);
+        }
       })
       .catch(error => {
-        console.error('Error fetching locations:', error);
-        showToast('Ошибка загрузки данных', 'error');
+        console.error('Error fetching initial locations:', error);
+        showToast('Ошибка загрузки начальных данных о местоположении.', 'error');
+         // Fallback to polling on error if Supabase is not the primary issue
+        if (!this.supabase) {
+            setInterval(() => this.fetchInitialData(), MAP_CONFIG.UPDATE_INTERVAL);
+        }
       });
   }
 
-  startUpdates() {
-    this.updateLocations();
-    setInterval(() => this.updateLocations(), MAP_CONFIG.UPDATE_INTERVAL);
+  subscribeToRealtimeUpdates() {
+    if (!this.supabase) return;
+
+    const channel = this.supabase
+      .channel('public:player_locations')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'player_locations' }, 
+        payload => {
+          console.log('Realtime location update:', payload);
+          let entryToProcess = null;
+
+          if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
+            entryToProcess = payload.new;
+          } else if (payload.eventType === 'DELETE') {
+            // For DELETE, payload.old contains the data of the deleted row
+            // We need to ensure we have a UUID to remove the marker.
+            if (payload.old && payload.old.uuid) {
+                this._removeMarker(payload.old.uuid);
+                this.playerData.delete(payload.old.uuid);
+            }
+          }
+          
+          if (entryToProcess) {
+            // A quick fetch to get up-to-date nickname and avatar for this specific UUID
+            // This could be optimized, e.g. if the payload *does* contain them
+            if (entryToProcess.uuid) { // Check if uuid exists
+                 fetch(`/api/player-details/${entryToProcess.uuid}`)
+                    .then(res => {
+                        if (!res.ok) {
+                            // If API returns 404 (player not found) or other error, create an error object to pass down
+                            return res.json().then(errData => Promise.reject(new Error(errData.error || `API Error: ${res.status}`)));
+                        }
+                        return res.json();
+                    })
+                    .then(playerDetails => {
+                        // Merge playerDetails with entryToProcess. entryToProcess might have more recent x,y,z,timestamp
+                        const finalEntry = {
+                            ...entryToProcess, // Contains x, y, z, client_timestamp, created_at from DB
+                            uuid: playerDetails.uuid, // Ensure UUID from details is used if it was manipulated
+                            nickname: playerDetails.nickname,
+                            avatar_base64: playerDetails.avatar_base64
+                        };
+                        this._processLocationEntry(finalEntry);
+                        this._updateHeatmap();
+                        this.updatePlayerList(this.playerData);
+                    })
+                    .catch(err => {
+                        console.warn(`Error fetching details for ${entryToProcess.uuid} via /api/player-details:`, err.message);
+                        // Process with data from Supabase payload, nickname/avatar might be missing or stale
+                        // This ensures the point still appears on the map even if detail fetch fails.
+                        const fallbackEntry = {
+                            ...entryToProcess,
+                            nickname: entryToProcess.nickname || entryToProcess.uuid.substring(0,8) + '...', // Use existing or fallback
+                            avatar_base64: entryToProcess.avatar_base64 || null // Use existing or null
+                        };
+                        this._processLocationEntry(fallbackEntry);
+                        this._updateHeatmap();
+                        this.updatePlayerList(this.playerData);
+                    });
+            } else if (entryToProcess) { // if entryToProcess exists but uuid is missing (should not happen with proper DB schema)
+                 console.warn("Realtime update received without UUID in entryToProcess:", entryToProcess);
+                 // Attempt to process if enough data, though it will likely be incomplete
+                 this._processLocationEntry(entryToProcess); 
+                 this._updateHeatmap();
+                 this.updatePlayerList(this.playerData);
+            }
+          }
+          // After processing any type of change, update heatmap and player list (moved inside promise chain for async ops)
+          // this._updateHeatmap();
+          // this.updatePlayerList(this.playerData); // Already called within the .then/.catch
+        }
+      )
+      .subscribe(status => {
+        if (status === 'SUBSCRIBED') {
+          console.log('Subscribed to player_locations realtime updates!');
+        } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+            console.error(`Realtime subscription failed: ${status}. Falling back to polling.`);
+            showToast('Ошибка подписки на обновления в реальном времени. Карта может не обновляться автоматически.', 'warning');
+            // Fallback to polling if subscription fails
+            channel.unsubscribe(); // Attempt to clean up
+            setInterval(() => this.fetchInitialData(), MAP_CONFIG.UPDATE_INTERVAL);
+        }
+      });
   }
 }
 
-// Initialize the map when the page loads
 document.addEventListener('DOMContentLoaded', () => {
-  window.playerMap = new PlayerMap();
+  // Pass the Supabase client instance to the PlayerMap
+  window.playerMap = new PlayerMap(supabase); 
 });
+
+// Basic Toast Notification (Optional - replace with your preferred library if you have one)
+function showToast(message, type = 'info') {
+    const toastContainer = document.body; // Or a specific toast container element
+    const toast = document.createElement('div');
+    toast.className = `toast-notification toast-${type}`;
+    toast.textContent = message;
+    toastContainer.appendChild(toast);
+    setTimeout(() => {
+        toast.classList.add('show');
+    }, 100); // Delay to allow CSS transition
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+            toast.remove();
+        }, 500); // Delay to allow fade out transition
+    }, 3000); // Toast visible for 3 seconds
+}
 </script>
+<style>
+/* Basic Toast Styling (Optional) */
+.toast-notification {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    border-radius: 5px;
+    color: white;
+    font-size: 0.9em;
+    z-index: 10000;
+    opacity: 0;
+    transition: opacity 0.4s ease-in-out;
+}
+.toast-notification.show {
+    opacity: 1;
+}
+.toast-info { background-color: #007bff; }
+.toast-success { background-color: #28a745; }
+.toast-warning { background-color: #ffc107; color: #333; }
+.toast-error { background-color: #dc3545; }
+</style>
 {% endblock %}

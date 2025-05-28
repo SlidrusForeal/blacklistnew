@@ -4,7 +4,7 @@
 import os
 import json
 import time
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 import functools
 from functools import wraps
 from typing import Optional
@@ -318,21 +318,21 @@ def role_required(*allowed_roles):
     return decorator
 
 # Функции для работы с whitelist (файл uuid_list.json)
-def load_whitelist():
-    try:
-        with open("uuid_list.json", "r", encoding="utf-8") as f:
-            return json.load(f)
-    except Exception as e:
-        app.logger.error(f"Ошибка загрузки whitelist: {str(e)}")
-        return []
+# def load_whitelist():
+#     try:
+#         with open("uuid_list.json", "r", encoding="utf-8") as f:
+#             return json.load(f)
+#     except Exception as e:
+#         app.logger.error(f"Ошибка загрузки whitelist: {str(e)}")
+#         return []
 
 
-def save_whitelist(data):
-    try:
-        with open("uuid_list.json", "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=2)
-    except Exception as e:
-        app.logger.error(f"Ошибка сохранения whitelist: {str(e)}")
+# def save_whitelist(data):
+#     try:
+#         with open("uuid_list.json", "w", encoding="utf-8") as f:
+#             json.dump(data, f, indent=2)
+#     except Exception as e:
+#         app.logger.error(f"Ошибка сохранения whitelist: {str(e)}")
 
 
 # --- Helper for Audit Logging ---
@@ -382,7 +382,11 @@ def index():
 
 @app.route("/fullist")
 def fullist():
-    return render_template("fullist.html")
+    return render_template(
+        "fullist.html",
+        SUPABASE_URL=SUPABASE_URL,      # Pass the imported SUPABASE_URL
+        SUPABASE_KEY=SUPABASE_KEY        # Pass the imported SUPABASE_KEY (anon key)
+    )
 
 
 @app.route("/ave")
@@ -530,10 +534,15 @@ def update_reason(entry_id):
 @app.route("/admin/delete/<int:entry_id>", methods=["POST"])
 @role_required("owner", "admin")
 def delete_entry(entry_id):
-    entry_to_delete = db.get_blacklist_entry_by_id(entry_id) # Get details before deleting for logging
+    entry_to_delete = db.get_blacklist_entry_by_id(entry_id)  # Get details before deleting for logging
     if entry_to_delete:
         if db.delete_blacklist_entry(entry_id):
-            log_admin_action("DELETE_BLACKLIST", target_type="blacklist_entry", target_identifier=str(entry_id), details=f"Nickname: {entry_to_delete.get('nickname')}, UUID: {entry_to_delete.get('uuid')}")
+            log_admin_action(
+                "DELETE_BLACKLIST",
+                target_type="blacklist_entry",
+                target_identifier=str(entry_id),
+                details=f"Nickname: {entry_to_delete.get('nickname')}, UUID: {entry_to_delete.get('uuid')}"
+            )
             flash("Запись удалена из ЧС.", "success")
         else:
             flash("Ошибка при удалении записи.", "danger")
@@ -570,48 +579,69 @@ def delete_user(user_id):
 @role_required("owner")
 def admin_whitelist():
     form = WhitelistForm()
-    whitelist = load_whitelist()
+    
+    current_user_identity = get_jwt_identity() # For logging who added/deleted
 
     if form.validate_on_submit():
         uuid_to_modify = form.uuid.data.strip()
         action = form.action.data
 
-        if not uuid_to_modify: 
+        if not uuid_to_modify:
             flash("UUID не может быть пустым.", "warning")
             return redirect(url_for('admin_whitelist'))
 
         if action == "add":
-            if uuid_to_modify not in whitelist:
-                whitelist.append(uuid_to_modify)
-                save_whitelist(whitelist)
-                log_admin_action("ADD_WHITELIST", target_type="whitelist_entry", target_identifier=uuid_to_modify)
-                flash(f"UUID {uuid_to_modify} добавлен в whitelist.", "success")
+            if not db.is_whitelisted(uuid_to_modify):
+                if db.add_to_whitelist(uuid_to_modify, added_by=current_user_identity):
+                    log_admin_action("ADD_WHITELIST_SUPABASE", target_type="whitelist_player", target_identifier=uuid_to_modify, details=f"Added by: {current_user_identity}")
+                    flash(f"UUID {uuid_to_modify} добавлен в whitelist (Supabase).", "success")
+                else:
+                    flash(f"Ошибка при добавлении UUID {uuid_to_modify} в Supabase.", "danger")
             else:
-                flash(f"UUID {uuid_to_modify} уже в whitelist.", "info")
+                flash(f"UUID {uuid_to_modify} уже в whitelist (Supabase).", "info")
         elif action == "delete":
-            if uuid_to_modify in whitelist:
-                whitelist.remove(uuid_to_modify)
-                save_whitelist(whitelist)
-                log_admin_action("DELETE_WHITELIST", target_type="whitelist_entry", target_identifier=uuid_to_modify)
-                flash(f"UUID {uuid_to_modify} удален из whitelist.", "success")
+            if db.is_whitelisted(uuid_to_modify): # Check if it exists before attempting delete
+                if db.remove_from_whitelist(uuid_to_modify):
+                    log_admin_action("DELETE_WHITELIST_SUPABASE", target_type="whitelist_player", target_identifier=uuid_to_modify, details=f"Removed by: {current_user_identity}")
+                    flash(f"UUID {uuid_to_modify} удален из whitelist (Supabase).", "success")
+                else:
+                    flash(f"Ошибка при удалении UUID {uuid_to_modify} из Supabase.", "danger")
             else:
-                flash(f"UUID {uuid_to_modify} не найден в whitelist.", "warning")
+                flash(f"UUID {uuid_to_modify} не найден в whitelist (Supabase) для удаления.", "warning")
         return redirect(url_for('admin_whitelist'))
     
-    if request.method == "POST" and not form.is_submitted(): 
-        uuid_to_delete = request.form.get("uuid")
-        action_delete = request.form.get("action")
-        if uuid_to_delete and action_delete == "delete":
-            if uuid_to_delete in whitelist:
-                whitelist.remove(uuid_to_delete)
-                save_whitelist(whitelist)
-                log_admin_action("DELETE_WHITELIST", target_type="whitelist_entry", target_identifier=uuid_to_delete, details="Deleted via button in list")
-                flash(f"UUID {uuid_to_delete} удален из whitelist (через кнопку).", "success")
+    # Handle direct deletion from the list if a form with 'uuid_to_delete_direct' and 'action=delete_direct' is POSTed
+    # This is an alternative to the main form, often used for buttons next to each item in a list.
+    if request.method == "POST" and request.form.get("action_direct") == "delete":
+        uuid_to_delete_direct = request.form.get("uuid_to_delete_direct")
+        if uuid_to_delete_direct:
+            if db.is_whitelisted(uuid_to_delete_direct):
+                if db.remove_from_whitelist(uuid_to_delete_direct):
+                    log_admin_action("DELETE_WHITELIST_SUPABASE", target_type="whitelist_player", target_identifier=uuid_to_delete_direct, details=f"Deleted via button by: {current_user_identity}")
+                    flash(f"UUID {uuid_to_delete_direct} удален из whitelist (через кнопку, Supabase).", "success")
+                else:
+                    flash(f"Ошибка при удалении {uuid_to_delete_direct} из Supabase.", "danger")
             else:
-                flash(f"UUID {uuid_to_delete} не найден в whitelist.", "warning")
+                flash(f"UUID {uuid_to_delete_direct} не найден для удаления.", "warning")
             return redirect(url_for('admin_whitelist'))
 
-    return render_template("admin_whitelist.html", form=form, whitelist=whitelist)
+    # Fetch all whitelist entries for display
+    whitelist_entries = db.get_all_whitelist_entries() # This now returns a list of dicts
+    
+    # The template admin_whitelist.html will need to be updated to iterate over whitelist_entries
+    # and display appropriate fields (e.g., entry.uuid, entry.added_by, entry.created_at).
+    # It will also need to change how the delete button POSTs, using 'uuid_to_delete_direct' and 'action_direct=delete'.
+    return render_template("admin_whitelist.html", form=form, whitelist_entries=whitelist_entries)
+
+# New API endpoint for the mod
+@app.route("/api/whitelist/all", methods=["GET"])
+def api_get_all_whitelisted_uuids():
+    try:
+        uuids = db.get_all_whitelisted_uuids()
+        return jsonify(uuids) # Returns a simple JSON array of UUID strings
+    except Exception as e:
+        app.logger.error(f"Error in /api/whitelist/all: {e}")
+        return jsonify({"error": "Failed to fetch whitelist", "message": str(e)}), 500
 
 @app.route("/admin/update_nicknames", methods=["POST"])
 @role_required("owner")
@@ -743,7 +773,7 @@ def api_check():
         }
     else:
         payload = {'in_blacklist': False}
-    
+
     db.add_check_log(check_source='api_check') # Log the check
     text = json.dumps(payload, ensure_ascii=False)
     return Response(text, status=200, mimetype='application/json')
@@ -751,7 +781,11 @@ def api_check():
 @app.route("/admin/map", methods=["GET"])
 @role_required("owner", "admin")
 def admin_map():
-    return render_template("admin_map.html")
+    return render_template(
+        "admin_map.html",
+        SUPABASE_URL=SUPABASE_URL,      # Pass the imported SUPABASE_URL
+        SUPABASE_KEY=SUPABASE_KEY        # Pass the imported SUPABASE_KEY (anon key)
+    )
 
 @app.route("/admin/audit_log", methods=["GET"])
 @role_required("owner")
@@ -774,14 +808,35 @@ def statistics_page():
     total_checks = db.count_total_checks()
     checks_last_24_hours = db.count_checks_last_24_hours()
     
-    # Placeholder for blacklist growth data - this would require more complex historical data storage
-    blacklist_growth_data = [] 
+    # New statistics
+    blacklist_growth_data = db.get_blacklist_entries_by_month(num_months=12) # Get last 12 months
+    top_reasons = db.get_top_n_reasons(n=5) # Get top 5 reasons
+    unique_players_in_blacklist = db.get_unique_player_count_in_blacklist()
+    latest_blacklist_additions = db.get_latest_n_blacklist_entries(n=5) # Get latest 5 entries
+
+    # Prepare data for Chart.js (example for blacklist_growth_data)
+    # Chart.js expects labels and data arrays.
+    monthly_labels = [item['month'] for item in blacklist_growth_data]
+    monthly_counts = [item['count'] for item in blacklist_growth_data]
+
+    top_reasons_labels = [item['reason'] for item in top_reasons]
+    top_reasons_counts = [item['count'] for item in top_reasons]
 
     return render_template("statistics.html",
                            total_blacklist_entries=total_blacklist_entries,
                            total_checks=total_checks,
                            checks_last_24_hours=checks_last_24_hours,
-                           blacklist_growth_data=blacklist_growth_data)
+                           unique_players_in_blacklist=unique_players_in_blacklist,
+                           latest_blacklist_additions=latest_blacklist_additions,
+                           # Data for charts
+                           monthly_labels_json=json.dumps(monthly_labels),
+                           monthly_counts_json=json.dumps(monthly_counts),
+                           top_reasons_labels_json=json.dumps(top_reasons_labels),
+                           top_reasons_counts_json=json.dumps(top_reasons_counts),
+                           # Raw data if needed by template directly
+                           blacklist_growth_data=blacklist_growth_data,
+                           top_reasons_data=top_reasons 
+                           )
 
 @app.route('/api/fullist')
 def api_full_blacklist():
@@ -916,27 +971,121 @@ def api_latest_data():
 @app.route("/api/locations/view", methods=["GET"])
 @role_required("owner", "admin")
 def api_locations_view():
-    import time
-
-    now = time.time()
-    cutoff = now - 3600  # час назад
-    results = []
-
     try:
-        with open("locations.json", "r", encoding="utf-8") as f:
-            locations = json.load(f)  # массив объектов
-    except (FileNotFoundError, json.JSONDecodeError):
-        locations = []
+        # Fetch locations from the last hour, most recent first
+        response = db.client.table('player_locations')\
+            .select('uuid, x, y, z, client_timestamp, created_at')\
+            .order('created_at', desc=True)\
+            .limit(100) \
+            .execute()
 
-    for entry in locations:
-        ts = entry.get("timestamp", 0)
-        if ts > cutoff:
-            # приводим timestamp к ISO для фронта, если нужно
-            entry["timestamp"] = datetime.utcfromtimestamp(ts).isoformat()
-            results.append(entry)
+        if response.error:
+            app.logger.error(f"Error fetching locations from Supabase: {response.error.message}")
+            return jsonify({"error": "Failed to fetch locations", "details": response.error.message}), 500
 
-    return jsonify(results)
+        locations_data = response.data
+        results = []
 
+        # Get a unique set of UUIDs to fetch nicknames and avatars efficiently
+        unique_uuids = list(set(loc['uuid'] for loc in locations_data if loc['uuid']))
+
+        nicknames_cache = {}
+        avatars_cache = {}
+
+        for u_id in unique_uuids:
+            nicknames_cache[u_id] = get_name_from_uuid(u_id) # Mojang API call
+            # Fetch avatar (simplified, assumes api_avatar logic or direct Minotar)
+            avatar_url = f"https://minotar.net/helm/{u_id}/32.png" # Smaller avatar for map
+            try:
+                avatar_resp = requests.get(avatar_url, timeout=2)
+                if avatar_resp.status_code == 200:
+                    b64_avatar = base64.b64encode(avatar_resp.content).decode('ascii')
+                    avatars_cache[u_id] = f"data:image/png;base64,{b64_avatar}"
+                else:
+                    avatars_cache[u_id] = None # Or a default placeholder avatar
+            except requests.RequestException:
+                avatars_cache[u_id] = None
+
+        for loc in locations_data:
+            # Use client_timestamp if available and valid, otherwise fall back to created_at
+            timestamp_to_use = loc.get('client_timestamp') or loc.get('created_at')
+            # Ensure timestamp is in ISO format string for JSON serialization
+            if isinstance(timestamp_to_use, datetime):
+                iso_timestamp = timestamp_to_use.isoformat()
+            elif isinstance(timestamp_to_use, str):
+                iso_timestamp = timestamp_to_use
+            else:
+                iso_timestamp = datetime.utcnow().isoformat()
+            player_uuid = loc.get('uuid')
+            results.append({
+                "uuid": player_uuid,
+                "nickname": nicknames_cache.get(player_uuid, "Unknown"),
+                "avatar_base64": avatars_cache.get(player_uuid),
+                "x": loc.get("x"),
+                "y": loc.get("y"),
+                "z": loc.get("z"),
+                "timestamp": iso_timestamp 
+            })
+        # Filter results to only include those from the last hour
+        now_dt = datetime.utcnow().replace(tzinfo=None) # Naive datetime for comparison
+        one_hour_ago = now_dt - timedelta(hours=1)
+        final_results = []
+        for r in results:
+            ts_str = r.get("timestamp")
+            if ts_str:
+                try:
+                    dt_obj = datetime.fromisoformat(ts_str.replace('Z', '+00:00'))
+                    if dt_obj.tzinfo:
+                        dt_obj = dt_obj.astimezone(timezone.utc).replace(tzinfo=None)
+                    if dt_obj > one_hour_ago:
+                        final_results.append(r)
+                except ValueError as e:
+                    app.logger.warning(f"Could not parse timestamp '{ts_str}' for location: {e}")
+        return jsonify(final_results)
+    except Exception as e:
+        app.logger.error(f"Unexpected error in /api/locations/view: {e}", exc_info=True)
+        return jsonify({"error": "An unexpected error occurred.", "message": str(e)}), 500
+
+
+@app.route("/api/player-details/<player_uuid>", methods=["GET"])
+def api_player_details(player_uuid):
+    """
+    Возвращает JSON с никнеймом и аватаркой игрока в Base64 по UUID.
+    Ответ:
+      200: { "uuid": "...", "nickname": "...", "avatar_base64": "data:image/png;base64,..." }
+      404: { "error": "Player details not found or UUID invalid" }
+      500: { "error": "Internal error fetching player details" }
+    """
+    if not player_uuid or len(player_uuid.replace('-', '')) != 32:
+        return jsonify(error="Invalid UUID format"), 400
+
+    nickname = get_name_from_uuid(player_uuid)
+    # Avatar fetching logic (similar to /api/avatar/)
+    avatar_base64 = None
+    avatar_url = f"https://minotar.net/helm/{player_uuid}/32.png" # Using 32px for map consistency
+    try:
+        resp = requests.get(avatar_url, timeout=3) # Short timeout for combined endpoint
+        if resp.status_code == 200:
+            b64 = base64.b64encode(resp.content).decode('ascii')
+            avatar_base64 = f"data:image/png;base64,{b64}"
+        # Not found (404) for avatar is acceptable, nickname might still exist
+    except requests.RequestException as e:
+        app.logger.warning(f"Error fetching avatar for {player_uuid} in player-details: {e}")
+        # Continue without avatar if it fails, nickname is more critical here
+
+    if not nickname and not avatar_base64:
+        # Only return 404 if both are missing and it seems like a totally invalid/unknown UUID
+        # If Mojang API fails for nickname but avatar was found (or vice-versa), we might still return 200 with partial data.
+        # However, get_name_from_uuid returns None on API error or 404.
+        # Minotar returns 404 if UUID is unknown.
+        # So if both are None/failed, it's likely the UUID is bad or Mojang/Minotar are down.
+        return jsonify(error="Player details not found or UUID invalid"), 404
+
+    return jsonify({
+        "uuid": player_uuid,
+        "nickname": nickname, # Will be null if not found
+        "avatar_base64": avatar_base64 # Will be null if not found or error
+    }), 200
 
 @app.route("/api/avatar/<user_uuid>", methods=["GET"])
 def api_avatar(user_uuid):
@@ -970,34 +1119,66 @@ def api_avatar(user_uuid):
 @app.route("/api/locations/report", methods=["GET","POST"])
 def api_locations_report():
     if request.method == "GET":
-        return jsonify(message="POST JSON {uuid,x,y,z} to me"), 200
+        return jsonify(message="POST JSON {uuid, x, y, z, client_timestamp (optional, ISO format)} to me"), 200
 
     data = request.get_json(silent=True)
     if not data:
         return jsonify({"error": "Invalid or missing JSON"}), 400
 
-    uuid = data.get("uuid")
-    x, y, z = data.get("x"), data.get("y"), data.get("z")
-    if not all([uuid, x, y, z]):
-        return jsonify({"error": "Fields uuid, x, y, z are required"}), 400
+    player_uuid = data.get("uuid") # Renamed to avoid conflict with uuid module
+    x = data.get("x")
+    y = data.get("y")
+    z = data.get("z")
+    client_timestamp_str = data.get("client_timestamp") # Optional client-provided timestamp
 
-    # load existing, but guard against empty/corrupt JSON
+    if not all([player_uuid, isinstance(x, int), isinstance(y, int), isinstance(z, int)]):
+        return jsonify({"error": "Fields uuid (string), x (int), y (int), z (int) are required and must be correct types."}), 400
+
+    client_timestamp = None
+    if client_timestamp_str:
+        try:
+            client_timestamp = datetime.fromisoformat(client_timestamp_str.replace('Z', '+00:00'))
+        except ValueError:
+            return jsonify({"error": "Invalid client_timestamp format. Please use ISO 8601 format."}), 400
+    
     try:
-        with open("locations.json", "r", encoding="utf-8") as f:
-            locations = json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        locations = []
+        # Insert into Supabase
+        record = {
+            'uuid': player_uuid,
+            'x': x,
+            'y': y,
+            'z': z
+        }
+        if client_timestamp:
+            record['client_timestamp'] = client_timestamp.isoformat()
+        else:
+            # If no client_timestamp, Supabase will use default for created_at
+            # and client_timestamp column will be NULL if not set otherwise in DB schema
+            pass 
+            
+        # Use the Supabase client (db) to insert
+        # Assuming your Supabase client instance is `db` and has an insert method like:
+        # db.client.table('player_locations').insert(record).execute()
+        # The actual method depends on your `supabase_client.py` implementation.
+        # For now, I will assume a generic insert method on your `db` object.
+        # You might need to adjust this part based on your `SupabaseClient` class methods.
+        
+        # Let's assume db.add_player_location(record) or similar exists in supabase_client.py
+        # If not, we would do: db.client.table('player_locations').insert(record).execute()
+        # This requires knowing the structure of your `db` object from `supabase_client.py`
+        # For now, proceeding with the direct table insert approach:
+        response = db.client.table('player_locations').insert(record).execute()
 
-    # append & prune
-    ts_now = time.time()
-    locations.append({"uuid": uuid, "x": x, "y": y, "z": z, "timestamp": ts_now})
-    cutoff = ts_now - 3600
-    locations = [loc for loc in locations if loc.get("timestamp", 0) > cutoff]
+        if response.data:
+            app.logger.info(f"Reported location for {player_uuid}: X:{x} Y:{y} Z:{z} TS:{client_timestamp_str}")
+            return jsonify({"success": True, "message": "Location reported successfully."}), 200
+        else:
+            app.logger.error(f"Failed to report location to Supabase: {response.error.message if response.error else 'Unknown error'}")
+            return jsonify({"error": "Failed to store location", "details": response.error.message if response.error else 'Unknown error'}), 500
 
-    with open("locations.json", "w", encoding="utf-8") as f:
-        json.dump(locations, f, indent=2, ensure_ascii=False)
-
-    return jsonify({"success": True}), 200
+    except Exception as e:
+        app.logger.error(f"Error in /api/locations/report: {e}", exc_info=True)
+        return jsonify({"error": "An unexpected error occurred."}), 500
 
 @csrf.exempt
 @app.route('/github-webhook', methods=['GET', 'POST'])

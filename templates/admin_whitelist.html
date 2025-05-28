@@ -1,47 +1,60 @@
 {% extends "base.html" %}
-{% block title %}Редактор whitelist{% endblock %}
+{% block title %}Редактор Whitelist | ЧС Сосмарка{% endblock %}
 
 {% block content %}
-<main class="container admin-container">
-  <h1>Редактор whitelist</h1>
-  <p><a href="{{ url_for('admin_panel') }}" class="btn-check">&larr; Назад в админ панель</a></p>
+<div class="container mt-4">
+    <h1 class="mb-4">Редактор Whitelist</h1>
+    <a href="{{ url_for('admin_panel') }}" class="btn btn-outline-secondary mb-3">Назад в админ-панель</a>
 
-  <section class="admin-section">
-  <h2>Добавить / удалить UUID</h2>
-    <form method="POST" action="{{ url_for('admin_whitelist') }}" class="form-inline">
-    {{ form.hidden_tag() }}
-    <div class="input-group">
-        {{ form.uuid.label(class="form-label") }}
-        {{ form.uuid(placeholder="Введите UUID", class="form-control") }}
-      </div>
-      <div class="input-group">
-        {{ form.action.label(class="form-label") }}
-        {{ form.action(class="form-select") }}
-      </div>
-      <div class="input-group">
-        {{ form.submit(class="btn-check btn-primary") }}
+    <div class="card mb-4 admin-section">
+        <div class="card-header">Добавить UUID в Whitelist</div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('admin_whitelist') }}">
+                {{ form.hidden_tag() }}
+                <div class="form-row align-items-end">
+                    <div class="form-group col-md-6">
+                        {{ form.uuid.label(class="form-label") }}
+                        {{ form.uuid(class="form-control") }}
+                    </div>
+                    <div class="form-group col-md-3">
+                        {{ form.action.label(class="form-label") }}
+                        {{ form.action(class="form-control") }}
+                    </div>
+                    <div class="form-group col-md-3">
+                        {{ form.submit(class="btn btn-primary w-100") }}
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
-  </form>
-  </section>
 
-  <section class="admin-section">
-  <h2>Текущий whitelist</h2>
-  {% if whitelist %}
-      <ul class="whitelist-list">
-      {% for u in whitelist %}
-          <li class="whitelist-item">
-            <span>{{ u }}</span>
-            <form method="POST" action="{{ url_for('admin_whitelist') }}" class="form-inline-item">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="uuid" value="{{ u }}">
-              <button type="submit" name="action" value="delete" class="btn-check btn-danger btn-sm">Удалить</button>
-          </form>
-        </li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p>Whitelist пуст.</p>
-  {% endif %}
-  </section>
-</main>
+    <div class="card admin-section">
+        <div class="card-header">Текущий Whitelist</div>
+        <div class="card-body">
+            {% if whitelist_entries %}
+                <ul class="list-group mb-3">
+                    {% for entry in whitelist_entries %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ entry.uuid }}</strong><br>
+                                <small class="text-muted">
+                                    Добавлен: {{ entry.created_at | format_datetime if entry.created_at else 'N/A' }}
+                                    {% if entry.added_by %} | Автор: {{ entry.added_by }}{% endif %}
+                                </small>
+                            </div>
+                            <form method="POST" action="{{ url_for('admin_whitelist') }}" style="display: inline;">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="uuid_to_delete_direct" value="{{ entry.uuid }}">
+                                <input type="hidden" name="action_direct" value="delete">
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Удалить {{ entry.uuid }} из whitelist?');">Удалить</button>
+                            </form>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Whitelist пуст.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
 {% endblock %}

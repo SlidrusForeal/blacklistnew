@@ -1,64 +1,226 @@
 {% extends "base.html" %}
-{% block title %}Статистика сайта{% endblock %}
+{% block title %}Статистика Сайта | ЧС Сосмарка{% endblock %}
+
+{% block head %}
+  {{ super() }} {# Include anystyles from base.html #}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .stat-card {
+      background-color: #2a2a2e;
+      border: 1px solid #444;
+      color: #f1f1f1;
+      margin-bottom: 20px;
+    }
+    .stat-card .card-header {
+      background-color: #343a40;
+      border-bottom: 1px solid #444;
+      font-weight: bold;
+    }
+    .stat-card .card-title {
+      font-size: 2.5rem;
+      color: #17a2b8;
+    }
+    .chart-container {
+      background-color: #2a2a2e;
+      padding: 20px;
+      border-radius: 5px;
+      border: 1px solid #444;
+      margin-bottom: 30px;
+    }
+    .chart-container h3 {
+        color: #e9ecef;
+        margin-bottom: 20px;
+    }
+    canvas {
+        max-width: 100%; /* Ensure canvas is responsive */
+    }
+    .latest-additions-list .list-group-item {
+        background-color: #343a40;
+        border-color: #444;
+        color: #f1f1f1;
+    }
+    .latest-additions-list .list-group-item strong {
+        color: #17a2b8;
+    }
+  </style>
+{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <h1 class="mb-4">Статистика сайта</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Статистика Сайта</h1>
+        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">На главную</a>
+    </div>
 
     <div class="row">
-        <div class="col-md-4 mb-3">
-            <div class="card text-center">
-                <div class="card-header">
-                    Общее количество записей в ЧС
-                </div>
-                <div class="card-body">
-                    <h2 class="card-title">{{ total_blacklist_entries }}</h2>
-                </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center stat-card">
+                <div class="card-header">Записей в ЧС</div>
+                <div class="card-body"><h2 class="card-title">{{ total_blacklist_entries }}</h2></div>
             </div>
         </div>
-        <div class="col-md-4 mb-3">
-            <div class="card text-center">
-                <div class="card-header">
-                    Всего проверок выполнено
-                </div>
-                <div class="card-body">
-                    <h2 class="card-title">{{ total_checks }}</h2>
-                </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center stat-card">
+                <div class="card-header">Уникальных Игроков в ЧС</div>
+                <div class="card-body"><h2 class="card-title">{{ unique_players_in_blacklist }}</h2></div>
             </div>
         </div>
-        <div class="col-md-4 mb-3">
-            <div class="card text-center">
-                <div class="card-header">
-                    Проверок за последние 24 часа
-                </div>
-                <div class="card-body">
-                    <h2 class="card-title">{{ checks_last_24_hours }}</h2>
-                </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center stat-card">
+                <div class="card-header">Всего Проверок</div>
+                <div class="card-body"><h2 class="card-title">{{ total_checks }}</h2></div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center stat-card">
+                <div class="card-header">Проверок за 24ч</div>
+                <div class="card-body"><h2 class="card-title">{{ checks_last_24_hours }}</h2></div>
             </div>
         </div>
     </div>
 
-    <h2 class="mt-5 mb-3">Рост черного списка</h2>
-    {% if blacklist_growth_data %}
-        {# Placeholder for a chart. You would typically use a JS charting library here like Chart.js or D3.js #}
-        {# For now, just displaying the raw data if any #}
-        <p>Данные о росте ЧС (требуется интеграция с библиотекой графиков):</p>
-        <pre>{{ blacklist_growth_data | tojson(indent=2) }}</pre>
-    {% else %}
-        <p>Данные о росте черного списка пока недоступны. Эта функция требует дополнительной настройки для сбора исторических данных.</p>
-    {% endif %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="chart-container">
+                <h3>Динамика добавления в ЧС (последние 12 месяцев)</h3>
+                <canvas id="blacklistGrowthChart"></canvas>
+            </div>
+        </div>
+    </div>
 
-    <div class="mt-4">
-        <a href="{{ url_for('index') }}" class="btn btn-secondary">На главную</a>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="chart-container">
+                <h3>Топ 5 Причин Добавления в ЧС</h3>
+                <canvas id="topReasonsChart"></canvas>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="chart-container latest-additions-list">
+                <h3>Последние 5 Добавлений в ЧС</h3>
+                {% if latest_blacklist_additions %}
+                    <ul class="list-group list-group-flush">
+                        {% for entry in latest_blacklist_additions %}
+                            <li class="list-group-item">
+                                <strong>{{ entry.nickname }}</strong> ({{ entry.uuid }})<br>
+                                <small>Причина: {{ entry.reason }}</small><br>
+                                <small>Дата: {{ entry.created_at | format_datetime }}</small>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>Нет недавних добавлений.</p>
+                {% endif %}
+            </div>
+        </div>
     </div>
 
 </div>
+{% endblock %}
 
-{# If you plan to use Chart.js, for example:
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% block scripts %}
+{{ super() }}
 <script>
-    // Example: var ctx = document.getElementById('blacklistGrowthChart').getContext('2d');
-    // ... chart configuration using blacklist_growth_data ...
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof Chart === 'undefined') {
+            console.error('Chart.js is not loaded!');
+            return;
+        }
+
+        const defaultFontColor = '#e9ecef';
+        const defaultBorderColor = '#444';
+
+        Chart.defaults.color = defaultFontColor;
+        Chart.defaults.borderColor = defaultBorderColor;
+        Chart.defaults.plugins.legend.labels.color = defaultFontColor;
+        
+        // Data for charts - ensure this is valid JSON parsed correctly
+        let monthlyLabels, monthlyCounts, topReasonsLabels, topReasonsCounts;
+        try {
+            monthlyLabels = JSON.parse('{{ monthly_labels_json | safe | escapejs }}');
+            monthlyCounts = JSON.parse('{{ monthly_counts_json | safe | escapejs }}');
+            topReasonsLabels = JSON.parse('{{ top_reasons_labels_json | safe | escapejs }}');
+            topReasonsCounts = JSON.parse('{{ top_reasons_counts_json | safe | escapejs }}');
+        } catch (e) {
+            console.error("Error parsing chart data from Jinja:", e);
+            // Initialize with empty arrays to prevent further errors if data is malformed
+            monthlyLabels = []; monthlyCounts = []; topReasonsLabels = []; topReasonsCounts = [];
+        }
+
+        // 1. Blacklist Growth Chart (Line Chart)
+        const blacklistGrowthCtx = document.getElementById('blacklistGrowthChart');
+        if (blacklistGrowthCtx && monthlyLabels.length > 0) {
+            new Chart(blacklistGrowthCtx.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: monthlyLabels,
+                    datasets: [{
+                        label: 'Количество добавлений в ЧС',
+                        data: monthlyCounts,
+                        borderColor: '#17a2b8',
+                        backgroundColor: 'rgba(23, 162, 184, 0.2)',
+                        tension: 0.1,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1, color: defaultFontColor },
+                            grid: { color: defaultBorderColor }
+                        },
+                        x: {
+                             ticks: { color: defaultFontColor },
+                             grid: { color: defaultBorderColor }
+                        }
+                    }
+                }
+            });
+        } else if (blacklistGrowthCtx) {
+            blacklistGrowthCtx.parentElement.innerHTML += '<p class="text-muted text-center">Данных для графика роста ЧС пока нет.</p>';
+        } else {
+            console.error("Element with ID 'blacklistGrowthChart' not found.");
+        }
+
+        // 2. Top Reasons Chart (Doughnut Chart)
+        const topReasonsCtx = document.getElementById('topReasonsChart');
+        if (topReasonsCtx && topReasonsLabels.length > 0) {
+            new Chart(topReasonsCtx.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: topReasonsLabels,
+                    datasets: [{
+                        label: 'Топ причин',
+                        data: topReasonsCounts,
+                        backgroundColor: [
+                            'rgba(23, 162, 184, 0.8)',  // info
+                            'rgba(40, 167, 69, 0.8)',   // success
+                            'rgba(255, 193, 7, 0.8)',    // warning
+                            'rgba(220, 53, 69, 0.8)',    // danger
+                            'rgba(108, 117, 125, 0.8)' // secondary
+                        ],
+                        borderColor: '#2a2a2e', 
+                        hoverOffset: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+        } else if (topReasonsCtx) {
+             topReasonsCtx.parentElement.innerHTML += '<p class="text-muted text-center">Данных для графика причин пока нет.</p>';
+        } else {
+            console.error("Element with ID 'topReasonsChart' not found.");
+        }
+    });
 </script>
-#}
 {% endblock %} 

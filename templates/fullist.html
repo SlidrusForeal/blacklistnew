@@ -5,6 +5,8 @@
 
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/fullist.css') }}">
+{# Import Supabase JS library #}
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 {% endblock %}
 
 {% block content %}
@@ -50,6 +52,22 @@
 <script src="{{ url_for('static', filename='js/infinite-scroll.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+  const SUPABASE_URL = '{{ SUPABASE_URL }}';
+  const SUPABASE_ANON_KEY = '{{ SUPABASE_KEY }}';
+  let supabase = null;
+
+  if (SUPABASE_URL && SUPABASE_ANON_KEY && SUPABASE_URL !== 'None' && SUPABASE_ANON_KEY !== 'None') {
+    try {
+        supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log("Supabase client initialized for fullist.");
+    } catch (e) {
+        console.error("Error initializing Supabase client for fullist:", e);
+        alert("Не удалось инициализировать клиент Supabase. Обновления в реальном времени не будут работать.");
+    }
+  } else {
+    console.warn("Supabase URL or Anon Key not configured for fullist. Realtime updates will not work.");
+  }
+
   const searchInput = document.getElementById('searchInput');
   const blacklistContainer = document.getElementById('blacklistContainer');
   const loadingIndicator = document.getElementById('loadingIndicator');
@@ -79,7 +97,8 @@ document.addEventListener('DOMContentLoaded', () => {
     sortBy: sortBySelect ? sortBySelect.value : 'created_at',
     sortOrder: sortOrderSelect ? sortOrderSelect.value : 'desc',
     dateFrom: dateFromInput ? dateFromInput.value : '',
-    dateTo: dateToInput ? dateToInput.value : ''
+    dateTo: dateToInput ? dateToInput.value : '',
+    supabaseClient: supabase // Pass the Supabase client to the class
   };
 
   const globalInfiniteScrollInstance = new InfiniteScroll(blacklistContainer, initialOptions);
