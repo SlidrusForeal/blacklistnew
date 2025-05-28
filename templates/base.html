@@ -94,6 +94,7 @@
         <li><a href="{{ url_for('index') }}">Главная</a></li>
         <li><a href="{{ url_for('fullist') }}">Полный список</a></li>
         <li><a href="{{ url_for('contacts') }}">Контакты</a></li>
+        <li><a href="{{ url_for('statistics_page') }}">Статистика</a></li>
       </ul>
     </nav>
   </header>
@@ -115,8 +116,8 @@
   <footer class="footer mt-auto py-3 bg-light">
     <div class="container text-center">
       <span class="text-muted">© {{ current_year() }} Blacklist Sosmark. Все права защищены. 
-        <a href="{{ url_for('contacts') }}">Контакты</a> | 
-        <a href="{{ url_for('statistics_page') }}">Статистика</a>
+        {# <a href="{{ url_for('contacts') }}">Контакты</a> |  #}
+        {# <a href="{{ url_for('statistics_page') }}">Статистика</a> #}
       </span>
     </div>
   </footer>
