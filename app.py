@@ -822,21 +822,23 @@ def statistics_page():
     top_reasons_labels = [item['reason'] for item in top_reasons]
     top_reasons_counts = [item['count'] for item in top_reasons]
 
+    # Create a single chart data object
+    chart_data = {
+        'monthlyLabels': monthly_labels,
+        'monthlyCounts': monthly_counts,
+        'topReasonsLabels': top_reasons_labels,
+        'topReasonsCounts': top_reasons_counts
+    }
+
     return render_template("statistics.html",
                            total_blacklist_entries=total_blacklist_entries,
                            total_checks=total_checks,
                            checks_last_24_hours=checks_last_24_hours,
                            unique_players_in_blacklist=unique_players_in_blacklist,
                            latest_blacklist_additions=latest_blacklist_additions,
-                           # Data for charts - properly escaped
-                           monthly_labels_json=json.dumps(monthly_labels, ensure_ascii=False),
-                           monthly_counts_json=json.dumps(monthly_counts, ensure_ascii=False),
-                           top_reasons_labels_json=json.dumps(top_reasons_labels, ensure_ascii=False),
-                           top_reasons_counts_json=json.dumps(top_reasons_counts, ensure_ascii=False),
-                           # Raw data if needed by template directly
+                           chart_data=json.dumps(chart_data, ensure_ascii=False),
                            blacklist_growth_data=blacklist_growth_data,
-                           top_reasons_data=top_reasons 
-                           )
+                           top_reasons_data=top_reasons)
 
 @app.route('/api/fullist')
 def api_full_blacklist():
@@ -976,7 +978,7 @@ def api_locations_view():
         response = db.client.table('player_locations')\
             .select('uuid, x, y, z, client_timestamp, created_at')\
             .order('created_at', desc=True)\
-            .limit(100) \
+            .limit(100)\
             .execute()
 
         if response.error:
@@ -1026,6 +1028,7 @@ def api_locations_view():
                 "z": loc.get("z"),
                 "timestamp": iso_timestamp 
             })
+
         # Filter results to only include those from the last hour
         now_dt = datetime.utcnow().replace(tzinfo=None) # Naive datetime for comparison
         one_hour_ago = now_dt - timedelta(hours=1)

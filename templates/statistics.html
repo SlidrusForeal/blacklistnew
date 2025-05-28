@@ -4,6 +4,9 @@
 {% block head %}
   {{ super() }} {# Include styles from base.html #}
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+  <script type="text/javascript">
+    var chartData = JSON.parse('{{ chart_data | tojson | safe }}');
+  </script>
   <style>
     .stat-card {
       background-color: #2a2a2e;
@@ -120,7 +123,7 @@
 
 {% block scripts %}
 {{ super() }}
-<script>
+<script type="text/javascript">
     document.addEventListener('DOMContentLoaded', function() {
         if (typeof Chart === 'undefined') {
             console.error('Chart.js is not loaded!');
@@ -133,23 +136,17 @@
         Chart.defaults.color = defaultFontColor;
         Chart.defaults.borderColor = defaultBorderColor;
         Chart.defaults.plugins.legend.labels.color = defaultFontColor;
-        
-        // Data for charts - parse JSON safely
-        const monthlyLabels = JSON.parse('{{ monthly_labels_json | tojson | safe }}');
-        const monthlyCounts = JSON.parse('{{ monthly_counts_json | tojson | safe }}');
-        const topReasonsLabels = JSON.parse('{{ top_reasons_labels_json | tojson | safe }}');
-        const topReasonsCounts = JSON.parse('{{ top_reasons_counts_json | tojson | safe }}');
 
         // 1. Blacklist Growth Chart (Line Chart)
         const blacklistGrowthCtx = document.getElementById('blacklistGrowthChart');
-        if (blacklistGrowthCtx && monthlyLabels.length > 0) {
+        if (blacklistGrowthCtx && chartData.monthlyLabels.length > 0) {
             new Chart(blacklistGrowthCtx.getContext('2d'), {
                 type: 'line',
                 data: {
-                    labels: monthlyLabels,
+                    labels: chartData.monthlyLabels,
                     datasets: [{
                         label: 'Количество добавлений в ЧС',
-                        data: monthlyCounts,
+                        data: chartData.monthlyCounts,
                         borderColor: '#17a2b8',
                         backgroundColor: 'rgba(23, 162, 184, 0.2)',
                         tension: 0.1,
@@ -180,14 +177,14 @@
 
         // 2. Top Reasons Chart (Doughnut Chart)
         const topReasonsCtx = document.getElementById('topReasonsChart');
-        if (topReasonsCtx && topReasonsLabels.length > 0) {
+        if (topReasonsCtx && chartData.topReasonsLabels.length > 0) {
             new Chart(topReasonsCtx.getContext('2d'), {
                 type: 'doughnut',
                 data: {
-                    labels: topReasonsLabels,
+                    labels: chartData.topReasonsLabels,
                     datasets: [{
                         label: 'Топ причин',
-                        data: topReasonsCounts,
+                        data: chartData.topReasonsCounts,
                         backgroundColor: [
                             'rgba(23, 162, 184, 0.8)',  // info
                             'rgba(40, 167, 69, 0.8)',   // success
