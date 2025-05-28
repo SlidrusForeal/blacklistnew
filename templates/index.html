@@ -24,7 +24,7 @@
   </form>
 
   {% if result %}
-    <div id="result" class="result-container" style="color: {{ result.color }};">
+    <div id="result" class="result-container {% if result.color == 'red' %}text-danger{% else %}text-success{% endif %}">
       <p>{{ result.message }}</p>
       {% if result.reason %}
         <p>Причина: {{ result.reason }}</p>
