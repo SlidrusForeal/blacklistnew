@@ -18,6 +18,21 @@
            aria-label="Поиск по списку"
            class="search-input">
   </div>
+  
+  {# Placeholder for filter controls - to be added if desired #}
+  {# <div class="filter-controls" style="margin-bottom: 20px; padding: 15px; background-color: #333; border-radius: 5px;">
+    <select id="sortBy" style="margin-right: 10px;">
+        <option value="created_at">Дата добавления</option>
+        <option value="nickname">Никнейм</option>
+    </select>
+    <select id="sortOrder" style="margin-right: 10px;">
+        <option value="desc">По убыванию</option>
+        <option value="asc">По возрастанию</option>
+    </select>
+    <input type="date" id="dateFrom" style="margin-right: 10px;">
+    <input type="date" id="dateTo" style="margin-right: 10px;">
+    <button id="applyFiltersBtn">Применить фильтры</button>
+  </div> #}
 
   <div id="blacklistContainer" class="blacklist-entries" role="list">
     <!-- Entries will be loaded dynamically -->
@@ -36,58 +51,63 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const searchInput = document.getElementById('searchInput');
-  const blacklistContainer = document.getElementById('blacklistContainer'); // Ensure this ID matches
+  const blacklistContainer = document.getElementById('blacklistContainer');
   const loadingIndicator = document.getElementById('loadingIndicator');
   const noMoreResultsIndicator = document.getElementById('noMoreResultsIndicator');
 
-  let globalInfiniteScrollInstance;
+  // Filter and Sort controls (get them if they exist)
+  const sortBySelect = document.getElementById('sortBy');
+  const sortOrderSelect = document.getElementById('sortOrder');
+  const dateFromInput = document.getElementById('dateFrom');
+  const dateToInput = document.getElementById('dateTo');
+  const applyFiltersBtn = document.getElementById('applyFiltersBtn');
 
-  function initializeInfiniteScroll(searchQuery = '') {
-    if (globalInfiniteScrollInstance) {
-      // If an instance exists, we might need to reset it or ensure it handles new search query
-      // For simplicity with the old class, we might just clear container and make a new one.
-      // However, the provided old JS class has a .reset() method which should be used.
-      // globalInfiniteScrollInstance.options.searchQuery = searchQuery; // Assuming the class can pick this up or reset uses it
-      // globalInfiniteScrollInstance.reset();
-      // The old code actually made a new instance, which is fine.
-    }
-    
-    // Clear previous content if any, before initializing new scroll
-    if (blacklistContainer) { // Check if container exists
-        // blacklistContainer.innerHTML = ''; // The reset method in the old class should handle this
-    }
-
-
-    globalInfiniteScrollInstance = new InfiniteScroll(blacklistContainer, {
-      perPage: 20,
-      threshold: 200,
-      searchQuery: searchQuery,
-      loadingTemplate: '<div class="loading-spinner"><div class="spinner"></div><p>Загрузка записей...</p></div>', // Example template
-      noMoreResultsIndicator: noMoreResultsIndicator, // Pass the indicator
-      loadingIndicator: loadingIndicator, // Pass the loading indicator
-      initialPageContentElement: blacklistContainer // Pass container to show 'no results'
-    });
+  if (!blacklistContainer) {
+    console.error('Blacklist container not found. Infinite scroll cannot be initialized.');
+    return;
   }
-  
-  initializeInfiniteScroll(); // Initial load without search query
+
+  const initialOptions = {
+    perPage: 20,
+    threshold: 200, // Adjusted threshold for potentially taller items
+    searchQuery: searchInput ? searchInput.value.trim() : '',
+    loadingTemplate: '<div class="loading-spinner"><div class="spinner"></div><p>Загрузка записей...</p></div>',
+    noMoreResultsIndicator: noMoreResultsIndicator,
+    loadingIndicator: loadingIndicator,
+    initialPageContentElement: blacklistContainer,
+    // Set initial sort/filter values if controls exist, otherwise defaults in class will be used
+    sortBy: sortBySelect ? sortBySelect.value : 'created_at',
+    sortOrder: sortOrderSelect ? sortOrderSelect.value : 'desc',
+    dateFrom: dateFromInput ? dateFromInput.value : '',
+    dateTo: dateToInput ? dateToInput.value : ''
+  };
+
+  const globalInfiniteScrollInstance = new InfiniteScroll(blacklistContainer, initialOptions);
 
   let searchTimeout;
   if (searchInput) {
     searchInput.addEventListener('input', (e) => {
       clearTimeout(searchTimeout);
       searchTimeout = setTimeout(() => {
-        // Instead of creating a new InfiniteScroll instance every time,
-        // we should ideally have a method on the existing instance to reset and fetch with a new query.
-        // The old InfiniteScroll class has a 'reset' method, let's use that.
-        // We'll need to update the searchQuery for the instance.
-        if (globalInfiniteScrollInstance) {
-            globalInfiniteScrollInstance.options.searchQuery = e.target.value.trim();
-            globalInfiniteScrollInstance.reset();
-        } else {
-            // Fallback if instance wasn't created, though it should have been
-            initializeInfiniteScroll(e.target.value.trim());
-        }
-      }, 500); // Debounce
+        globalInfiniteScrollInstance.options.searchQuery = e.target.value.trim();
+        // If filter/sort controls are present, their current values should also be applied
+        if (sortBySelect) globalInfiniteScrollInstance.options.sortBy = sortBySelect.value;
+        if (sortOrderSelect) globalInfiniteScrollInstance.options.sortOrder = sortOrderSelect.value;
+        if (dateFromInput) globalInfiniteScrollInstance.options.dateFrom = dateFromInput.value;
+        if (dateToInput) globalInfiniteScrollInstance.options.dateTo = dateToInput.value;
+        globalInfiniteScrollInstance.reset();
+      }, 300); // Debounce search
+    });
+  }
+
+  if (applyFiltersBtn) {
+    applyFiltersBtn.addEventListener('click', () => {
+      globalInfiniteScrollInstance.options.searchQuery = searchInput ? searchInput.value.trim() : '';
+      globalInfiniteScrollInstance.options.sortBy = sortBySelect ? sortBySelect.value : 'created_at';
+      globalInfiniteScrollInstance.options.sortOrder = sortOrderSelect ? sortOrderSelect.value : 'desc';
+      globalInfiniteScrollInstance.options.dateFrom = dateFromInput ? dateFromInput.value : '';
+      globalInfiniteScrollInstance.options.dateTo = dateToInput ? dateToInput.value : '';
+      globalInfiniteScrollInstance.reset();
     });
   }
 });
