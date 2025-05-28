@@ -110,14 +110,23 @@ class InfiniteScroll {
   }
   
   async renderItems(items) {
+<<<<<<< HEAD
+=======
     if (!this.container) return;
+>>>>>>> 3a2030e8a93208f3e3cf84526f7350abff580ee1
     const fragment = document.createDocumentFragment();
     
     for (const item of items) {
       const element = document.createElement('div');
+<<<<<<< HEAD
+      element.className = 'blacklist-entry';
+      
+      let avatarSrc = '/static/icons/favicon.ico'; // Placeholder/fallback avatar
+=======
       element.className = 'blacklist-entry'; // This class should exist in your CSS
       
       let avatarSrc = 'https://minotar.net/helm/MHF_Steve/50.png'; // Default fallback avatar
+>>>>>>> 3a2030e8a93208f3e3cf84526f7350abff580ee1
       try {
         const avatarResponse = await fetch(`/api/avatar/${item.uuid}`);
         if (avatarResponse.ok) {
@@ -127,6 +136,14 @@ class InfiniteScroll {
           }
         }
       } catch (e) {
+<<<<<<< HEAD
+        console.error(`Failed to load avatar for ${item.nickname}:`, e);
+      }
+      
+      element.innerHTML = `
+        <div class="entry-header">
+          <img src="${avatarSrc}" alt="${item.nickname}" class="avatar" loading="lazy">
+=======
         console.warn(`Failed to load avatar for ${item.nickname}:`, e);
       }
       
@@ -134,6 +151,7 @@ class InfiniteScroll {
       element.innerHTML = `
         <div class="entry-header">
           <img src="${avatarSrc}" alt="${item.nickname}" class="avatar" loading="lazy" style="width:50px; height:50px; margin-right:10px; border-radius:5px;">
+>>>>>>> 3a2030e8a93208f3e3cf84526f7350abff580ee1
           <h3>${item.nickname}</h3>
         </div>
         <div class="entry-details">

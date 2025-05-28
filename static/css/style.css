@@ -687,6 +687,10 @@ a.btn.btn-secondary:focus {
   box-shadow: 0 0 0 0.2rem rgba(var(--primary-color-rgb, 97, 134, 255), 0.25); /* Фокус как у search-input */
 }
 
+<<<<<<< HEAD
+/* Убираем специфичные стили для .input-group input[type="text"] если они конфликтуют */
+/* или делаем их менее специфичными, чтобы .form-control-custom мог их переопределить */
+=======
 /* == LEGACY FULLIST STYLES (CARD-BASED) START == */
 @keyframes fullistEntryFadeIn { /* Renamed from fadeIn to avoid conflict */
   from {
@@ -845,3 +849,4 @@ a.btn.btn-secondary:focus {
   /* .search-input already uses CSS variables, should adapt if theme changes vars */
 }
 /* == LEGACY FULLIST STYLES (CARD-BASED) END == */
+>>>>>>> 3a2030e8a93208f3e3cf84526f7350abff580ee1

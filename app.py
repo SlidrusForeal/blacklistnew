@@ -576,7 +576,11 @@ def admin_whitelist():
         uuid_to_modify = form.uuid.data.strip()
         action = form.action.data
 
+<<<<<<< HEAD
+        if not uuid_to_modify: # Добавим проверку, что UUID не пустой
+=======
         if not uuid_to_modify: 
+>>>>>>> 3a2030e8a93208f3e3cf84526f7350abff580ee1
             flash("UUID не может быть пустым.", "warning")
             return redirect(url_for('admin_whitelist'))
 
@@ -584,7 +588,10 @@ def admin_whitelist():
             if uuid_to_modify not in whitelist:
                 whitelist.append(uuid_to_modify)
                 save_whitelist(whitelist)
+<<<<<<< HEAD
+=======
                 log_admin_action("ADD_WHITELIST", target_type="whitelist_entry", target_identifier=uuid_to_modify)
+>>>>>>> 3a2030e8a93208f3e3cf84526f7350abff580ee1
                 flash(f"UUID {uuid_to_modify} добавлен в whitelist.", "success")
             else:
                 flash(f"UUID {uuid_to_modify} уже в whitelist.", "info")
@@ -592,20 +599,31 @@ def admin_whitelist():
             if uuid_to_modify in whitelist:
                 whitelist.remove(uuid_to_modify)
                 save_whitelist(whitelist)
+<<<<<<< HEAD
+=======
                 log_admin_action("DELETE_WHITELIST", target_type="whitelist_entry", target_identifier=uuid_to_modify)
+>>>>>>> 3a2030e8a93208f3e3cf84526f7350abff580ee1
                 flash(f"UUID {uuid_to_modify} удален из whitelist.", "success")
             else:
                 flash(f"UUID {uuid_to_modify} не найден в whitelist.", "warning")
         return redirect(url_for('admin_whitelist'))
     
+<<<<<<< HEAD
+    # Для POST-запросов от кнопок "Удалить" в списке
+    if request.method == "POST" and not form.is_submitted(): # Проверяем, что это не сабмит основной формы
+=======
     if request.method == "POST" and not form.is_submitted(): 
+>>>>>>> 3a2030e8a93208f3e3cf84526f7350abff580ee1
         uuid_to_delete = request.form.get("uuid")
         action_delete = request.form.get("action")
         if uuid_to_delete and action_delete == "delete":
             if uuid_to_delete in whitelist:
                 whitelist.remove(uuid_to_delete)
                 save_whitelist(whitelist)
+<<<<<<< HEAD
+=======
                 log_admin_action("DELETE_WHITELIST", target_type="whitelist_entry", target_identifier=uuid_to_delete, details="Deleted via button in list")
+>>>>>>> 3a2030e8a93208f3e3cf84526f7350abff580ee1
                 flash(f"UUID {uuid_to_delete} удален из whitelist (через кнопку).", "success")
             else:
                 flash(f"UUID {uuid_to_delete} не найден в whitelist.", "warning")
@@ -615,16 +633,26 @@ def admin_whitelist():
 
 @app.route("/admin/update_nicknames", methods=["POST"])
 @role_required("owner")
+<<<<<<< HEAD
+def update_nicknames_route(): # Переименовал функцию, чтобы не конфликтовать с возможными другими
+    if request.method == "POST":
+        try:
+            all_entries_data = db.get_all_blacklist_entries(page=1, per_page=10000) # Получаем все записи (или достаточно много)
+=======
 def update_nicknames_route(): 
     if request.method == "POST":
         try:
             all_entries_data = db.get_all_blacklist_entries(page=1, per_page=10000) 
+>>>>>>> 3a2030e8a93208f3e3cf84526f7350abff580ee1
             entries = all_entries_data.get('items', [])
             
             updated_count = 0
             failed_fetch_count = 0
             no_change_count = 0
+<<<<<<< HEAD
+=======
             log_details = []
+>>>>>>> 3a2030e8a93208f3e3cf84526f7350abff580ee1
 
             if not entries:
                 flash("Черный список пуст. Нечего обновлять.", "info")
@@ -640,23 +668,36 @@ def update_nicknames_route():
                     failed_fetch_count += 1
                     continue
 
+<<<<<<< HEAD
+                new_nickname = get_name_from_uuid(current_uuid) # Используем существующую функцию
+=======
                 new_nickname = get_name_from_uuid(current_uuid) 
+>>>>>>> 3a2030e8a93208f3e3cf84526f7350abff580ee1
 
                 if new_nickname:
                     if new_nickname.lower() != old_nickname.lower():
                         if db.update_blacklist_entry(entry_id, {'nickname': new_nickname}):
                             updated_count += 1
+<<<<<<< HEAD
+                            app.logger.info(f"Updated nickname for UUID {current_uuid} from {old_nickname} to {new_nickname}")
+                        else:
+                            app.logger.error(f"Failed to update nickname in DB for UUID {current_uuid}")
+                            failed_fetch_count += 1 # Считаем как ошибку, если БД не обновилась
+=======
                             log_details.append(f"Updated: {old_nickname} (UUID: {current_uuid}) -> {new_nickname}")
                             app.logger.info(f"Updated nickname for UUID {current_uuid} from {old_nickname} to {new_nickname}")
                         else:
                             app.logger.error(f"Failed to update nickname in DB for UUID {current_uuid}")
                             failed_fetch_count += 1 
+>>>>>>> 3a2030e8a93208f3e3cf84526f7350abff580ee1
                     else:
                         no_change_count +=1
                 else:
                     app.logger.warning(f"Could not fetch new nickname for UUID {current_uuid} (was {old_nickname}).")
                     failed_fetch_count += 1
             
+<<<<<<< HEAD
+=======
             if updated_count > 0 or failed_fetch_count > 0: # Log only if there were changes or errors
                 log_admin_action(
                     "UPDATE_ALL_NICKNAMES",
@@ -666,6 +707,7 @@ def update_nicknames_route():
                     )
                 )
 
+>>>>>>> 3a2030e8a93208f3e3cf84526f7350abff580ee1
             flash_messages = []
             if updated_count > 0:
                 flash_messages.append(f"Обновлено никнеймов: {updated_count}.")
