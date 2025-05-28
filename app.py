@@ -46,7 +46,7 @@ app.config['WTF_CSRF_SECRET_KEY'] = WTF_CSRF_SECRET_KEY
 app.config['JWT_SECRET_KEY'] = JWT_SECRET_KEY
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 app.config['JWT_ACCESS_COOKIE_PATH'] = '/'
-app.config['JWT_COOKIE_CSRF_PROTECT'] = True
+app.config['JWT_COOKIE_CSRF_PROTECT'] = False
 app.config['GITHUB_SECRET'] = GITHUB_SECRET
 
 # ─────────────── Настройка логирования ───────────────
@@ -117,33 +117,34 @@ _session.mount("http://", _adapter)
 
 
 # ─────────────── Модели ───────────────
+# SQLAlchemy models are no longer used, SupabaseClient is used instead.
 
-class BlacklistEntry(db.Model):
-    __tablename__ = 'blacklist_entry'
-    id = db.Column(db.Integer, primary_key=True)
-    nickname = db.Column(db.String(64), nullable=False)
-    uuid = db.Column(db.String(36), unique=True, nullable=False)
-    reason = db.Column(db.String(256), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    def __repr__(self):
-        return f"<BlacklistEntry {self.nickname} ({self.uuid})>"
-
-
-class AdminUser(db.Model):
-    __tablename__ = 'admin_user'
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), unique=True, nullable=False)
-    password_hash = db.Column(db.String(256), nullable=False)
-    role = db.Column(db.String(16), nullable=False)  # owner, admin, moderator
-
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
-
-    def __repr__(self):
-        return f"<AdminUser {self.username} ({self.role})>"
+# class BlacklistEntry(db.Model): # OLD SQLAlchemy Model
+#     __tablename__ = 'blacklist_entry'
+#     id = db.Column(db.Integer, primary_key=True)
+#     nickname = db.Column(db.String(64), nullable=False)
+#     uuid = db.Column(db.String(36), unique=True, nullable=False)
+#     reason = db.Column(db.String(256), nullable=False)
+#     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+#
+#     def __repr__(self):
+#         return f"<BlacklistEntry {self.nickname} ({self.uuid})>"
+#
+#
+# class AdminUser(db.Model): # OLD SQLAlchemy Model
+#     __tablename__ = 'admin_user'
+#     id = db.Column(db.Integer, primary_key=True)
+#     username = db.Column(db.String(64), unique=True, nullable=False)
+#     password_hash = db.Column(db.String(256), nullable=False)
+#     role = db.Column(db.String(16), nullable=False)  # owner, admin, moderator
+#
+#     def set_password(self, password):
+#         self.password_hash = generate_password_hash(password)
+#     def check_password(self, password):
+#         return check_password_hash(self.password_hash, password)
+#
+#     def __repr__(self):
+#         return f"<AdminUser {self.username} ({self.role})>"
 
 
 # ─────────────── Формы ───────────────
@@ -389,8 +390,7 @@ def index():
 
 @app.route("/fullist")
 def fullist():
-    players = BlacklistEntry.query.order_by(BlacklistEntry.nickname.asc()).all()
-    return render_template("fullist.html", players=players)
+    return render_template("fullist.html")
 
 
 @app.route("/ave")
@@ -745,20 +745,16 @@ def api_latest_data():
     limit = max(1, min(limit, 100))
 
     # Получаем последние записи
-    entries = (
-        BlacklistEntry.query
-        .order_by(BlacklistEntry.created_at.desc())
-        .limit(limit)
-        .all()
-    )
+    result = db.get_all_blacklist_entries(page=1, per_page=limit)
+    entries = result.get('items', [])
 
     # Формируем JSON-пayload
     payload = [
         {
-            "nickname": e.nickname,
-            "uuid": e.uuid,
-            "reason": e.reason,
-            "created_at": e.created_at.isoformat()
+            "nickname": e.get('nickname'),
+            "uuid": e.get('uuid'),
+            "reason": e.get('reason'),
+            "created_at": e.get('created_at') # Supabase returns ISO string directly
         }
         for e in entries
     ]
