@@ -270,15 +270,26 @@ const urlsToCache = [
   '/',
   '/static/css/style.css',
   '/static/js/main.js',
-  '/offline',
-  '/static/img/icon-192x192.png',
-  '/static/img/icon-512x512.png'
+  '/offline'
 ];
 
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(urlsToCache))
+      .then(cache => {
+        // Try to cache each resource, but don't fail if some are missing
+        return Promise.allSettled(
+          urlsToCache.map(url => 
+            fetch(url)
+              .then(response => {
+                if (!response.ok) throw new Error(`Failed to fetch ${url}`);
+                return cache.put(url, response);
+              })
+              .catch(error => console.warn(`Failed to cache ${url}:`, error))
+          )
+        );
+      })
+      .then(() => self.skipWaiting())
   );
 });
 
@@ -297,7 +308,8 @@ self.addEventListener('fetch', event => {
             const responseToCache = response.clone();
             caches.open(CACHE_NAME)
               .then(cache => {
-                cache.put(event.request, responseToCache);
+                cache.put(event.request, responseToCache)
+                  .catch(error => console.warn(`Failed to cache ${event.request.url}:`, error));
               });
             return response;
           })
