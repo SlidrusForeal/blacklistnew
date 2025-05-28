@@ -790,20 +790,40 @@ def api_full_blacklist():
         per_page = int(request.args.get('per_page', 20))
         search_query = request.args.get('q', '').strip().lower()
         
-        # Parameters for sorting and filtering are removed
+        # Get sort and filter parameters
+        sort_by = request.args.get('sort_by', 'created_at') # Default to created_at
+        sort_order = request.args.get('sort_order', 'desc') # Default to desc
+        date_from = request.args.get('date_from') # Optional, can be empty string or None
+        date_to = request.args.get('date_to')     # Optional, can be empty string or None
 
         # Validate parameters
         if page < 1:
             page = 1
-        if per_page < 1 or per_page > 100:
-            per_page = 20
+        if per_page < 1: # Min per_page is 1
+            per_page = 1 
+        if per_page > 100: # Max per_page is 100
+            per_page = 100
 
-        # Get paginated results with search
-        result = db.get_all_blacklist_entries(page=page, per_page=per_page, search=search_query)
+        # Ensure empty strings for dates are treated as None if your DB layer expects that
+        date_from = date_from if date_from else None
+        date_to = date_to if date_to else None
+
+        result = db.get_all_blacklist_entries(
+            page=page, 
+            per_page=per_page, 
+            search=search_query,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            date_from=date_from,
+            date_to=date_to
+        )
         return jsonify(result)
 
+    except ValueError: # Handle cases where page or per_page are not valid integers
+        app.logger.warning(f"Invalid page or per_page parameter in api_full_blacklist: page='{request.args.get('page')}', per_page='{request.args.get('per_page')}'")
+        return jsonify({'error': 'Invalid page or per_page parameter. Must be integers.'}), 400
     except Exception as e:
-        app.logger.error(f"Error in api_full_blacklist: {str(e)}")
+        app.logger.error(f"Error in api_full_blacklist: {str(e)}", exc_info=True)
         return jsonify({
             'error': 'Internal server error',
             'message': str(e)
