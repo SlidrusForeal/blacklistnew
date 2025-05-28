@@ -1221,7 +1221,7 @@ def set_security_headers(response):
         "connect-src 'self' https://api.mojang.com https://api.namemc.com https://minotar.net https://api.minecraftservices.com; "
         "img-src 'self' data: https://minotar.net https://avatars.githubusercontent.com; "
         "media-src 'self' data: blob: https://minotar.net; "
-        "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; "
+        "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js; "
         "worker-src 'self' blob:; "
         "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; "
         "font-src 'self' data:; "
@@ -1252,6 +1252,28 @@ def set_security_headers(response):
         response.headers['Cache-Control'] = 'public, max-age=3600'
     
     return response
+
+# Add Jinja filter for formatting datetimes in templates
+def format_datetime_filter(value, format='%Y-%m-%d %H:%M:%S'):
+    """Format a datetime object or an ISO string to a more readable string."""
+    if isinstance(value, str):
+        try:
+            # Attempt to parse ISO format, including those with 'Z' or timezone offset
+            if 'Z' in value:
+                value = value.replace('Z', '+00:00')
+            dt_obj = datetime.fromisoformat(value)
+        except ValueError:
+            return value # Return original string if parsing fails
+    elif isinstance(value, datetime):
+        dt_obj = value
+    else:
+        return value # Return as is if not a string or datetime
+    # If it has timezone info, convert to naive UTC
+    if dt_obj.tzinfo:
+        dt_obj = dt_obj.astimezone(timezone.utc).replace(tzinfo=None)
+    return dt_obj.strftime(format)
+
+app.jinja_env.filters['format_datetime'] = format_datetime_filter
 
 if __name__ == '__main__':
     # Ensure all required directories exist
