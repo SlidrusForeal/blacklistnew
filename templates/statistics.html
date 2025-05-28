@@ -134,11 +134,11 @@
         Chart.defaults.borderColor = defaultBorderColor;
         Chart.defaults.plugins.legend.labels.color = defaultFontColor;
         
-        // Data for charts - assign using JSON.parse and tojson for safety
-        let monthlyLabels = JSON.parse('{{ monthly_labels_json | tojson | safe }}');
-        let monthlyCounts = JSON.parse('{{ monthly_counts_json | tojson | safe }}');
-        let topReasonsLabels = JSON.parse('{{ top_reasons_labels_json | tojson | safe }}');
-        let topReasonsCounts = JSON.parse('{{ top_reasons_counts_json | tojson | safe }}');
+        // Data for charts - parse JSON safely
+        const monthlyLabels = JSON.parse('{{ monthly_labels_json | tojson | safe }}');
+        const monthlyCounts = JSON.parse('{{ monthly_counts_json | tojson | safe }}');
+        const topReasonsLabels = JSON.parse('{{ top_reasons_labels_json | tojson | safe }}');
+        const topReasonsCounts = JSON.parse('{{ top_reasons_counts_json | tojson | safe }}');
 
         // 1. Blacklist Growth Chart (Line Chart)
         const blacklistGrowthCtx = document.getElementById('blacklistGrowthChart');

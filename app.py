@@ -828,11 +828,11 @@ def statistics_page():
                            checks_last_24_hours=checks_last_24_hours,
                            unique_players_in_blacklist=unique_players_in_blacklist,
                            latest_blacklist_additions=latest_blacklist_additions,
-                           # Data for charts
-                           monthly_labels_json=json.dumps(monthly_labels),
-                           monthly_counts_json=json.dumps(monthly_counts),
-                           top_reasons_labels_json=json.dumps(top_reasons_labels),
-                           top_reasons_counts_json=json.dumps(top_reasons_counts),
+                           # Data for charts - properly escaped
+                           monthly_labels_json=json.dumps(monthly_labels, ensure_ascii=False),
+                           monthly_counts_json=json.dumps(monthly_counts, ensure_ascii=False),
+                           top_reasons_labels_json=json.dumps(top_reasons_labels, ensure_ascii=False),
+                           top_reasons_counts_json=json.dumps(top_reasons_counts, ensure_ascii=False),
                            # Raw data if needed by template directly
                            blacklist_growth_data=blacklist_growth_data,
                            top_reasons_data=top_reasons 
@@ -1218,7 +1218,7 @@ def set_security_headers(response):
     csp = (
         "default-src 'self'; "
         "frame-src 'self' https://*; "
-        "connect-src 'self' https://*.supabase.co https://api.mojang.com https://api.namemc.com https://minotar.net https://api.minecraftservices.com; "
+        "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.mojang.com https://api.namemc.com https://minotar.net https://api.minecraftservices.com; "
         "img-src 'self' data: https://minotar.net https://avatars.githubusercontent.com; "
         "media-src 'self' data: blob: https://minotar.net; "
         "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net 'unsafe-eval'; "
@@ -1227,7 +1227,7 @@ def set_security_headers(response):
         "font-src 'self' data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; "
         "object-src 'none'; "
         "base-uri 'self'; "
-        "frame-ancestors 'none'; "
+        "frame-ancestors 'self'; "
         "upgrade-insecure-requests;"
     )
     response.headers['Content-Security-Policy'] = csp
