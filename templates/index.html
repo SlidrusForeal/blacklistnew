@@ -1,25 +1,58 @@
 {% extends "base.html" %}
-{% block title %}ЧС Сосмарка - Главная{% endblock %}
+
+{% block title %}
+  {% if result %}
+    {% if result.color == "red" %}⛔ {{ result.message }}{% else %}✅ {{ result.message }}{% endif %}
+  {% else %}
+    ЧС Сосмарка - Проверка игрока
+  {% endif %}
+{% endblock %}
 
 {% block content %}
-<main class="container">
-  <h1>Добро пожаловать!</h1>
-  <form method="POST" action="{{ url_for('index') }}" class="checker-container">
+<main class="container checker-container">
+  <h1>Проверка на наличие в ЧС</h1>
+  <p>Введите никнейм для проверки:</p>
+  
+  <form method="POST" action="{{ url_for('index') }}" class="checker-form">
     {{ form.hidden_tag() }}
-    <p>Введите ваш никнейм для проверки:</p>
     <div class="input-group">
-      {{ form.nickname(placeholder="Ваш никнейм", autocomplete="off") }}
+      {{ form.nickname(id="nickname", class="form-control-custom", placeholder="Ваш никнейм", autocomplete="off") }}
     </div>
-    {{ form.submit(class="btn-check") }}
+    <div class="input-group">
+      {{ form.submit(class="btn-check") }}
+    </div>
   </form>
 
   {% if result %}
-    <div class="result-container" style="color: {{ result.color }}">
+    <div id="result" class="result-container" style="color: {{ result.color }};">
       <p>{{ result.message }}</p>
-      {% if result.color == "red" and result.reason %}
+      {% if result.reason %}
         <p>Причина: {{ result.reason }}</p>
+      {% endif %}
+      {% if result.color == 'red' %}
+        <canvas id="confettiCanvas" width="600" height="400" style="display:none;"></canvas>
       {% endif %}
     </div>
   {% endif %}
 </main>
+{% endblock %}
+
+{% block scripts %}
+{% if result and result.color == 'red' %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const canvas = document.getElementById('confettiCanvas');
+    if(canvas){
+        canvas.style.display = 'block';
+        const confetti = new ConfettiGenerator({ 
+            target: 'confettiCanvas', 
+            clock: 25,
+            duration: 2000
+        });
+        confetti.render();
+        setTimeout(() => { canvas.style.display = 'none'; }, 3000);
+    }
+  });
+</script>
+{% endif %}
 {% endblock %}

@@ -8,12 +8,12 @@
 
   {% if current_role == 'owner' %}
     <p><a href="{{ url_for('admin_register') }}" class="btn-check">Регистрация нового пользователя</a></p>
-    {# <p><a href="{{ url_for('admin_whitelist') }}" class="btn-check">Редактор whitelist</a></p> #}
+    <p><a href="{{ url_for('admin_whitelist') }}" class="btn-check">Редактор whitelist</a></p>
     <p><a href="{{ url_for('admin_users') }}" class="btn-check">Управление пользователями</a></p>
-    {# <form method="POST" action="{{ url_for('update_nicknames') }}" style="margin-top:20px;">
+    <form method="POST" action="{{ url_for('update_nicknames_route') }}" style="margin-top:20px;">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <button type="submit" class="btn-check">Обновить ники</button>
-    </form> #}
+    </form>
   {% endif %}
 
   {% if current_role in ['owner','admin'] %}

@@ -219,7 +219,7 @@ footer {
 
 /* Контактная информация */
 .contact-info {
-  background-color: #1a1a1a;
+  background-color: #2c2c2c;
   padding: 20px;
   border-radius: 8px;
   margin-top: 20px;
@@ -519,3 +519,156 @@ a {
   0%, 100% { opacity: 1 }
   50%      { opacity: 0.4 }
 }
+
+/* Admin Whitelist Styles */
+.admin-section {
+  background-color: var(--background-color-light, #f9f9f9); /* Чуть отличный фон для секций */
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color, #e0e0e0);
+}
+
+.admin-section h2 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-color, #e0e0e0);
+  padding-bottom: 0.75rem;
+}
+
+/* Стили для форм, если не определены глобально */
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.form-control,
+.form-select {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--text-color, #212529);
+  background-color: var(--input-bg, #fff);
+  background-clip: padding-box;
+  border: 1px solid var(--border-color, #ced4da);
+  border-radius: 0.25rem;
+  transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--primary-color, #80bdff);
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(var(--primary-color-rgb, 0, 123, 255), 0.25);
+}
+
+.input-group {
+  margin-bottom: 1rem;
+}
+
+/* Для формы в одну строку (если нужно) */
+.form-inline {
+  display: flex;
+  flex-wrap: wrap; /* Позволяет переносить элементы на новую строку на маленьких экранах */
+  align-items: flex-end; /* Выравнивание по нижней границе для элементов разной высоты */
+  gap: 1rem; /* Пространство между элементами */
+}
+
+.form-inline .input-group {
+  flex-grow: 1; /* Позволяет элементам расти и занимать доступное пространство */
+  margin-bottom: 0; /* Убираем нижний отступ, так как есть gap */
+}
+
+.form-inline .input-group:last-child {
+  flex-grow: 0; /* Кнопка не должна растягиваться */
+}
+
+/* Whitelist List Styles */
+.whitelist-list {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.whitelist-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+  background-color: var(--background-color, #fff);
+}
+
+.whitelist-item span {
+  font-family: monospace; /* UUID лучше смотрятся моноширинным шрифтом */
+  word-break: break-all; /* Перенос длинных UUID */
+  margin-right: 1rem;
+}
+
+.form-inline-item {
+  margin-left: auto; /* Прижимает кнопку к правому краю, если нужно*/
+}
+
+/* Уточнение для кнопок, если .btn-check не покрывает все */
+.btn-primary {
+  background-color: var(--primary-color, #007bff);
+  border-color: var(--primary-color, #007bff);
+  color: #fff;
+}
+.btn-primary:hover {
+  background-color: var(--primary-color-dark, #0056b3);
+  border-color: var(--primary-color-dark, #0056b3);
+}
+
+.btn-danger {
+  background-color: var(--danger-color, #dc3545);
+  border-color: var(--danger-color, #dc3545);
+  color: #fff;
+}
+.btn-danger:hover {
+  background-color: var(--danger-color-dark, #c82333);
+  border-color: var(--danger-color-dark, #c82333);
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  border-radius: 0.2rem;
+}
+
+/* Custom Form Control Styles (similar to search-input) */
+.form-control-custom {
+  display: block; /* или inline-block, если нужно */
+  width: 100%;
+  padding: 0.75rem 1rem; /* ~12px 16px */
+  font-size: 1rem;
+  font-family: inherit; /* Наследование шрифта */
+  line-height: 1.6;
+  color: var(--text-color, #f1f1f1);
+  background-color: var(--input-bg, #3a3a3a); /* Можно взять цвет от существующих инпутов или --background-color */
+  background-clip: padding-box;
+  border: 2px solid var(--border-color, #555); /* Как у search-input, но можно взять #444 от существующих */
+  border-radius: 8px; /* Как у search-input */
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+.form-control-custom::placeholder {
+  color: var(--placeholder-color, #bbb);
+  opacity: 1; /* Firefox */
+}
+
+.form-control-custom:focus {
+  color: var(--text-color, #f1f1f1);
+  background-color: var(--input-focus-bg, #444); /* Можно взять от search-input:focus или существующего */
+  border-color: var(--primary-color, #6186ff);
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(var(--primary-color-rgb, 97, 134, 255), 0.25); /* Фокус как у search-input */
+}
+
+/* Убираем специфичные стили для .input-group input[type="text"] если они конфликтуют */
+/* или делаем их менее специфичными, чтобы .form-control-custom мог их переопределить */

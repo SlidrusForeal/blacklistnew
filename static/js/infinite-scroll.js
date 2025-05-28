@@ -49,7 +49,7 @@ class InfiniteScroll {
       const data = await response.json();
       
       if (data.items && data.items.length > 0) {
-        this.renderItems(data.items);
+        await this.renderItems(data.items);
         this.page++;
         this.hasMore = data.has_more;
       } else {
@@ -64,15 +64,29 @@ class InfiniteScroll {
     }
   }
   
-  renderItems(items) {
+  async renderItems(items) {
     const fragment = document.createDocumentFragment();
     
-    items.forEach(item => {
+    for (const item of items) {
       const element = document.createElement('div');
       element.className = 'blacklist-entry';
+      
+      let avatarSrc = '/static/icons/favicon.ico'; // Placeholder/fallback avatar
+      try {
+        const avatarResponse = await fetch(`/api/avatar/${item.uuid}`);
+        if (avatarResponse.ok) {
+          const avatarData = await avatarResponse.json();
+          if (avatarData.avatar_base64) {
+            avatarSrc = avatarData.avatar_base64;
+          }
+        }
+      } catch (e) {
+        console.error(`Failed to load avatar for ${item.nickname}:`, e);
+      }
+      
       element.innerHTML = `
         <div class="entry-header">
-          <img src="/avatar/${item.uuid}.png" alt="${item.nickname}" class="avatar" loading="lazy">
+          <img src="${avatarSrc}" alt="${item.nickname}" class="avatar" loading="lazy">
           <h3>${item.nickname}</h3>
         </div>
         <div class="entry-details">
@@ -81,7 +95,7 @@ class InfiniteScroll {
         </div>
       `;
       fragment.appendChild(element);
-    });
+    }
     
     this.container.insertBefore(fragment, this.loadingEl);
   }
