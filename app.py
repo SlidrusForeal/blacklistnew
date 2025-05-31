@@ -47,7 +47,7 @@ app.config['WTF_CSRF_SECRET_KEY'] = WTF_CSRF_SECRET_KEY
 app.config['JWT_SECRET_KEY'] = JWT_SECRET_KEY
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 app.config['JWT_ACCESS_COOKIE_PATH'] = '/'
-app.config['JWT_COOKIE_CSRF_PROTECT'] = False
+app.config['JWT_COOKIE_CSRF_PROTECT'] = True
 app.config['GITHUB_SECRET'] = GITHUB_SECRET
 
 # Initialize Supabase logger
@@ -1239,7 +1239,6 @@ def format_datetime_filter(value, format='%Y-%m-%d %H:%M:%S'):
 app.jinja_env.filters['format_datetime'] = format_datetime_filter
 
 @app.route('/api/config')
-@role_required("owner", "admin", "moderator")
 def get_api_config():
     """Return API configuration securely from environment variables"""
     supabase_url = os.getenv('SUPABASE_URL')

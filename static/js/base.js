@@ -214,12 +214,19 @@
             submitButton.innerHTML = '<span class="spinner"></span> Sending...';
           }
 
+          // CSRF token support
+          const csrfToken = form.querySelector('input[name="csrf_token"]')?.value;
+          const headers = {
+            'Accept': 'application/json'
+          };
+          if (csrfToken) {
+            headers['X-CSRF-TOKEN'] = csrfToken;
+          }
+
           const response = await fetch(form.action, {
             method: form.method || 'POST',
             body: formData,
-            headers: {
-              'Accept': 'application/json'
-            }
+            headers
           });
 
           if (!response.ok) throw new Error('Submission failed');

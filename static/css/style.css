@@ -529,3 +529,165 @@ a:hover, a:focus {
     padding: 14px 6px;
   }
 }
+
+/* --- Admin Panel --- */
+.admin-container {
+  max-width: 800px;
+  margin: 40px auto 0 auto;
+  padding: 32px 24px;
+  background: var(--bg-light);
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+  animation: fadeIn 0.8s;
+}
+.admin-container h1, .admin-container h2 {
+  color: var(--primary-color);
+  margin-bottom: 18px;
+}
+.admin-container ul#blacklist {
+  margin: 18px 0 0 0;
+  padding: 0;
+  list-style: none;
+}
+.admin-container ul#blacklist li {
+  background: #23272e;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--text-light);
+}
+.admin-container .btn-check {
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+/* --- Admin Register --- */
+.admin-register-container {
+  max-width: 500px;
+  margin: 40px auto 0 auto;
+  padding: 32px 24px;
+  background: var(--bg-light);
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+  animation: fadeIn 0.8s;
+}
+.admin-register-container h1 {
+  color: var(--primary-color);
+  margin-bottom: 18px;
+}
+
+/* --- Admin Users --- */
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #23272e;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 18px;
+}
+.users-table th, .users-table td {
+  padding: 12px 16px;
+  text-align: left;
+  color: var(--text-light);
+}
+.users-table th {
+  background: #1a1d22;
+  font-weight: 700;
+}
+.users-table tr:nth-child(even) {
+  background: #262a31;
+}
+.users-table tr:hover {
+  background: #2e3340;
+}
+.btn-delete {
+  background: #f44336;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-delete:hover {
+  background: #d32f2f;
+}
+.hash-cell {
+  font-size: 0.95em;
+  color: #bdbdbd;
+  word-break: break-all;
+}
+
+/* --- Admin Whitelist --- */
+.admin-section {
+  margin-bottom: 32px;
+}
+.admin-section .card-header {
+  background: var(--primary-color);
+  color: #fff;
+  font-weight: 600;
+  border-radius: 8px 8px 0 0;
+  padding: 14px 20px;
+}
+.admin-section .card-body {
+  background: #23272e;
+  border-radius: 0 0 8px 8px;
+  padding: 20px 20px 16px 20px;
+}
+.list-group-item {
+  background: #23272e;
+  color: var(--text-light);
+  border: none;
+  border-bottom: 1px solid #2e3340;
+  border-radius: 0;
+}
+.list-group-item:last-child {
+  border-bottom: none;
+}
+
+/* --- Admin Logs & Audit Log --- */
+.admin-logs-container, .admin-auditlog-container {
+  max-width: 900px;
+  margin: 40px auto 0 auto;
+  padding: 32px 24px;
+  background: var(--bg-light);
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+  animation: fadeIn 0.8s;
+}
+.admin-logs-container h1, .admin-auditlog-container h1 {
+  color: var(--primary-color);
+  margin-bottom: 18px;
+}
+.log-table, .auditlog-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #23272e;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 18px;
+}
+.log-table th, .log-table td, .auditlog-table th, .auditlog-table td {
+  padding: 10px 14px;
+  text-align: left;
+  color: var(--text-light);
+}
+.log-table th, .auditlog-table th {
+  background: #1a1d22;
+  font-weight: 700;
+}
+.log-table tr:nth-child(even), .auditlog-table tr:nth-child(even) {
+  background: #262a31;
+}
+.log-table tr:hover, .auditlog-table tr:hover {
+  background: #2e3340;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
