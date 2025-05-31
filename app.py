@@ -90,7 +90,7 @@ logging.getLogger('werkzeug').setLevel(logging.INFO)
 csrf = CSRFProtect(app)
 jwt = JWTManager(app)
 
-# ─────────────── Параметры rate-limiting и HTTP-клиент ───────────────
+# ─────────────── Параметры rate-limiting и HTTP-клиент ок ───────────────
 _MAX_CALLS = 600
 _WINDOW_SEC = 10 * 60
 _call_times = deque()
