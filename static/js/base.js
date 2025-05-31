@@ -214,20 +214,21 @@
             submitButton.innerHTML = '<span class="spinner"></span> Sending...';
           }
 
-          // CSRF token support
-          const csrfToken = form.querySelector('input[name="csrf_token"]')?.value;
-          const headers = {
-            'Accept': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
-          };
-          if (csrfToken) {
-            headers['X-CSRF-TOKEN'] = csrfToken;
+          // Get CSRF token from meta tag
+          const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+          // Add CSRF token to form data if not present
+          if (!formData.has('csrf_token')) {
+            formData.append('csrf_token', csrfToken);
           }
 
           const response = await fetch(form.action, {
-            method: form.method,
+            method: form.method || 'POST',
             body: formData,
-            headers,
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest',
+              'X-CSRF-Token': csrfToken
+            },
             credentials: 'same-origin'
           });
 
@@ -255,7 +256,7 @@
           const messageContainer = document.querySelector('.message-container') || createMessageContainer();
           const messageDiv = document.createElement('div');
           messageDiv.className = 'error-message';
-          messageDiv.textContent = 'An error occurred. Please try again.';
+          messageDiv.textContent = 'Произошла ошибка. Пожалуйста, попробуйте снова.';
           messageContainer.appendChild(messageDiv);
         } finally {
           const submitButton = form.querySelector('[type="submit"]');
