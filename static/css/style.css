@@ -149,7 +149,6 @@ header nav ul li a.active {
 }
 
 .btn-check {
-  composes: btn;
   width: 100%;
   background-color: var(--primary-color);
   color: var(--bg-dark);
