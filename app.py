@@ -1230,7 +1230,7 @@ def set_security_headers(response):
         "font-src 'self' data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; "
         "object-src 'none'; "
         "base-uri 'self'; "
-        "frame-ancestors 'self'; "
+        "frame-ancestors 'none'; "
         "upgrade-insecure-requests;"
     )
     response.headers['Content-Security-Policy'] = csp
