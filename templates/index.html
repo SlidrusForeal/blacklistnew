@@ -16,7 +16,7 @@
   <form method="POST" action="{{ url_for('index') }}" class="checker-form">
     {{ form.hidden_tag() }}
     <div class="input-group">
-      {{ form.nickname(id="nickname", class="form-control-custom", placeholder="Ваш никнейм", autocomplete="off") }}
+      {{ form.nickname(id="nickname", class="form-control-custom", placeholder="Ваш никнейм", autocomplete="username") }}
     </div>
     <div class="input-group">
     {{ form.submit(class="btn-check") }}

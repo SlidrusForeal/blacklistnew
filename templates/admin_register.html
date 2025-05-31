@@ -7,10 +7,10 @@
   <form method="POST" action="{{ url_for('admin_register') }}">
     {{ form.hidden_tag() }}
     <div class="input-group">
-      {{ form.username(placeholder="Имя пользователя") }}
+      {{ form.username(placeholder="Имя пользователя", autocomplete="username") }}
     </div>
     <div class="input-group">
-      {{ form.password(placeholder="Пароль") }}
+      {{ form.password(placeholder="Пароль", autocomplete="new-password") }}
     </div>
     <div class="input-group">
       {{ form.role.label }}<br>

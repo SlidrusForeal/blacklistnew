@@ -22,10 +22,10 @@
     <form method="POST" action="{{ url_for('admin_panel') }}">
       {{ form.hidden_tag() }}
       <div class="input-group">
-        {{ form.nickname(placeholder="Никнейм") }}
+        {{ form.nickname(placeholder="Никнейм", autocomplete="username") }}
       </div>
       <div class="input-group">
-        {{ form.reason(placeholder="Причина") }}
+        {{ form.reason(placeholder="Причина", autocomplete="off") }}
       </div>
       {{ form.submit(class="btn-check") }}
     </form>
