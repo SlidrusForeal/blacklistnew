@@ -217,22 +217,20 @@
           // Get CSRF token from meta tag
           const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-          // Add CSRF token to form data if not present
-          if (!formData.has('csrf_token')) {
-            formData.append('csrf_token', csrfToken);
-          }
-
           const response = await fetch(form.action, {
             method: form.method || 'POST',
             body: formData,
             headers: {
               'X-Requested-With': 'XMLHttpRequest',
-              'X-CSRF-Token': csrfToken
+              'X-CSRFToken': csrfToken
             },
             credentials: 'same-origin'
           });
 
-          if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+          }
 
           const data = await response.json();
           
@@ -256,7 +254,7 @@
           const messageContainer = document.querySelector('.message-container') || createMessageContainer();
           const messageDiv = document.createElement('div');
           messageDiv.className = 'error-message';
-          messageDiv.textContent = 'Произошла ошибка. Пожалуйста, попробуйте снова.';
+          messageDiv.textContent = error.message || 'Произошла ошибка. Пожалуйста, попробуйте снова.';
           messageContainer.appendChild(messageDiv);
         } finally {
           const submitButton = form.querySelector('[type="submit"]');

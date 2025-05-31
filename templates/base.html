@@ -150,9 +150,7 @@
     // Add CSRF token to all forms
     document.addEventListener('DOMContentLoaded', function() {
       const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-      const forms = document.querySelectorAll('form');
-      
-      forms.forEach(form => {
+      document.querySelectorAll('form').forEach(form => {
         if (!form.querySelector('input[name="csrf_token"]')) {
           const csrfInput = document.createElement('input');
           csrfInput.type = 'hidden';

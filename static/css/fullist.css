@@ -39,19 +39,15 @@
 }
 
 .blacklist-entry {
-  background: var(--card-bg);
+  background: var(--surface-color);
   border: 2px solid var(--border-color);
   border-radius: 8px;
   padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  position: absolute;
-  left: 0;
-  right: 0;
+  margin-bottom: 1rem;
+  position: relative;
+  transition: all 0.3s ease;
   height: 180px;
-  transition: transform 0.3s;
-  transform: translateY(0);
-  word-wrap: break-word;
-  max-width: 100%;
+  overflow: hidden;
 }
 
 .blacklist-entry::before {
