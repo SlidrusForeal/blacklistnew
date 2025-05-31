@@ -49,9 +49,7 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/infinite-scroll.js') }}"></script>
 <script>
-document.addEventListener('DOMContentLoaded', () => {
   const SUPABASE_URL = '{{ SUPABASE_URL }}';
   const SUPABASE_ANON_KEY = '{{ SUPABASE_KEY }}';
   let supabase = null;
@@ -67,68 +65,6 @@ document.addEventListener('DOMContentLoaded', () => {
   } else {
     console.warn("Supabase URL or Anon Key not configured for fullist. Realtime updates will not work.");
   }
-
-  const searchInput = document.getElementById('searchInput');
-  const blacklistContainer = document.getElementById('blacklistContainer');
-  const loadingIndicator = document.getElementById('loadingIndicator');
-  const noMoreResultsIndicator = document.getElementById('noMoreResultsIndicator');
-
-  // Filter and Sort controls (get them if they exist)
-  const sortBySelect = document.getElementById('sortBy');
-  const sortOrderSelect = document.getElementById('sortOrder');
-  const dateFromInput = document.getElementById('dateFrom');
-  const dateToInput = document.getElementById('dateTo');
-  const applyFiltersBtn = document.getElementById('applyFiltersBtn');
-
-  if (!blacklistContainer) {
-    console.error('Blacklist container not found. Infinite scroll cannot be initialized.');
-    return;
-  }
-
-  const initialOptions = {
-    perPage: 20,
-    threshold: 200, // Adjusted threshold for potentially taller items
-    searchQuery: searchInput ? searchInput.value.trim() : '',
-    loadingTemplate: '<div class="loading-spinner"><div class="spinner"></div><p>Загрузка записей...</p></div>',
-    noMoreResultsIndicator: noMoreResultsIndicator,
-    loadingIndicator: loadingIndicator,
-    initialPageContentElement: blacklistContainer,
-    // Set initial sort/filter values if controls exist, otherwise defaults in class will be used
-    sortBy: sortBySelect ? sortBySelect.value : 'created_at',
-    sortOrder: sortOrderSelect ? sortOrderSelect.value : 'desc',
-    dateFrom: dateFromInput ? dateFromInput.value : '',
-    dateTo: dateToInput ? dateToInput.value : '',
-    supabaseClient: supabase // Pass the Supabase client to the class
-  };
-
-  const globalInfiniteScrollInstance = new InfiniteScroll(blacklistContainer, initialOptions);
-
-  let searchTimeout;
-  if (searchInput) {
-    searchInput.addEventListener('input', (e) => {
-      clearTimeout(searchTimeout);
-      searchTimeout = setTimeout(() => {
-        globalInfiniteScrollInstance.options.searchQuery = e.target.value.trim();
-        // If filter/sort controls are present, their current values should also be applied
-        if (sortBySelect) globalInfiniteScrollInstance.options.sortBy = sortBySelect.value;
-        if (sortOrderSelect) globalInfiniteScrollInstance.options.sortOrder = sortOrderSelect.value;
-        if (dateFromInput) globalInfiniteScrollInstance.options.dateFrom = dateFromInput.value;
-        if (dateToInput) globalInfiniteScrollInstance.options.dateTo = dateToInput.value;
-        globalInfiniteScrollInstance.reset();
-      }, 300); // Debounce search
-    });
-  }
-
-  if (applyFiltersBtn) {
-    applyFiltersBtn.addEventListener('click', () => {
-      globalInfiniteScrollInstance.options.searchQuery = searchInput ? searchInput.value.trim() : '';
-      globalInfiniteScrollInstance.options.sortBy = sortBySelect ? sortBySelect.value : 'created_at';
-      globalInfiniteScrollInstance.options.sortOrder = sortOrderSelect ? sortOrderSelect.value : 'desc';
-      globalInfiniteScrollInstance.options.dateFrom = dateFromInput ? dateFromInput.value : '';
-      globalInfiniteScrollInstance.options.dateTo = dateToInput ? dateToInput.value : '';
-      globalInfiniteScrollInstance.reset();
-    });
-  }
-});
 </script>
+<script src="{{ url_for('static', filename='js/pages/fullist.js') }}" defer></script>
 {% endblock %}
