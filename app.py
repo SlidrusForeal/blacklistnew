@@ -37,7 +37,6 @@ from config import (
     GITHUB_SECRET, SUPABASE_URL, SUPABASE_KEY
 )
 from supabase_client import db
-from supabase_logger import SupabaseLogger
 
 # ─────────────── Конфигурация Flask ───────────────
 load_dotenv()
@@ -47,13 +46,13 @@ app.config['WTF_CSRF_SECRET_KEY'] = WTF_CSRF_SECRET_KEY
 app.config['JWT_SECRET_KEY'] = JWT_SECRET_KEY
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 app.config['JWT_ACCESS_COOKIE_PATH'] = '/'
-app.config['JWT_COOKIE_CSRF_PROTECT'] = True
+app.config['JWT_COOKIE_CSRF_PROTECT'] = False
 app.config['GITHUB_SECRET'] = GITHUB_SECRET
 
-# Initialize Supabase logger
-logger = SupabaseLogger(db.admin_client)
-
 # ─────────────── Настройка логирования ───────────────
+# Создаём папку для логов, если её нет
+# if not os.path.exists('logs'):
+#     os.mkdir('logs')
 
 LOG_CONFIG = {
     'version': 1,
@@ -72,9 +71,26 @@ LOG_CONFIG = {
             'formatter': 'default',
             'level': 'INFO'
         },
+        # 'info_file': {
+        #     'class': 'logging.handlers.TimedRotatingFileHandler',
+        #     'filename': 'logs/info.log',
+        #     'when': 'midnight',
+        #     'backupCount': 7,
+        #     'formatter': 'default',
+        #     'level': 'INFO'
+        # },
+        # 'error_file': {
+        #     'class': 'logging.handlers.TimedRotatingFileHandler',
+        #     'filename': 'logs/error.log',
+        #     'when': 'midnight',
+        #     'backupCount': 30,
+        #     'formatter': 'default',
+        #     'level': 'ERROR'
+        # }
     },
     'loggers': {
         '': {
+            # 'handlers': ['console', 'info_file', 'error_file'],
             'handlers': ['console'],
             'level': 'INFO',
             'propagate': True
@@ -90,7 +106,7 @@ logging.getLogger('werkzeug').setLevel(logging.INFO)
 csrf = CSRFProtect(app)
 jwt = JWTManager(app)
 
-# ─────────────── Параметры rate-limiting и HTTP-клиент ок ───────────────
+# ─────────────── Параметры rate-limiting и HTTP-клиент ───────────────
 _MAX_CALLS = 600
 _WINDOW_SEC = 10 * 60
 _call_times = deque()
@@ -301,6 +317,24 @@ def role_required(*allowed_roles):
         return wrapper
     return decorator
 
+# Функции для работы с whitelist (файл uuid_list.json)
+# def load_whitelist():
+#     try:
+#         with open("uuid_list.json", "r", encoding="utf-8") as f:
+#             return json.load(f)
+#     except Exception as e:
+#         app.logger.error(f"Ошибка загрузки whitelist: {str(e)}")
+#         return []
+
+
+# def save_whitelist(data):
+#     try:
+#         with open("uuid_list.json", "w", encoding="utf-8") as f:
+#             json.dump(data, f, indent=2)
+#     except Exception as e:
+#         app.logger.error(f"Ошибка сохранения whitelist: {str(e)}")
+
+
 # --- Helper for Audit Logging ---
 def log_admin_action(action_type: str, target_type: Optional[str] = None, target_identifier: Optional[str] = None, details: Optional[str] = None):
     try:
@@ -343,15 +377,16 @@ def index():
         else:
             result = {"message": f"{name}, вы не в ЧС!", "color": "green"}
         db.add_check_log(check_source='main_page_check') # Log the check
-        # If AJAX/fetch/XHR, return JSON
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.accept_mimetypes['application/json'] > request.accept_mimetypes['text/html']:
-            return jsonify(result)
     return render_template("index.html", form=form, result=result)
 
 
 @app.route("/fullist")
 def fullist():
-    return render_template("fullist.html")
+    return render_template(
+        "fullist.html",
+        SUPABASE_URL=SUPABASE_URL,      # Pass the imported SUPABASE_URL
+        SUPABASE_KEY=SUPABASE_KEY        # Pass the imported SUPABASE_KEY (anon key)
+    )
 
 
 @app.route("/ave")
@@ -447,33 +482,27 @@ def admin_register():
 @role_required("owner", "admin", "moderator")
 def admin_panel():
     form = BlacklistForm()
-    result = None
     if form.validate_on_submit():
         nick = form.nickname.data.strip()
         reason = form.reason.data.strip()
-        uuid_val = get_uuid_from_nickname(nick)
+        uuid_val = get_uuid_from_nickname(nick) # Renamed to avoid conflict with uuid module
+        
         if not uuid_val:
-            result = {"error": "Не удалось получить UUID."}
-        elif db.get_blacklist_entry(nick):
-            result = {"error": "Уже в черном списке."}
+            flash("Не удалось получить UUID.", "warning")
+        elif db.get_blacklist_entry(nick): # Checks by nickname, which could lead to issues if nickname changed.
+            flash("Уже в черном списке.", "info")
         else:
+            # It might be better to check by UUID if it's the primary identifier
             existing_by_uuid = db.client.table('blacklist_entry').select('id').eq('uuid', uuid_val).execute()
             if existing_by_uuid.data:
-                result = {"error": f"Пользователь с UUID {uuid_val} уже в черном списке."}
+                flash(f"Пользователь с UUID {uuid_val} уже в черном списке.", "info")
             elif db.add_blacklist_entry(nick, uuid_val, reason):
                 log_admin_action("ADD_BLACKLIST", target_type="blacklist_entry", target_identifier=nick, details=f"UUID: {uuid_val}, Reason: {reason}")
-                result = {"message": "Запись добавлена в ЧС.", "success": True}
+                flash("Запись добавлена в ЧС.", "success")
+                return redirect(url_for('admin_panel'))
             else:
-                result = {"error": "Ошибка при добавлении записи."}
-        # If AJAX/fetch/XHR, return JSON
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.accept_mimetypes['application/json'] > request.accept_mimetypes['text/html']:
-            return jsonify(result)
-        # Otherwise, use flash and redirect for normal POST
-        if result.get('error'):
-            flash(result['error'], 'danger')
-        else:
-            flash(result['message'], 'success')
-        return redirect(url_for('admin_panel'))
+                flash("Ошибка при добавлении записи.", "danger")
+    
     entries = db.get_all_blacklist_entries()['items']
     return render_template("admin_panel.html", form=form, entries=entries)
 
@@ -596,8 +625,12 @@ def admin_whitelist():
                 flash(f"UUID {uuid_to_delete_direct} не найден для удаления.", "warning")
             return redirect(url_for('admin_whitelist'))
 
-    whitelist_entries = db.get_all_whitelist_entries()
+    # Fetch all whitelist entries for display
+    whitelist_entries = db.get_all_whitelist_entries() # This now returns a list of dicts
     
+    # The template admin_whitelist.html will need to be updated to iterate over whitelist_entries
+    # and display appropriate fields (e.g., entry.uuid, entry.added_by, entry.created_at).
+    # It will also need to change how the delete button POSTs, using 'uuid_to_delete_direct' and 'action_direct=delete'.
     return render_template("admin_whitelist.html", form=form, whitelist_entries=whitelist_entries)
 
 # New API endpoint for the mod
@@ -748,7 +781,11 @@ def api_check():
 @app.route("/admin/map", methods=["GET"])
 @role_required("owner", "admin")
 def admin_map():
-    return render_template("admin_map.html")
+    return render_template(
+        "admin_map.html",
+        SUPABASE_URL=SUPABASE_URL,      # Pass the imported SUPABASE_URL
+        SUPABASE_KEY=SUPABASE_KEY        # Pass the imported SUPABASE_KEY (anon key)
+    )
 
 @app.route("/admin/audit_log", methods=["GET"])
 @role_required("owner")
@@ -764,6 +801,44 @@ def admin_audit_log():
                            per_page=logs_data.get('per_page'),
                            total_items=logs_data.get('total_items'),
                            has_more=logs_data.get('has_more'))
+
+@app.route("/statistics", methods=["GET"])
+def statistics_page():
+    total_blacklist_entries = db.get_total_blacklist_entries_count()
+    total_checks = db.count_total_checks()
+    checks_last_24_hours = db.count_checks_last_24_hours()
+    
+    # New statistics
+    blacklist_growth_data = db.get_blacklist_entries_by_month(num_months=12) # Get last 12 months
+    top_reasons = db.get_top_n_reasons(n=5) # Get top 5 reasons
+    unique_players_in_blacklist = db.get_unique_player_count_in_blacklist()
+    latest_blacklist_additions = db.get_latest_n_blacklist_entries(n=5) # Get latest 5 entries
+
+    # Prepare data for Chart.js (example for blacklist_growth_data)
+    # Chart.js expects labels and data arrays.
+    monthly_labels = [item['month'] for item in blacklist_growth_data]
+    monthly_counts = [item['count'] for item in blacklist_growth_data]
+
+    top_reasons_labels = [item['reason'] for item in top_reasons]
+    top_reasons_counts = [item['count'] for item in top_reasons]
+
+    # Create a single chart data object
+    chart_data = {
+        'monthlyLabels': monthly_labels,
+        'monthlyCounts': monthly_counts,
+        'topReasonsLabels': top_reasons_labels,
+        'topReasonsCounts': top_reasons_counts
+    }
+
+    return render_template("statistics.html",
+                           total_blacklist_entries=total_blacklist_entries,
+                           total_checks=total_checks,
+                           checks_last_24_hours=checks_last_24_hours,
+                           unique_players_in_blacklist=unique_players_in_blacklist,
+                           latest_blacklist_additions=latest_blacklist_additions,
+                           chart_data=json.dumps(chart_data, ensure_ascii=False),
+                           blacklist_growth_data=blacklist_growth_data,
+                           top_reasons_data=top_reasons)
 
 @app.route('/api/fullist')
 def api_full_blacklist():
@@ -1002,6 +1077,11 @@ def api_player_details(player_uuid):
         # Continue without avatar if it fails, nickname is more critical here
 
     if not nickname and not avatar_base64:
+        # Only return 404 if both are missing and it seems like a totally invalid/unknown UUID
+        # If Mojang API fails for nickname but avatar was found (or vice-versa), we might still return 200 with partial data.
+        # However, get_name_from_uuid returns None on API error or 404.
+        # Minotar returns 404 if UUID is unknown.
+        # So if both are None/failed, it's likely the UUID is bad or Mojang/Minotar are down.
         return jsonify(error="Player details not found or UUID invalid"), 404
 
     return jsonify({
@@ -1075,8 +1155,21 @@ def api_locations_report():
         if client_timestamp:
             record['client_timestamp'] = client_timestamp.isoformat()
         else:
+            # If no client_timestamp, Supabase will use default for created_at
+            # and client_timestamp column will be NULL if not set otherwise in DB schema
             pass 
             
+        # Use the Supabase client (db) to insert
+        # Assuming your Supabase client instance is `db` and has an insert method like:
+        # db.client.table('player_locations').insert(record).execute()
+        # The actual method depends on your `supabase_client.py` implementation.
+        # For now, I will assume a generic insert method on your `db` object.
+        # You might need to adjust this part based on your `SupabaseClient` class methods.
+        
+        # Let's assume db.add_player_location(record) or similar exists in supabase_client.py
+        # If not, we would do: db.client.table('player_locations').insert(record).execute()
+        # This requires knowing the structure of your `db` object from `supabase_client.py`
+        # For now, proceeding with the direct table insert approach:
         response = db.client.table('player_locations').insert(record).execute()
 
         if response.data:
@@ -1089,6 +1182,39 @@ def api_locations_report():
     except Exception as e:
         app.logger.error(f"Error in /api/locations/report: {e}", exc_info=True)
         return jsonify({"error": "An unexpected error occurred."}), 500
+
+@csrf.exempt
+@app.route('/github-webhook', methods=['GET', 'POST'])
+def hook():
+    # GitHub Ping
+    if request.method == 'GET':
+        return 'pong', 200
+
+    # Проверяем подпись POST
+    secret = app.config['GITHUB_SECRET'].encode('utf-8')
+    data = request.get_data()
+    sig256 = request.headers.get('X-Hub-Signature-256', '')
+    sig1   = request.headers.get('X-Hub-Signature', '')
+
+    valid = False
+    if sig256.startswith('sha256='):
+        expected = 'sha256=' + hmac.new(secret, data, hashlib.sha256).hexdigest()
+        valid = hmac.compare_digest(expected, sig256)
+    elif sig1.startswith('sha1='):
+        expected = 'sha1=' + hmac.new(secret, data, hashlib.sha1).hexdigest()
+        valid = hmac.compare_digest(expected, sig1)
+
+    if not valid:
+        abort(403)
+
+    # Всё ок — запускаем скрипт из корня проекта
+    script_path = os.path.join(os.path.dirname(__file__), 'github‑webhook.sh')
+    subprocess.Popen(
+        [script_path],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL
+    )
+    return '', 204
     
 @app.after_request
 def set_security_headers(response):
@@ -1154,119 +1280,10 @@ def format_datetime_filter(value, format='%Y-%m-%d %H:%M:%S'):
 
 app.jinja_env.filters['format_datetime'] = format_datetime_filter
 
-@app.route('/api/config')
-def get_api_config():
-    """Return API configuration securely from environment variables"""
-    supabase_url = os.getenv('SUPABASE_URL')
-    supabase_key = os.getenv('SUPABASE_KEY')
-    
-    if not supabase_url or not supabase_key:
-        return jsonify({'error': 'Configuration not found'}), 500
-        
-    return jsonify({
-        'supabaseUrl': supabase_url,
-        'supabaseKey': supabase_key
-    })
-
-@app.template_filter('datetime')
-def format_datetime_filter(value, format='%Y-%m-%d %H:%M:%S'):
-    """Format a datetime object or an ISO string to a more readable string."""
-    if isinstance(value, str):
-        try:
-            # Attempt to parse ISO format, including those with 'Z' or timezone offset
-            if 'Z' in value:
-                value = value.replace('Z', '+00:00')
-            dt_obj = datetime.fromisoformat(value)
-        except ValueError:
-            return value # Return original string if parsing fails
-    elif isinstance(value, datetime):
-        dt_obj = value
-    else:
-        return value # Return as is if not a string or datetime
-    # If it has timezone info, convert to naive UTC
-    if dt_obj.tzinfo:
-        dt_obj = dt_obj.astimezone(timezone.utc).replace(tzinfo=None)
-    return dt_obj.strftime(format)
-
-@app.route("/admin/logs")
-@role_required("owner", "admin")
-def admin_logs():
-    """View system logs with filtering and pagination"""
-    try:
-        page = request.args.get('page', 1, type=int)
-        per_page = 50
-        level = request.args.get('level')
-        logger_name = request.args.get('logger')
-        search = request.args.get('search')
-
-        # Build query
-        query = db.admin_client.table('system_logs').select('*', count='exact')
-
-        # Apply filters
-        if level:
-            query = query.eq('level', level)
-        if logger_name:
-            query = query.eq('logger_name', logger_name)
-        if search:
-            query = query.or_(f'message.ilike.%{search}%,extra_data.ilike.%{search}%')
-
-        # Get unique logger names for filter dropdown
-        logger_names_result = db.admin_client.table('system_logs').select('logger_name').execute()
-        logger_names = sorted(set(log['logger_name'] for log in logger_names_result.data))
-
-        # Pagination
-        start = (page - 1) * per_page
-        query = query.order('timestamp', desc=True).range(start, start + per_page - 1)
-        
-        result = query.execute()
-        logs = result.data
-        total = result.count if hasattr(result, 'count') and result.count is not None else 0
-
-        # Create pagination object
-        class Pagination:
-            def __init__(self, page, per_page, total):
-                self.page = page
-                self.per_page = per_page
-                self.total = total
-                self.pages = (total + per_page - 1) // per_page
-                self.has_prev = page > 1
-                self.has_next = page < self.pages
-                self.prev_num = page - 1
-                self.next_num = page + 1
-
-            def iter_pages(self):
-                left_edge = 2
-                left_current = 2
-                right_current = 2
-                right_edge = 2
-
-                last = 0
-                for num in range(1, self.pages + 1):
-                    if (
-                        num <= left_edge
-                        or num > self.pages - right_edge
-                        or (
-                            num >= self.page - left_current
-                            and num <= self.page + right_current
-                        )
-                    ):
-                        if last + 1 != num:
-                            yield None
-                        yield num
-                        last = num
-
-        pagination = Pagination(page, per_page, total)
-
-        return render_template(
-            'admin_logs.html',
-            logs=logs,
-            pagination=pagination,
-            logger_names=logger_names
-        )
-    except Exception as e:
-        logger.exception("Error viewing system logs", e)
-        flash('Ошибка при загрузке логов', 'error')
-        return redirect(url_for('admin_panel'))
-
 if __name__ == '__main__':
+    # Ensure all required directories exist
+    # for directory in ['logs', 'tmp']:
+    #     if not os.path.exists(directory):
+    #         os.makedirs(directory)
+            
     app.run(debug=False)

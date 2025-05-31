@@ -248,11 +248,11 @@ class PlayerMap {
 // Initialize map when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
   // Ensure Supabase client is initialized
-  if (!window.supabaseInstance) {
+  if (!supabase) {
     console.error('Supabase client not initialized');
     return;
   }
   
   // Create map instance
-  const map = new PlayerMap(window.supabaseInstance);
+  const map = new PlayerMap(supabase);
 }); 

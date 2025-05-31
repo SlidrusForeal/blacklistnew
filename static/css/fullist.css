@@ -34,30 +34,15 @@
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
   margin-top: 2rem;
-  position: relative;
-  min-height: 200px;
 }
 
 .blacklist-entry {
-  background: var(--surface-color);
-  border: 2px solid var(--border-color);
+  background-color: var(--background-color);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
-  padding: 1.5rem;
-  margin-bottom: 1rem;
-  position: relative;
-  transition: all 0.3s ease;
-  height: 180px;
-  overflow: hidden;
-}
-
-.blacklist-entry::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 4px;
-  height: 100%;
-  background-color: #ff4444;
+  padding: 1rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  animation: fadeIn 0.3s ease-in-out;
 }
 
 .blacklist-entry:hover {
@@ -67,11 +52,8 @@
 
 .entry-header {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   margin-bottom: 1rem;
-  flex-wrap: wrap;
-  gap: 1rem;
 }
 
 .avatar {
@@ -83,11 +65,9 @@
 }
 
 .entry-header h3 {
-  color: var(--text-color);
-  font-size: 1.25rem;
-  font-weight: 600;
   margin: 0;
-  word-break: break-word;
+  color: var(--text-color);
+  font-size: 1.1rem;
 }
 
 .entry-details {
@@ -95,22 +75,15 @@
 }
 
 .reason {
-  margin: 1rem 0;
-  font-size: 1rem;
-  line-height: 1.6;
-  color: var(--text-color);
-  background: var(--bg-color);
-  padding: 1rem;
-  border-radius: 6px;
-  word-break: break-word;
-  white-space: pre-wrap;
+  margin: 0 0 0.5rem 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
 }
 
 .date {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   color: var(--secondary-color);
-  font-weight: 500;
 }
 
 .loading-spinner {
@@ -149,52 +122,6 @@
   }
 }
 
-/* Error message styling */
-.error-message {
-  background-color: rgba(220, 53, 69, 0.1);
-  border: 1px solid rgba(220, 53, 69, 0.2);
-  color: #dc3545;
-  padding: 1rem;
-  margin: 1rem 0;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  position: relative;
-  z-index: 1;
-}
-
-.error-message::before {
-  content: '⚠️';
-  font-size: 1.2rem;
-}
-
-/* Success message styling */
-.success-message {
-  background-color: rgba(40, 167, 69, 0.1);
-  border: 1px solid rgba(40, 167, 69, 0.2);
-  color: #28a745;
-  padding: 1rem;
-  margin: 1rem 0;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  position: relative;
-  z-index: 1;
-}
-
-.success-message::before {
-  content: '✓';
-  font-size: 1.2rem;
-}
-
-/* Ensure messages don't overlap with buttons */
-.message-container {
-  margin-bottom: 2rem;
-  position: relative;
-}
-
 /* Responsive Design */
 @media (max-width: 768px) {
   .fullist-container {
@@ -206,21 +133,7 @@
   }
 
   .blacklist-entry {
-    padding: 1rem;
-  }
-
-  .entry-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .entry-header h3 {
-    font-size: 1.1rem;
-  }
-
-  .reason {
-    font-size: 0.95rem;
-    padding: 0.75rem;
+    margin-bottom: 1rem;
   }
 
   .search-input {
@@ -228,65 +141,18 @@
   }
 }
 
-/* Dark mode adjustments */
+/* Dark mode specific styles */
 @media (prefers-color-scheme: dark) {
   .blacklist-entry {
-    background-color: #1a1a1a;
-    border-color: #333;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   }
 
-  .blacklist-entry::before {
-    background-color: #ff6b6b;
-  }
-
-  .entry-header h3 {
-    color: #ff6b6b;
-  }
-
-  .reason {
-    background-color: rgba(255, 107, 107, 0.15);
-  }
-
-  .error-message {
-    background-color: rgba(211, 47, 47, 0.1);
-    color: #ff6b6b;
-    border-left-color: #ff6b6b;
-  }
-
-  .success-message {
-    background-color: rgba(46, 125, 50, 0.1);
-    color: #81c784;
-    border-left-color: #81c784;
+  .blacklist-entry:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   }
 
   .search-input {
     background-color: var(--background-color);
     color: var(--text-color);
   }
-}
-
-#noMoreResultsIndicator {
-    display: block;
-    text-align: center;
-    margin: 50px;
-    color: var(--text-muted);
-    font-size: 1.1rem;
-    padding: 1rem;
-    border-radius: 8px;
-    background: var(--bg-color);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-#noMoreResultsIndicator p {
-    margin: 0;
-    padding: 0.5rem;
-}
-
-/* Dark mode adjustments */
-@media (prefers-color-scheme: dark) {
-    #noMoreResultsIndicator {
-        color: var(--text-muted);
-        background: var(--card-bg);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    }
 } 

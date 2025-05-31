@@ -1,15 +1,4 @@
-/* Base Styles */
-:root {
-  --primary-color: #6186ff;
-  --bg-dark: #1a1a1a;
-  --bg-light: #2c2c2c;
-  --text-light: #f1f1f1;
-  --text-muted: #bbb;
-  --shadow: 0 4px 10px rgba(0,0,0,0.2);
-  --anim-duration: 0.3s;
-}
-
-/* Reset */
+/* Общие стили */
 *,
 *::before,
 *::after {
@@ -18,7 +7,17 @@
   padding: 0;
 }
 
-/* Typography */
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #1a1a1a;
+  color: #f1f1f1;
+  line-height: 1.6;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Подключите шрифты */
 @font-face {
   font-family: 'Poppins';
   font-style: normal;
@@ -27,17 +26,7 @@
   font-display: swap;
 }
 
-body {
-  font-family: 'Poppins', system-ui, -apple-system, sans-serif;
-  background-color: var(--bg-dark);
-  color: var(--text-light);
-  line-height: 1.6;
-  overflow-x: hidden;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-}
-
-/* Animations */
+/* Анимации */
 @keyframes fadeIn {
   from { opacity: 0; }
   to   { opacity: 1; }
@@ -45,41 +34,36 @@ body {
 
 @keyframes slideInDown {
   from { transform: translateY(-100%); opacity: 0; }
-  to   { transform: translateY(0); opacity: 1; }
+  to   { transform: translateY(0);      opacity: 1; }
 }
 
 @keyframes slideInUp {
   from { transform: translateY(100%); opacity: 0; }
-  to   { transform: translateY(0); opacity: 1; }
+  to   { transform: translateY(0);   opacity: 1; }
 }
 
-@keyframes pulse {
-  0% { opacity: .6; }
-  50% { opacity: 1; }
-  100% { opacity: .6; }
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.animated { animation: fadeIn 1s ease-in-out; }
-
-/* Layout */
-.container {
-  width: 100%;
-  max-width: 800px;
-  margin: 20px auto;
-  padding: 20px;
-  background-color: var(--bg-light);
-  border-radius: 8px;
-  box-shadow: var(--shadow);
+.animated {
   animation: fadeIn 1s ease-in-out;
 }
 
-/* Header */
+.checker-container p {
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+
+p {
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    unicode-bidi: isolate;
+}
+
+/* Шапка сайта */
 header {
-  background-color: var(--bg-light);
+  background-color: #2c2c2c;
   padding: 15px 20px;
   margin-bottom: 30px;
 }
@@ -88,6 +72,8 @@ header nav ul {
   display: flex;
   justify-content: space-around;
   list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 header nav ul li {
@@ -98,19 +84,50 @@ header nav ul li {
 header nav ul li a {
   display: block;
   text-decoration: none;
-  color: var(--text-light);
+  color: #f1f1f1;
   padding: 8px 12px;
   border-radius: 4px;
-  transition: background-color var(--anim-duration), color var(--anim-duration);
+  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
 }
 
 header nav ul li a:hover,
 header nav ul li a.active {
-  background-color: var(--primary-color);
-  color: var(--bg-dark);
+  background-color: #6186ff;
+  color: #1a1a1a;
 }
 
-/* Forms */
+/* Основной контейнер */
+.container {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #2c2c2c;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  animation: fadeIn 1s ease-in-out;
+}
+
+.container h1 {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 20px;
+  color: #f1f1f1;
+}
+
+/* Чекер */
+.checker h1 {
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 20px;
+  animation: slideInDown 0.5s ease-out;
+}
+
+.checker p {
+  text-align: center;
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
 .input-group {
   position: relative;
   margin-bottom: 20px;
@@ -118,68 +135,60 @@ header nav ul li a.active {
 
 .input-group input[type="text"],
 .input-group input[type="password"],
-.input-group select,
-.search-input {
+.input-group select {
   width: 100%;
   padding: 15px;
   font-size: 1rem;
   border: none;
   border-radius: 50px;
   background-color: #3a3a3a;
-  color: var(--text-light);
-  transition: box-shadow var(--anim-duration);
+  color: #f1f1f1;
+  transition: box-shadow 0.3s ease-in-out;
 }
 
 .input-group input:focus,
-.input-group select:focus,
-.search-input:focus {
+.input-group select:focus {
   outline: none;
-  box-shadow: 0 0 10px var(--primary-color);
+  box-shadow: 0 0 10px #6186ff;
 }
 
-/* Buttons */
-.btn {
-  display: inline-block;
-  padding: 15px;
-  font-size: 1.1rem;
-  border: none;
-  border-radius: 50px;
-  cursor: pointer;
-  transition: all var(--anim-duration);
-}
-
+/* Кнопка чекера */
 .btn-check {
+  display: block;
   width: 100%;
-  background-color: var(--primary-color);
-  color: var(--bg-dark);
+  padding: 15px;
+  background-color: #6186ff;
+  color: #1a1a1a;
   font-size: 1.1rem;
-  font-weight: 600;
-  padding: 15px 0;
   border: none;
   border-radius: 50px;
-  box-shadow: 0 2px 8px rgba(97,134,255,0.10);
-  transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.1s;
   cursor: pointer;
-  letter-spacing: 0.03em;
-  outline: none;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.08);
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  animation: fadeIn 1s ease-in-out;
 }
 
-.btn-check:hover, .btn-check:focus {
-  background: #75c1ff;
-  color: var(--bg-dark);
-  box-shadow: 0 4px 16px rgba(97,134,255,0.18);
-  transform: translateY(-2px) scale(1.03);
+.btn-check:hover {
+  background-color: #75c1ff;
+  transform: translateY(-3px);
 }
 
-/* Notifications */
+/* Результаты */
+.result-container {
+  margin-top: 30px;
+  padding: 20px;
+  background-color: #1a1a1a;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  animation: fadeIn 1s ease-in-out;
+}
+
+/* Уведомления */
 .notification {
   visibility: hidden;
   min-width: 250px;
-  background-color: var(--bg-light);
-  color: var(--text-light);
+  background-color: #2c2c2c;
+  color: #f1f1f1;
   text-align: center;
   border-radius: 4px;
   padding: 15px;
@@ -188,9 +197,10 @@ header nav ul li a.active {
   bottom: 30px;
   transform: translateX(-50%);
   z-index: 100;
-  box-shadow: var(--shadow);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  animation: fadeIn 0.5s ease-in-out;
+  transition: visibility 0.3s, opacity 0.3s;
   opacity: 0;
-  transition: visibility var(--anim-duration), opacity var(--anim-duration);
 }
 
 .notification.active {
@@ -198,496 +208,593 @@ header nav ul li a.active {
   opacity: 1;
 }
 
-/* Tables */
-.table-responsive {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+/* Footer */
+footer {
+  text-align: center;
+  margin-top: 40px;
+  font-size: 0.9rem;
+  color: #bbb;
+  animation: fadeIn 1s ease-in-out;
 }
 
-.admin-container table,
-.users-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 1rem 0;
+/* Footer link styling to match contact links */
+footer.footer .text-muted a {
+    color: #6186ff;
+    text-decoration: none;
 }
 
-.admin-container th,
-.admin-container td,
-.users-table th,
-.users-table td {
+footer.footer .text-muted a:hover {
+    text-decoration: underline; /* Optional: add underline on hover for better UX */
+}
+
+/* Контактная информация */
+.contact-info {
+  background-color: #2c2c2c;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 20px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.contact-info ul {
+  margin-top: 15px;
+  padding-left: 25px;
+}
+
+.contact-info li {
+  position: relative;
+  cursor: pointer;
   padding: 12px;
-  text-align: left;
-  border-bottom: 1px solid #3a3a3a;
+  margin-bottom: 10px;
+  background-color: #2c2c2c;
+  border-left: 4px solid transparent;
+  transition: all 0.3s ease;
 }
 
-.admin-container tbody tr:nth-child(odd) { background-color: #262626; }
-.admin-container tbody tr:nth-child(even) { background-color: var(--bg-light); }
-.admin-container tbody tr:hover { background-color: #333; }
-
-/* Loading States */
-.skeleton {
-  background: linear-gradient(90deg, #2c2c2c 25%, #3a3a3a 50%, #2c2c2c 75%);
-  background-size: 200% 100%;
-  animation: pulse 1.5s ease-in-out infinite;
+.contact-info li:hover {
+  background-color: #4a4a4a;
+  border-left-color: #6186ff;
+  transform: translateX(8px);
+  box-shadow: 0 4px 15px rgba(97,134,255,0.2);
 }
 
-.loading-spinner {
+.contact-info a {
+  color: #6186ff;
+  text-decoration: none;
+}
+
+.contact-info a:hover {
+  text-decoration: underline;
+}
+
+/* Черный список */
+#blacklist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#blacklist li {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    margin: 10px 0;
+    background-color: #1a1a1a;
+    border-radius: 6px;
+    animation: slideInUp 0.5s ease-out;
+    border-bottom: 1px solid #444;
+    color: #6186ff;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+#blacklist li:hover {
+  background-color: #3a3a3a;
+  border-color: #6186ff;
+  box-shadow: 0 2px 8px rgba(97,134,255,0.15);
+}
+
+#blacklist li::before {
+  content: "⛔";
+  font-size: 1.4em;
+}
+
+/* Поиск */
+#search-input {
+  width: 100%;
+  padding: 12px 20px;
+  border: 1px solid #444;
+  border-radius: 50px;
+  background-color: #3a3a3a;
+  color: #f1f1f1;
+  font-size: 1rem;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+#search-input::placeholder {
+  color: #bbb;
+}
+
+#search-input:focus {
+  outline: none;
+  border-color: #6186ff;
+  box-shadow: 0 0 10px #6186ff;
+  background-color: #444;
+}
+
+/* Admin */
+.admin-container {
+  background-color: #2b2b2b;
+  border: 1px solid #444;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  padding: 30px;
+  border-radius: 8px;
+  margin: 30px auto;
+  max-width: 900px;
+}
+
+.admin-container h1 {
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 20px;
+  color: #f1f1f1;
+}
+
+.admin-container .input-group input,
+.admin-container .input-group select {
+  width: 100%;
+  padding: 15px;
+  font-size: 1rem;
+  border: 1px solid #555;
+  border-radius: 4px;
+  background-color: #3a3a3a;
+  color: #f1f1f1;
+  margin-bottom: 15px;
+}
+
+.admin-container .btn-check {
+  background-color: #6186ff;
+  color: #1a1a1a;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.admin-container .btn-check:hover {
+  background-color: #75c1ff;
+  transform: translateY(-3px);
+}
+
+/* Video page */
+.shmok-video-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 200px;
+  margin: 40px auto;
+  max-width: 800px;
+  padding: 20px;
+  background-color: #2c2c2c;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  animation: fadeIn 1s ease-in-out;
+}
+
+.shmok-video-container video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.shmok-video-container video:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.7);
+}
+
+/* Адаптив */
+@media (max-width: 768px) {
+  .container,
+  .input-group,
+  .checker-container {
+    margin: 15px;
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  header nav ul {
+    flex-direction: column;
+  }
+  header nav ul li {
+    margin-bottom: 10px;
+  }
+  header nav ul li:last-child {
+    margin-bottom: 0;
+  }
+}
+
+a {
+    text-decoration: none;
+    color: #6186ff;
+}
+
+/* Ensure anchor tags styled as .btn-secondary use Bootstrap's intended text color */
+a.btn.btn-secondary,
+a.btn.btn-secondary:hover,
+a.btn.btn-secondary:focus {
+    color: #fff;
+}
+
+.player-info a {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #6186ff;
+}
+
+/* ─────────────── Управление пользователями ─────────────── */
+.admin-container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background-color: #2c2c2c;
+  color: #f1f1f1;
+}
+
+.admin-container thead tr {
+  background-color: #2b2b2b;
+}
+
+.admin-container th,
+.admin-container td {
+  padding: 10px;
+  border: 1px solid #444;
+  text-align: left;
+  font-size: 0.95rem;
+}
+
+.admin-container th {
+  font-weight: 600;
+}
+
+.admin-container td:last-child {
+  text-align: center;
+}
+
+/* Зебра для строк */
+.admin-container tbody tr:nth-child(odd) {
+  background-color: #1f1f1f;
+}
+.admin-container tbody tr:nth-child(even) {
+  background-color: #292929;
+}
+
+/* Ховер для строк */
+.admin-container tbody tr:hover {
+  background-color: #3a3a3a;
+}
+
+.table-responsive {
+  overflow-x: auto;
+  margin-top: 20px;
+}
+
+/* сама таблица */
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; /* фиксирует колонки */
+}
+
+.users-table th,
+.users-table td {
+  padding: 10px;
+  border: 1px solid #444; /* или ваш цвет */
+  text-align: left;
+  vertical-align: top;
+  white-space: normal;    /* разрешает перенос строк */
+  word-wrap: break-word;  /* устаревший, но для совместимости */
+  overflow-wrap: anywhere;/* переносит длинные слова */
+}
+
+/* конкретно для колонки с хэшем */
+.users-table .hash-cell {
+  max-width: 250px;       /* ваша желаемая ширина */
+  font-family: monospace; /* чтобы было видно, что это хэш */
+}
+
+/* Кнопка удаления */
+.btn-delete {
+  display: inline-block;
+  padding: 8px 16px;
+  background-color: #c0392b;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease;
+  text-decoration: none;
+}
+
+.btn-delete:hover {
+  background-color: #e74c3c;
+}
+
+.skeleton {
+  background: #eee;
+  height: 100px;
+  width: 100px;
+  animation: pulse 1.2s infinite ease-in-out;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1 }
+  50%      { opacity: 0.4 }
+}
+
+/* Admin Whitelist Styles */
+.admin-section {
+  background-color: #3a3a3a; /* Darker section background */
+  color: #f1f1f1; /* Light text for the section */
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  border-radius: 8px;
+  border: 1px solid #555; /* Darker border */
+}
+
+.admin-section h2 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #555; /* Darker border */
+  padding-bottom: 0.75rem;
+  color: #f1f1f1; /* Ensure h2 text is light */
+}
+
+/* Стили для форм, если не определены глобально, specifically for .admin-section */
+.admin-section .form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #f1f1f1; /* Light label text */
+}
+
+.admin-section .form-control,
+.admin-section .form-select {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #f1f1f1; /* Light text in input */
+  background-color: #2c2c2c; /* Dark input background */
+  background-clip: padding-box;
+  border: 1px solid #555; /* Darker border for inputs */
+  border-radius: 0.25rem;
+  transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+.admin-section .form-control:focus,
+.admin-section .form-select:focus {
+  border-color: #6186ff; /* Primary color for focus */
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(97, 134, 255, 0.25); /* Primary color shadow */
+  background-color: #3a3a3a; /* Slightly lighter dark bg on focus */
+}
+
+/* Ensure input-group within admin-section does not add conflicting styles if any */
+.admin-section .input-group {
+  margin-bottom: 1rem;
+}
+
+/* Для формы в одну строку (если нужно) */
+.admin-section .form-inline {
+  display: flex;
+  flex-wrap: wrap; 
+  align-items: flex-end; 
+  gap: 1rem; 
+}
+
+.admin-section .form-inline .input-group {
+  flex-grow: 1; 
+  margin-bottom: 0; 
+}
+
+.admin-section .form-inline .input-group:last-child {
+  flex-grow: 0; 
+}
+
+/* Whitelist List Styles */
+.admin-section .whitelist-list {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.admin-section .whitelist-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border: 1px solid #555; /* Darker border */
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+  background-color: #2c2c2c; /* Dark item background */
+  color: #f1f1f1; /* Ensure text within item is light */
+}
+
+.admin-section .whitelist-item span {
+  font-family: monospace; 
+  word-break: break-all; 
+  margin-right: 1rem;
+  color: #f1f1f1; /* Explicitly set span color to light */
+}
+
+.admin-section .form-inline-item {
+  margin-left: auto; 
+}
+
+/* Уточнение для кнопок, если .btn-check не покрывает все */
+/* These button styles seem fine as they are mostly self-contained or use explicit colors */
+
+/* == LEGACY FULLIST STYLES (CARD-BASED) START == */
+@keyframes fullistEntryFadeIn { /* Renamed from fadeIn to avoid conflict */
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.fullist-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.search-container {
+  margin-bottom: 2rem;
+}
+
+/* Styles for searchInput on fullist page, assuming it has class .search-input */
+.fullist-container .search-input {
+  display: block;
+  width: 100%;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.fullist-container .search-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb, 0, 123, 255), 0.1); /* Added fallback for --primary-color-rgb */
+}
+
+.blacklist-entries {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.blacklist-entries .blacklist-entry { /* Applied to items generated by JS */
+  background-color: var(--background-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  animation: fullistEntryFadeIn 0.3s ease-in-out; /* Use renamed animation */
+}
+
+.blacklist-entries .blacklist-entry:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* General shadow, dark mode might override */
+}
+
+.blacklist-entries .blacklist-entry .entry-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.blacklist-entries .blacklist-entry .avatar { /* Class used by JS for the img tag */
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  margin-right: 1rem;
+  object-fit: cover;
+}
+
+.blacklist-entries .blacklist-entry .entry-header h3 {
+  margin: 0;
+  color: var(--text-color);
+  font-size: 1.1rem;
+}
+
+.blacklist-entries .blacklist-entry .entry-details {
+  color: var(--text-color);
+}
+
+.blacklist-entries .blacklist-entry .reason { /* Class used by JS for reason p tag */
+  margin: 0 0 0.5rem 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.blacklist-entries .blacklist-entry .date { /* Class used by JS for date p tag */
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--secondary-color);
+}
+
+/* uuid p tag is styled inline by JS, if .uuid class specific styling is needed, add here */
+
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: var(--text-color);
 }
 
 .spinner {
   width: 40px;
   height: 40px;
-  border: 4px solid #3a3a3a;
+  border: 3px solid var(--border-color);
   border-top-color: var(--primary-color);
   border-radius: 50%;
   animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
 }
 
-/* Footer */
-footer {
-  text-align: center;
-  margin-top: 40px;
-  padding: 20px;
-  color: var(--text-muted);
-  animation: fadeIn 1s ease-in-out;
-}
-
-footer a {
-  color: var(--primary-color);
-  text-decoration: none;
-  transition: color var(--anim-duration);
-}
-
-footer a:hover {
-  text-decoration: underline;
-}
-
-/* Accessibility */
-.skip-link {
-  position: absolute;
-  top: -40px;
-  left: 0;
-  background: var(--primary-color);
-  color: white;
-  padding: 8px;
-  z-index: 100;
-  transition: top var(--anim-duration);
-}
-
-.skip-link:focus {
-  top: 0;
-}
-
-/* Media Queries */
+/* Responsive Design from legacy fullist.css */
 @media (max-width: 768px) {
-  .container { padding: 15px; }
-  
-  header nav ul {
-    flex-direction: column;
-    gap: 10px;
+  .fullist-container {
+    padding: 1rem;
   }
-  
-  header nav ul li {
-    width: 100%;
+
+  .blacklist-entries {
+    grid-template-columns: 1fr;
   }
-  
-  .input-group input[type="text"],
-  .input-group input[type="password"],
-  .input-group select,
-  .search-input {
-    font-size: 16px; /* Prevent zoom on iOS */
+
+  /* .blacklist-entry in legacy had margin-bottom: 1rem here, but grid gap handles spacing */
+
+  .fullist-container .search-input {
+    font-size: 16px; /* Prevent zoom on mobile */
   }
 }
 
-@media (max-width: 480px) {
-  .container { margin: 10px; }
-  
-  .btn {
-    width: 100%;
-    margin: 5px 0;
-  }
-}
-
-/* Print Styles */
-@media print {
-  body {
-    background: white;
-    color: black;
-  }
-  
-  .container {
-    box-shadow: none;
-    margin: 0;
-    padding: 0;
-  }
-  
-  .no-print {
-    display: none;
-  }
-}
-
-/* Dark Mode */
+/* Dark mode specific styles from legacy fullist.css */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg-dark: #1a1a1a;
-    --bg-light: #2c2c2c;
-    --text-light: #f1f1f1;
+  .blacklist-entries .blacklist-entry {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   }
-}
 
-/* Reduced Motion */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+  .blacklist-entries .blacklist-entry:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   }
-}
 
-/* Infinite Scroll & Virtual DOM */
-.virtual-scroll-container {
-  position: relative;
-  width: 100%;
-  min-height: 100px;
+  /* .search-input already uses CSS variables, should adapt if theme changes vars */
 }
-.blacklist-entry {
-  background: #23272e;
-  margin: 8px 0;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  padding: 16px;
-  transition: box-shadow 0.2s;
-}
-.blacklist-entry:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-}
-.entry-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.avatar {
-  border-radius: 5px;
-  width: 50px;
-  height: 50px;
-  object-fit: cover;
-  background: #444;
-}
-.entry-details {
-  margin-top: 8px;
-}
-.no-results, .error-message {
-  text-align: center;
-  color: var(--text-muted);
-  padding: 24px 0;
-}
-
-/* Video Player Enhancements */
-#video-container {
-  position: relative;
-  max-width: 600px;
-  margin: 0 auto;
-}
-.video-loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.4);
-  z-index: 2;
-}
-.video-error {
-  color: #f44336;
-  background: #23272e;
-  padding: 20px;
-  border-radius: 8px;
-  text-align: center;
-  margin-top: 16px;
-}
-.video-controls {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: #23272e;
-  padding: 8px;
-  border-radius: 0 0 8px 8px;
-  margin-top: -4px;
-}
-.video-controls button, .video-controls select {
-  background: none;
-  border: none;
-  color: var(--text-light);
-  font-size: 1.1em;
-  cursor: pointer;
-}
-.video-controls .progress-bar {
-  flex: 1;
-  height: 6px;
-  background: #444;
-  border-radius: 3px;
-  margin: 0 8px;
-  position: relative;
-  overflow: hidden;
-}
-.video-controls .progress {
-  background: var(--primary-color);
-  height: 100%;
-  width: 0;
-  position: absolute;
-  left: 0; top: 0;
-  transition: width 0.2s;
-}
-.video-controls .buffer {
-  background: #888;
-  height: 100%;
-  width: 0;
-  position: absolute;
-  left: 0; top: 0;
-  opacity: 0.5;
-}
-
-/* Search Status */
-.search-status {
-  margin: 10px 0;
-  font-size: 0.95em;
-  color: var(--text-muted);
-}
-
-/* Marked (highlight) */
-mark {
-  background: #ffe066;
-  color: #23272e;
-  border-radius: 2px;
-  padding: 0 2px;
-}
-
-/* Links: remove underline, match text color, but keep hover/focus effect */
-a, a:visited {
-  color: inherit;
-  text-decoration: none;
-  font-weight: inherit;
-  transition: color 0.2s, text-decoration 0.2s;
-}
-a:hover, a:focus {
-  color: var(--primary-color);
-  text-decoration: underline;
-  outline: none;
-}
-
-.contact-info {
-  max-width: 600px;
-  margin: 40px auto 0 auto;
-  padding: 32px 24px;
-  background: var(--bg-light);
-  border-radius: 12px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
-  animation: fadeIn 0.8s;
-}
-.content-box {
-  background: #23272e;
-  border-radius: 8px;
-  padding: 24px 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  margin-top: 18px;
-}
-.contacts-list {
-  list-style: none;
-  padding: 0;
-  margin: 18px 0 0 0;
-}
-.contacts-list li {
-  font-size: 1.1em;
-  margin-bottom: 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--text-light);
-}
-.contacts-list a {
-  color: var(--primary-color);
-  font-weight: 600;
-  text-decoration: none;
-  transition: color 0.2s, text-decoration 0.2s;
-}
-.contacts-list a:hover, .contacts-list a:focus {
-  color: #75c1ff;
-  text-decoration: underline;
-}
-@media (max-width: 600px) {
-  .contact-info {
-    padding: 16px 6px;
-  }
-  .content-box {
-    padding: 14px 6px;
-  }
-}
-
-/* --- Admin Panel --- */
-.admin-container {
-  max-width: 800px;
-  margin: 40px auto 0 auto;
-  padding: 32px 24px;
-  background: var(--bg-light);
-  border-radius: 12px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
-  animation: fadeIn 0.8s;
-}
-.admin-container h1, .admin-container h2 {
-  color: var(--primary-color);
-  margin-bottom: 18px;
-}
-.admin-container ul#blacklist {
-  margin: 18px 0 0 0;
-  padding: 0;
-  list-style: none;
-}
-.admin-container ul#blacklist li {
-  background: #23272e;
-  border-radius: 8px;
-  margin-bottom: 10px;
-  padding: 14px 18px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  color: var(--text-light);
-}
-.admin-container .btn-check {
-  margin-top: 8px;
-  margin-bottom: 8px;
-}
-
-/* --- Admin Register --- */
-.admin-register-container {
-  max-width: 500px;
-  margin: 40px auto 0 auto;
-  padding: 32px 24px;
-  background: var(--bg-light);
-  border-radius: 12px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
-  animation: fadeIn 0.8s;
-}
-.admin-register-container h1 {
-  color: var(--primary-color);
-  margin-bottom: 18px;
-}
-
-/* --- Admin Users --- */
-.users-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: #23272e;
-  border-radius: 8px;
-  overflow: hidden;
-  margin-top: 18px;
-}
-.users-table th, .users-table td {
-  padding: 12px 16px;
-  text-align: left;
-  color: var(--text-light);
-}
-.users-table th {
-  background: #1a1d22;
-  font-weight: 700;
-}
-.users-table tr:nth-child(even) {
-  background: #262a31;
-}
-.users-table tr:hover {
-  background: #2e3340;
-}
-.btn-delete {
-  background: #f44336;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 6px 14px;
-  font-size: 1em;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.btn-delete:hover {
-  background: #d32f2f;
-}
-.hash-cell {
-  font-size: 0.95em;
-  color: #bdbdbd;
-  word-break: break-all;
-}
-
-/* --- Admin Whitelist --- */
-.admin-section {
-  margin-bottom: 32px;
-}
-.admin-section .card-header {
-  background: var(--primary-color);
-  color: #fff;
-  font-weight: 600;
-  border-radius: 8px 8px 0 0;
-  padding: 14px 20px;
-}
-.admin-section .card-body {
-  background: #23272e;
-  border-radius: 0 0 8px 8px;
-  padding: 20px 20px 16px 20px;
-}
-.list-group-item {
-  background: #23272e;
-  color: var(--text-light);
-  border: none;
-  border-bottom: 1px solid #2e3340;
-  border-radius: 0;
-}
-.list-group-item:last-child {
-  border-bottom: none;
-}
-
-/* --- Admin Logs & Audit Log --- */
-.admin-logs-container, .admin-auditlog-container {
-  max-width: 900px;
-  margin: 40px auto 0 auto;
-  padding: 32px 24px;
-  background: var(--bg-light);
-  border-radius: 12px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
-  animation: fadeIn 0.8s;
-}
-.admin-logs-container h1, .admin-auditlog-container h1 {
-  color: var(--primary-color);
-  margin-bottom: 18px;
-}
-.log-table, .auditlog-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: #23272e;
-  border-radius: 8px;
-  overflow: hidden;
-  margin-top: 18px;
-}
-.log-table th, .log-table td, .auditlog-table th, .auditlog-table td {
-  padding: 10px 14px;
-  text-align: left;
-  color: var(--text-light);
-}
-.log-table th, .auditlog-table th {
-  background: #1a1d22;
-  font-weight: 700;
-}
-.log-table tr:nth-child(even), .auditlog-table tr:nth-child(even) {
-  background: #262a31;
-}
-.log-table tr:hover, .auditlog-table tr:hover {
-  background: #2e3340;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+/* == LEGACY FULLIST STYLES (CARD-BASED) END == */

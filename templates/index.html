@@ -9,37 +9,32 @@
 {% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="check-form-container">
-        <h1>Проверка черного списка</h1>
-        <form method="POST" action="{{ url_for('index') }}" class="check-form">
-            {{ form.hidden_tag() }}
-            <div class="form-group">
-                <input type="text" 
-                       name="nickname" 
-                       id="nickname" 
-                       class="form-control" 
-                       placeholder="Введите никнейм"
-                       required
-                       autocomplete="off">
-            </div>
-            <button type="submit" class="btn btn-primary">Проверить</button>
-        </form>
+<main class="container checker-container">
+  <h1>Проверка на наличие в ЧС</h1>
+  <p>Введите никнейм для проверки:</p>
+  
+  <form method="POST" action="{{ url_for('index') }}" class="checker-form">
+    {{ form.hidden_tag() }}
+    <div class="input-group">
+      {{ form.nickname(id="nickname", class="form-control-custom", placeholder="Ваш никнейм", autocomplete="off") }}
     </div>
+    <div class="input-group">
+    {{ form.submit(class="btn-check") }}
+    </div>
+  </form>
 
-    {% if result %}
-    <div class="result-container {% if result.in_blacklist %}blacklisted{% else %}not-blacklisted{% endif %}">
-        <h2>Результат проверки</h2>
-        <p class="nickname">{{ result.nickname }}</p>
-        {% if result.in_blacklist %}
-            <p class="status blacklisted">В черном списке</p>
-            <p class="reason">{{ result.reason }}</p>
-        {% else %}
-            <p class="status not-blacklisted">Не в черном списке</p>
-        {% endif %}
+  {% if result %}
+    <div id="result" class="result-container {% if result.color == 'red' %}text-danger{% else %}text-success{% endif %}">
+      <p>{{ result.message }}</p>
+      {% if result.reason %}
+        <p>Причина: {{ result.reason }}</p>
+      {% endif %}
+      {% if result.color == 'red' %}
+        <canvas id="confettiCanvas" width="600" height="400" style="display:none;"></canvas>
+      {% endif %}
     </div>
-    {% endif %}
-</div>
+  {% endif %}
+</main>
 {% endblock %}
 
 {% block scripts %}
@@ -60,5 +55,4 @@
   });
 </script>
 {% endif %}
-<script src="{{ url_for('static', filename='js/pages/index.js') }}" defer></script>
 {% endblock %}
