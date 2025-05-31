@@ -38,16 +38,28 @@
 
 .blacklist-entry {
   background-color: var(--background-color);
-  border: 1px solid var(--border-color);
+  border: 2px solid var(--border-color);
   border-radius: 8px;
-  padding: 1rem;
+  padding: 1.5rem;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   animation: fadeIn 0.3s ease-in-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.blacklist-entry::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background-color: #ff4444;
 }
 
 .blacklist-entry:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
 .entry-header {
@@ -66,8 +78,9 @@
 
 .entry-header h3 {
   margin: 0;
-  color: var(--text-color);
-  font-size: 1.1rem;
+  color: #ff4444;
+  font-size: 1.2rem;
+  font-weight: bold;
 }
 
 .entry-details {
@@ -75,15 +88,20 @@
 }
 
 .reason {
-  margin: 0 0 0.5rem 0;
-  font-size: 0.9rem;
-  line-height: 1.4;
+  margin: 0.75rem 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--text-color);
+  padding: 0.5rem;
+  background-color: rgba(255, 68, 68, 0.1);
+  border-radius: 4px;
 }
 
 .date {
   margin: 0;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   color: var(--secondary-color);
+  font-weight: 500;
 }
 
 .loading-spinner {
@@ -122,6 +140,44 @@
   }
 }
 
+/* Error message styling */
+.error-message {
+  background-color: #ffebee;
+  color: #d32f2f;
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid #d32f2f;
+  margin: 1rem 0;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.error-message::before {
+  content: '⚠️';
+  font-size: 1.2rem;
+}
+
+/* Success message styling */
+.success-message {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid #2e7d32;
+  margin: 1rem 0;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.success-message::before {
+  content: '✓';
+  font-size: 1.2rem;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .fullist-container {
@@ -141,14 +197,35 @@
   }
 }
 
-/* Dark mode specific styles */
+/* Dark mode adjustments */
 @media (prefers-color-scheme: dark) {
   .blacklist-entry {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    background-color: #1a1a1a;
+    border-color: #333;
   }
 
-  .blacklist-entry:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  .blacklist-entry::before {
+    background-color: #ff6b6b;
+  }
+
+  .entry-header h3 {
+    color: #ff6b6b;
+  }
+
+  .reason {
+    background-color: rgba(255, 107, 107, 0.15);
+  }
+
+  .error-message {
+    background-color: rgba(211, 47, 47, 0.1);
+    color: #ff6b6b;
+    border-left-color: #ff6b6b;
+  }
+
+  .success-message {
+    background-color: rgba(46, 125, 50, 0.1);
+    color: #81c784;
+    border-left-color: #81c784;
   }
 
   .search-input {
