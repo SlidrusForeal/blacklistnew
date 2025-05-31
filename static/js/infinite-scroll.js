@@ -21,7 +21,7 @@ class InfiniteScroll {
       dateFrom: options.dateFrom || '',
       dateTo: options.dateTo || '',
       supabaseClient: options.supabaseClient || null,
-      itemHeight: options.itemHeight || 150, // Estimated item height for virtual scrolling
+      itemHeight: options.itemHeight || 180, // Estimated item height for virtual scrolling
       bufferSize: options.bufferSize || 5, // Number of items to render above/below viewport
       debounceDelay: options.debounceDelay || 150 // Debounce delay for scroll events
     };
