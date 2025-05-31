@@ -113,7 +113,6 @@
         <li><a href="{{ url_for('index') }}" {% if request.endpoint == 'index' %}aria-current="page"{% endif %}>Главная</a></li>
         <li><a href="{{ url_for('fullist') }}" {% if request.endpoint == 'fullist' %}aria-current="page"{% endif %}>Полный список</a></li>
         <li><a href="{{ url_for('contacts') }}" {% if request.endpoint == 'contacts' %}aria-current="page"{% endif %}>Контакты</a></li>
-        <li><a href="{{ url_for('statistics_page') }}" {% if request.endpoint == 'statistics_page' %}aria-current="page"{% endif %}>Статистика</a></li>
       </ul>
     </nav>
   </header>

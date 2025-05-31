@@ -798,44 +798,6 @@ def admin_audit_log():
                            total_items=logs_data.get('total_items'),
                            has_more=logs_data.get('has_more'))
 
-@app.route("/statistics", methods=["GET"])
-def statistics_page():
-    total_blacklist_entries = db.get_total_blacklist_entries_count()
-    total_checks = db.count_total_checks()
-    checks_last_24_hours = db.count_checks_last_24_hours()
-    
-    # New statistics
-    blacklist_growth_data = db.get_blacklist_entries_by_month(num_months=12) # Get last 12 months
-    top_reasons = db.get_top_n_reasons(n=5) # Get top 5 reasons
-    unique_players_in_blacklist = db.get_unique_player_count_in_blacklist()
-    latest_blacklist_additions = db.get_latest_n_blacklist_entries(n=5) # Get latest 5 entries
-
-    # Prepare data for Chart.js (example for blacklist_growth_data)
-    # Chart.js expects labels and data arrays.
-    monthly_labels = [item['month'] for item in blacklist_growth_data]
-    monthly_counts = [item['count'] for item in blacklist_growth_data]
-
-    top_reasons_labels = [item['reason'] for item in top_reasons]
-    top_reasons_counts = [item['count'] for item in top_reasons]
-
-    # Create a single chart data object
-    chart_data = {
-        'monthlyLabels': monthly_labels,
-        'monthlyCounts': monthly_counts,
-        'topReasonsLabels': top_reasons_labels,
-        'topReasonsCounts': top_reasons_counts
-    }
-
-    return render_template("statistics.html",
-                           total_blacklist_entries=total_blacklist_entries,
-                           total_checks=total_checks,
-                           checks_last_24_hours=checks_last_24_hours,
-                           unique_players_in_blacklist=unique_players_in_blacklist,
-                           latest_blacklist_additions=latest_blacklist_additions,
-                           chart_data=json.dumps(chart_data, ensure_ascii=False),
-                           blacklist_growth_data=blacklist_growth_data,
-                           top_reasons_data=top_reasons)
-
 @app.route('/api/fullist')
 def api_full_blacklist():
     try:

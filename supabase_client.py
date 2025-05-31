@@ -275,46 +275,6 @@ class SupabaseClient:
             self.logger.exception("Error counting checks in last 24 hours", e)
             return 0
 
-    # NEW STATISTICS FUNCTIONS
-    def get_blacklist_entries_by_month(self, num_months: int = 12) -> List[Dict[str, Any]]:
-        try:
-            result = self._get_client(True).rpc('get_monthly_blacklist_counts', {'last_n_months': num_months}).execute()
-            if result.data:
-                # Ensure data is sorted by month ascending for charting
-                return sorted(result.data, key=lambda x: x['month'])
-            return []
-        except Exception as e:
-            self.logger.exception("Error getting blacklist entries by month", e)
-            return []
-
-    def get_top_n_reasons(self, n: int = 5) -> List[Dict[str, Any]]:
-        try:
-            result = self._get_client(True).rpc('get_top_reasons', {'limit_count': n}).execute()
-            return result.data if result.data else []
-        except Exception as e:
-            self.logger.exception("Error getting top N reasons", e)
-            return []
-
-    def get_unique_player_count_in_blacklist(self) -> int:
-        try:
-            result = self._get_client(True).rpc('count_unique_blacklist_uuids', {}).execute()
-            return result.data if result.data is not None else 0
-        except Exception as e:
-            self.logger.exception("Error getting unique player count in blacklist", e)
-            return 0
-            
-    def get_latest_n_blacklist_entries(self, n: int = 5) -> List[Dict[str, Any]]:
-        try:
-            result = self._get_client().table('blacklist_entry') \
-                .select('*') \
-                .order('created_at', desc=True) \
-                .limit(n) \
-                .execute()
-            return result.data if result.data else []
-        except Exception as e:
-            self.logger.exception("Error getting latest N blacklist entries", e)
-            return []
-
     # Whitelist Operations
     def get_all_whitelist_entries(self) -> List[Dict[str, Any]]:
         try:
