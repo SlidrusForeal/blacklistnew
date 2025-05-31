@@ -485,27 +485,33 @@ def admin_register():
 @role_required("owner", "admin", "moderator")
 def admin_panel():
     form = BlacklistForm()
+    result = None
     if form.validate_on_submit():
         nick = form.nickname.data.strip()
         reason = form.reason.data.strip()
-        uuid_val = get_uuid_from_nickname(nick) # Renamed to avoid conflict with uuid module
-        
+        uuid_val = get_uuid_from_nickname(nick)
         if not uuid_val:
-            flash("Не удалось получить UUID.", "warning")
-        elif db.get_blacklist_entry(nick): # Checks by nickname, which could lead to issues if nickname changed.
-            flash("Уже в черном списке.", "info")
+            result = {"error": "Не удалось получить UUID."}
+        elif db.get_blacklist_entry(nick):
+            result = {"error": "Уже в черном списке."}
         else:
-            # It might be better to check by UUID if it's the primary identifier
             existing_by_uuid = db.client.table('blacklist_entry').select('id').eq('uuid', uuid_val).execute()
             if existing_by_uuid.data:
-                flash(f"Пользователь с UUID {uuid_val} уже в черном списке.", "info")
+                result = {"error": f"Пользователь с UUID {uuid_val} уже в черном списке."}
             elif db.add_blacklist_entry(nick, uuid_val, reason):
                 log_admin_action("ADD_BLACKLIST", target_type="blacklist_entry", target_identifier=nick, details=f"UUID: {uuid_val}, Reason: {reason}")
-                flash("Запись добавлена в ЧС.", "success")
-                return redirect(url_for('admin_panel'))
+                result = {"message": "Запись добавлена в ЧС.", "success": True}
             else:
-                flash("Ошибка при добавлении записи.", "danger")
-    
+                result = {"error": "Ошибка при добавлении записи."}
+        # If AJAX/fetch/XHR, return JSON
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.accept_mimetypes['application/json'] > request.accept_mimetypes['text/html']:
+            return jsonify(result)
+        # Otherwise, use flash and redirect for normal POST
+        if result.get('error'):
+            flash(result['error'], 'danger')
+        else:
+            flash(result['message'], 'success')
+        return redirect(url_for('admin_panel'))
     entries = db.get_all_blacklist_entries()['items']
     return render_template("admin_panel.html", form=form, entries=entries)
 
