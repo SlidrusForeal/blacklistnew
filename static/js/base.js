@@ -217,27 +217,46 @@
           // CSRF token support
           const csrfToken = form.querySelector('input[name="csrf_token"]')?.value;
           const headers = {
-            'Accept': 'application/json'
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
           };
           if (csrfToken) {
             headers['X-CSRF-TOKEN'] = csrfToken;
           }
 
           const response = await fetch(form.action, {
-            method: form.method || 'POST',
+            method: form.method,
             body: formData,
-            headers
+            headers,
+            credentials: 'same-origin'
           });
 
-          if (!response.ok) throw new Error('Submission failed');
+          if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
-          const result = await response.json();
-          showToast(result.message || 'Success!', 'success');
-          form.reset();
-
+          const data = await response.json();
+          
+          if (data.redirect) {
+            window.location.href = data.redirect;
+          } else if (data.message) {
+            // Show success message
+            const messageContainer = document.querySelector('.message-container') || createMessageContainer();
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'success-message';
+            messageDiv.textContent = data.message;
+            messageContainer.appendChild(messageDiv);
+            
+            // Clear form if it's not a search form
+            if (!form.classList.contains('search-form')) {
+              form.reset();
+            }
+          }
         } catch (error) {
           console.error('Form submission error:', error);
-          showToast('An error occurred. Please try again.', 'error');
+          const messageContainer = document.querySelector('.message-container') || createMessageContainer();
+          const messageDiv = document.createElement('div');
+          messageDiv.className = 'error-message';
+          messageDiv.textContent = 'An error occurred. Please try again.';
+          messageContainer.appendChild(messageDiv);
         } finally {
           const submitButton = form.querySelector('[type="submit"]');
           if (submitButton) {
@@ -290,6 +309,30 @@
     }, 100)).observe(document.body, { 
       childList: true, 
       subtree: true 
+    });
+  }
+
+  // Helper function to create message container
+  function createMessageContainer() {
+    const container = document.createElement('div');
+    container.className = 'message-container';
+    const mainContent = document.querySelector('.main-content');
+    mainContent.insertBefore(container, mainContent.firstChild);
+    return container;
+  }
+
+  // Handle search input
+  const searchInput = document.querySelector('.search-input');
+  if (searchInput) {
+    let searchTimeout;
+    searchInput.addEventListener('input', function() {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        const searchForm = this.closest('form');
+        if (searchForm) {
+          searchForm.dispatchEvent(new Event('submit'));
+        }
+      }, 300);
     });
   }
 })(); 

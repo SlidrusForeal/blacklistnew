@@ -97,6 +97,7 @@
   <script src="{{ url_for('static', filename='js/sw-register.js') }}" defer></script>
   <script src="{{ url_for('static', filename='js/confetti.browser.min.js') }}" defer></script>
   <script src="{{ url_for('static', filename='js/base.js') }}" defer></script>
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   {% block head %}{% endblock %}
 </head>
 <body>
@@ -144,5 +145,23 @@
   </footer>
 
   {% block scripts %}{% endblock %}
+
+  <script>
+    // Add CSRF token to all forms
+    document.addEventListener('DOMContentLoaded', function() {
+      const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+      const forms = document.querySelectorAll('form');
+      
+      forms.forEach(form => {
+        if (!form.querySelector('input[name="csrf_token"]')) {
+          const csrfInput = document.createElement('input');
+          csrfInput.type = 'hidden';
+          csrfInput.name = 'csrf_token';
+          csrfInput.value = csrfToken;
+          form.appendChild(csrfInput);
+        }
+      });
+    });
+  </script>
 </body>
 </html>

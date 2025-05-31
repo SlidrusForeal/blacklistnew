@@ -16,12 +16,15 @@
   <h1>Полный список</h1>
 
   <div class="search-container">
-    <input type="text"
-           id="searchInput"
-           placeholder="Поиск по никнейму или причине..."
-           aria-label="Поиск по списку"
-           class="search-input"
-           autocomplete="off">
+    <form method="GET" action="{{ url_for('fullist') }}" class="search-form">
+      {{ form.csrf_token }}
+      <input type="text" 
+             name="search" 
+             class="search-input" 
+             placeholder="Поиск по никнейму или причине..."
+             value="{{ request.args.get('search', '') }}"
+             autocomplete="off">
+    </form>
   </div>
   
   {# Placeholder for filter controls - to be added if desired #}
@@ -45,7 +48,7 @@
   <div id="loadingIndicator" style="display: none; text-align: center; margin: 20px;">
       <p>Загрузка...</p>
   </div>
-  <div id="noMoreResultsIndicator" style="display: none; text-align: center; margin: 20px; color: grey;">
+  <div id="noMoreResultsIndicator" style="display: block; text-align: center; margin: 50px; color: grey;">
       <p>Больше нет записей.</p>
   </div>
 </div>
