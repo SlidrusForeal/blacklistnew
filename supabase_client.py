@@ -350,9 +350,9 @@ class SupabaseClient:
         except Exception as e:
             # Could be a duplicate UUID violation (UNIQUE constraint on uuid column)
             if 'duplicate key value violates unique constraint' in str(e).lower():
-                logger.warning(f"Attempted to add duplicate UUID to whitelist: {uuid_to_add}")
+                self.logger.warning(f"Attempted to add duplicate UUID to whitelist: {uuid_to_add}")
             else:
-                logger.error(f"Error adding UUID to whitelist: {e}")
+                self.logger.error(f"Error adding UUID to whitelist: {e}")
             return False
 
     def remove_from_whitelist(self, uuid_to_remove: str) -> bool:
@@ -360,7 +360,7 @@ class SupabaseClient:
             result = self._get_client(True).table('whitelist_players').delete().eq('uuid', uuid_to_remove).execute()
             return bool(result.data) 
         except Exception as e:
-            logger.error(f"Error removing UUID from whitelist: {e}")
+            self.logger.error(f"Error removing UUID from whitelist: {e}")
             return False
 
 # Create a global instance
