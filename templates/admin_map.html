@@ -10,10 +10,13 @@
   <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
   {# Import Supabase JS library - make sure this matches your setup #}
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="{{ url_for('static', filename='js/supabase-init.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/api-config.js') }}"></script>
   <script>
-    // Supabase client setup - REPLACE WITH YOUR ACTUAL VALUES
-    const SUPABASE_URL = '{{ SUPABASE_URL }}'; 
-    const SUPABASE_ANON_KEY = '{{ SUPABASE_KEY }}';
+    // Initialize Supabase using the API
+    initializeSupabaseFromApi().catch(error => {
+      console.error('Failed to initialize Supabase:', error);
+    });
   </script>
   <script src="{{ url_for('static', filename='js/pages/admin-map.js') }}" defer></script>
   <style>

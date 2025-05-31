@@ -37,6 +37,7 @@ from config import (
     GITHUB_SECRET, SUPABASE_URL, SUPABASE_KEY
 )
 from supabase_client import db
+from supabase_logger import SupabaseLogger
 
 # ─────────────── Конфигурация Flask ───────────────
 load_dotenv()
@@ -48,6 +49,9 @@ app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 app.config['JWT_ACCESS_COOKIE_PATH'] = '/'
 app.config['JWT_COOKIE_CSRF_PROTECT'] = False
 app.config['GITHUB_SECRET'] = GITHUB_SECRET
+
+# Initialize Supabase logger
+logger = SupabaseLogger(db.admin_client)
 
 # ─────────────── Настройка логирования ───────────────
 # Создаём папку для логов, если её нет
@@ -382,11 +386,7 @@ def index():
 
 @app.route("/fullist")
 def fullist():
-    return render_template(
-        "fullist.html",
-        SUPABASE_URL=SUPABASE_URL,      # Pass the imported SUPABASE_URL
-        SUPABASE_KEY=SUPABASE_KEY        # Pass the imported SUPABASE_KEY (anon key)
-    )
+    return render_template("fullist.html")
 
 
 @app.route("/ave")
@@ -781,11 +781,7 @@ def api_check():
 @app.route("/admin/map", methods=["GET"])
 @role_required("owner", "admin")
 def admin_map():
-    return render_template(
-        "admin_map.html",
-        SUPABASE_URL=SUPABASE_URL,      # Pass the imported SUPABASE_URL
-        SUPABASE_KEY=SUPABASE_KEY        # Pass the imported SUPABASE_KEY (anon key)
-    )
+    return render_template("admin_map.html")
 
 @app.route("/admin/audit_log", methods=["GET"])
 @role_required("owner")
@@ -1279,6 +1275,121 @@ def format_datetime_filter(value, format='%Y-%m-%d %H:%M:%S'):
     return dt_obj.strftime(format)
 
 app.jinja_env.filters['format_datetime'] = format_datetime_filter
+
+@app.route('/api/config')
+@role_required("owner", "admin", "moderator")
+def get_api_config():
+    """Return API configuration securely from environment variables"""
+    supabase_url = os.getenv('SUPABASE_URL')
+    supabase_key = os.getenv('SUPABASE_KEY')
+    
+    if not supabase_url or not supabase_key:
+        return jsonify({'error': 'Configuration not found'}), 500
+        
+    return jsonify({
+        'supabaseUrl': supabase_url,
+        'supabaseKey': supabase_key
+    })
+
+@app.template_filter('datetime')
+def format_datetime_filter(value, format='%Y-%m-%d %H:%M:%S'):
+    """Format a datetime object or an ISO string to a more readable string."""
+    if isinstance(value, str):
+        try:
+            # Attempt to parse ISO format, including those with 'Z' or timezone offset
+            if 'Z' in value:
+                value = value.replace('Z', '+00:00')
+            dt_obj = datetime.fromisoformat(value)
+        except ValueError:
+            return value # Return original string if parsing fails
+    elif isinstance(value, datetime):
+        dt_obj = value
+    else:
+        return value # Return as is if not a string or datetime
+    # If it has timezone info, convert to naive UTC
+    if dt_obj.tzinfo:
+        dt_obj = dt_obj.astimezone(timezone.utc).replace(tzinfo=None)
+    return dt_obj.strftime(format)
+
+@app.route("/admin/logs")
+@role_required("owner", "admin")
+def admin_logs():
+    """View system logs with filtering and pagination"""
+    try:
+        page = request.args.get('page', 1, type=int)
+        per_page = 50
+        level = request.args.get('level')
+        logger_name = request.args.get('logger')
+        search = request.args.get('search')
+
+        # Build query
+        query = db.admin_client.table('system_logs').select('*', count='exact')
+
+        # Apply filters
+        if level:
+            query = query.eq('level', level)
+        if logger_name:
+            query = query.eq('logger_name', logger_name)
+        if search:
+            query = query.or_(f'message.ilike.%{search}%,extra_data.ilike.%{search}%')
+
+        # Get unique logger names for filter dropdown
+        logger_names_result = db.admin_client.table('system_logs').select('logger_name').execute()
+        logger_names = sorted(set(log['logger_name'] for log in logger_names_result.data))
+
+        # Pagination
+        start = (page - 1) * per_page
+        query = query.order('timestamp', desc=True).range(start, start + per_page - 1)
+        
+        result = query.execute()
+        logs = result.data
+        total = result.count if hasattr(result, 'count') and result.count is not None else 0
+
+        # Create pagination object
+        class Pagination:
+            def __init__(self, page, per_page, total):
+                self.page = page
+                self.per_page = per_page
+                self.total = total
+                self.pages = (total + per_page - 1) // per_page
+                self.has_prev = page > 1
+                self.has_next = page < self.pages
+                self.prev_num = page - 1
+                self.next_num = page + 1
+
+            def iter_pages(self):
+                left_edge = 2
+                left_current = 2
+                right_current = 2
+                right_edge = 2
+
+                last = 0
+                for num in range(1, self.pages + 1):
+                    if (
+                        num <= left_edge
+                        or num > self.pages - right_edge
+                        or (
+                            num >= self.page - left_current
+                            and num <= self.page + right_current
+                        )
+                    ):
+                        if last + 1 != num:
+                            yield None
+                        yield num
+                        last = num
+
+        pagination = Pagination(page, per_page, total)
+
+        return render_template(
+            'admin_logs.html',
+            logs=logs,
+            pagination=pagination,
+            logger_names=logger_names
+        )
+    except Exception as e:
+        logger.exception("Error viewing system logs", e)
+        flash('Ошибка при загрузке логов', 'error')
+        return redirect(url_for('admin_panel'))
 
 if __name__ == '__main__':
     # Ensure all required directories exist

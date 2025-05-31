@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block head %}
+<style>
+    .log-entry {
+        margin-bottom: 1rem;
+        padding: 1rem;
+        border-radius: 4px;
+        background-color: #2a2a2a;
+    }
+    .log-entry:hover {
+        background-color: #333;
+    }
+    .log-level {
+        font-weight: bold;
+        padding: 0.2rem 0.5rem;
+        border-radius: 3px;
+        margin-right: 0.5rem;
+    }
+    .level-INFO { background-color: #28a745; }
+    .level-WARNING { background-color: #ffc107; color: #000; }
+    .level-ERROR { background-color: #dc3545; }
+    .level-CRITICAL { background-color: #721c24; }
+    .level-DEBUG { background-color: #17a2b8; }
+    .log-timestamp {
+        color: #888;
+        font-size: 0.9rem;
+    }
+    .log-source {
+        color: #666;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+    }
+    .log-message {
+        margin-top: 0.5rem;
+        white-space: pre-wrap;
+    }
+    .log-extra {
+        margin-top: 0.5rem;
+        font-family: monospace;
+        background-color: #1a1a1a;
+        padding: 0.5rem;
+        border-radius: 3px;
+        overflow-x: auto;
+    }
+    .log-exception {
+        margin-top: 0.5rem;
+        color: #dc3545;
+        font-family: monospace;
+        white-space: pre-wrap;
+    }
+    .filters {
+        margin-bottom: 2rem;
+        padding: 1rem;
+        background-color: #2a2a2a;
+        border-radius: 4px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Системные логи</h1>
+        <a href="{{ url_for('admin_panel') }}" class="btn btn-secondary">&larr; Назад в админ панель</a>
+    </div>
+
+    <div class="filters">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <label for="level" class="form-label">Уровень</label>
+                <select name="level" id="level" class="form-select">
+                    <option value="">Все</option>
+                    <option value="INFO" {% if request.args.get('level') == 'INFO' %}selected{% endif %}>INFO</option>
+                    <option value="WARNING" {% if request.args.get('level') == 'WARNING' %}selected{% endif %}>WARNING</option>
+                    <option value="ERROR" {% if request.args.get('level') == 'ERROR' %}selected{% endif %}>ERROR</option>
+                    <option value="CRITICAL" {% if request.args.get('level') == 'CRITICAL' %}selected{% endif %}>CRITICAL</option>
+                    <option value="DEBUG" {% if request.args.get('level') == 'DEBUG' %}selected{% endif %}>DEBUG</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="logger" class="form-label">Логгер</label>
+                <select name="logger" id="logger" class="form-select">
+                    <option value="">Все</option>
+                    {% for logger_name in logger_names %}
+                    <option value="{{ logger_name }}" {% if request.args.get('logger') == logger_name %}selected{% endif %}>
+                        {{ logger_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="search" class="form-label">Поиск</label>
+                <input type="text" name="search" id="search" class="form-control" 
+                       value="{{ request.args.get('search', '') }}" 
+                       placeholder="Поиск по сообщениям...">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">Применить</button>
+            </div>
+        </form>
+    </div>
+
+    {% for log in logs %}
+    <div class="log-entry">
+        <div>
+            <span class="log-level level-{{ log.level }}">{{ log.level }}</span>
+            <span class="log-timestamp">{{ log.timestamp | format_datetime }}</span>
+        </div>
+        <div class="log-source">
+            {{ log.logger_name }} | {{ log.module }}.{{ log.function }}:{{ log.line_number }}
+        </div>
+        <div class="log-message">{{ log.message }}</div>
+        {% if log.exception %}
+        <div class="log-exception">{{ log.exception }}</div>
+        {% endif %}
+        {% if log.extra_data %}
+        <div class="log-extra">{{ log.extra_data | tojson(indent=2) }}</div>
+        {% endif %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">Логи не найдены</div>
+    {% endfor %}
+
+    {% if pagination.pages > 1 %}
+    <nav aria-label="Log navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if pagination.has_prev %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('admin_logs', page=pagination.prev_num, **request.args) }}">
+                    &laquo; Предыдущая
+                </a>
+            </li>
+            {% endif %}
+            
+            {% for page in pagination.iter_pages() %}
+                {% if page %}
+                    <li class="page-item {% if page == pagination.page %}active{% endif %}">
+                        <a class="page-link" href="{{ url_for('admin_logs', page=page, **request.args) }}">
+                            {{ page }}
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if pagination.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('admin_logs', page=pagination.next_num, **request.args) }}">
+                    Следующая &raquo;
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %} 

@@ -2,32 +2,50 @@ from supabase import create_client, Client
 from datetime import datetime, timedelta, timezone
 from config import SUPABASE_URL, SUPABASE_KEY, SUPABASE_SERVICE_KEY
 from typing import Optional, List, Dict, Any
-import logging
-
-logger = logging.getLogger(__name__)
+from .supabase_logger import SupabaseLogger
 
 class SupabaseClient:
     def __init__(self):
-        self.client: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
-        self.admin_client: Client = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+        """Initialize Supabase client with both anonymous and service role clients"""
+        self.client = create_client(SUPABASE_URL, SUPABASE_KEY)
+        self.admin_client = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+        self.logger = SupabaseLogger(self.admin_client)
+
+    def _get_client(self, require_admin: bool = False) -> Client:
+        """Get the appropriate client based on the operation type"""
+        return self.admin_client if require_admin else self.client
 
     # Blacklist operations
     def get_blacklist_entry(self, nickname: str) -> Optional[Dict[str, Any]]:
         try:
-            result = self.client.table('blacklist_entry').select('*').ilike('nickname', nickname).execute()
+            result = self._get_client().table('blacklist_entry').select('*').ilike('nickname', nickname).execute()
             entries = result.data
+            if entries:
+                self.logger.info(f"Found blacklist entry for nickname: {nickname}", 
+                               extra={'nickname': nickname, 'entry_id': entries[0]['id']})
+            else:
+                self.logger.info(f"No blacklist entry found for nickname: {nickname}", 
+                               extra={'nickname': nickname})
             return entries[0] if entries else None
         except Exception as e:
-            logger.error(f"Error getting blacklist entry: {e}")
+            self.logger.exception(f"Error getting blacklist entry for {nickname}", e, 
+                                extra={'nickname': nickname})
             return None
 
     def get_blacklist_entry_by_id(self, entry_id: int) -> Optional[Dict[str, Any]]:
         try:
-            result = self.client.table('blacklist_entry').select('*').eq('id', entry_id).execute()
+            result = self._get_client().table('blacklist_entry').select('*').eq('id', entry_id).execute()
             entries = result.data
+            if entries:
+                self.logger.info(f"Found blacklist entry by ID: {entry_id}", 
+                               extra={'entry_id': entry_id})
+            else:
+                self.logger.info(f"No blacklist entry found for ID: {entry_id}", 
+                               extra={'entry_id': entry_id})
             return entries[0] if entries else None
         except Exception as e:
-            logger.error(f"Error getting blacklist entry by ID: {e}")
+            self.logger.exception(f"Error getting blacklist entry by ID {entry_id}", e, 
+                                extra={'entry_id': entry_id})
             return None
 
     def add_blacklist_entry(self, nickname: str, uuid: str, reason: str) -> bool:
@@ -38,39 +56,50 @@ class SupabaseClient:
                 'reason': reason,
                 'created_at': datetime.utcnow().isoformat()
             }
-            result = self.admin_client.table('blacklist_entry').insert(data).execute()
-            return bool(result.data)
+            result = self._get_client(True).table('blacklist_entry').insert(data).execute()
+            success = bool(result.data)
+            if success:
+                self.logger.info(f"Added blacklist entry for {nickname}", 
+                               extra={'nickname': nickname, 'uuid': uuid, 'reason': reason})
+            else:
+                self.logger.warning(f"Failed to add blacklist entry for {nickname}", 
+                                  extra={'nickname': nickname, 'uuid': uuid})
+            return success
         except Exception as e:
-            logger.error(f"Error adding blacklist entry: {e}")
+            self.logger.exception(f"Error adding blacklist entry for {nickname}", e, 
+                                extra={'nickname': nickname, 'uuid': uuid})
             return False
 
     def update_blacklist_entry(self, entry_id: int, data: Dict[str, Any]) -> bool:
         try:
-            result = self.admin_client.table('blacklist_entry').update(data).eq('id', entry_id).execute()
+            result = self._get_client(True).table('blacklist_entry').update(data).eq('id', entry_id).execute()
             return bool(result.data)
         except Exception as e:
-            logger.error(f"Error updating blacklist entry: {e}")
+            self.logger.exception(f"Error updating blacklist entry for ID {entry_id}", e, 
+                                extra={'entry_id': entry_id})
             return False
 
     def update_blacklist_entry_nickname(self, entry_id: int, new_nickname: str) -> bool:
         try:
-            result = self.admin_client.table('blacklist_entry').update({'nickname': new_nickname}).eq('id', entry_id).execute()
+            result = self._get_client(True).table('blacklist_entry').update({'nickname': new_nickname}).eq('id', entry_id).execute()
             return bool(result.data)
         except Exception as e:
-            logger.error(f"Error updating blacklist entry nickname for id {entry_id}: {e}")
+            self.logger.exception(f"Error updating blacklist entry nickname for ID {entry_id}", e, 
+                                extra={'entry_id': entry_id, 'new_nickname': new_nickname})
             return False
 
     def delete_blacklist_entry(self, entry_id: int) -> bool:
         try:
-            result = self.admin_client.table('blacklist_entry').delete().eq('id', entry_id).execute()
+            result = self._get_client(True).table('blacklist_entry').delete().eq('id', entry_id).execute()
             return bool(result.data)
         except Exception as e:
-            logger.error(f"Error deleting blacklist entry: {e}")
+            self.logger.exception(f"Error deleting blacklist entry for ID {entry_id}", e, 
+                                extra={'entry_id': entry_id})
             return False
 
     def get_all_blacklist_entries(self, page: int = 1, per_page: int = 20, search: str = None, sort_by: str = 'created_at', sort_order: str = 'desc', date_from: Optional[str] = None, date_to: Optional[str] = None) -> Dict[str, Any]:
         try:
-            query = self.client.table('blacklist_entry').select('*', count='exact')
+            query = self._get_client().table('blacklist_entry').select('*', count='exact')
             
             if search:
                 query = query.or_(f'nickname.ilike.%{search}%,reason.ilike.%{search}%')
@@ -84,7 +113,7 @@ class SupabaseClient:
                     end_date = datetime.fromisoformat(date_to.replace('Z', '+00:00')) + timedelta(days=1)
                     query = query.lte('created_at', end_date.isoformat())
                 except ValueError:
-                    logger.warning(f"Invalid date_to format: {date_to}. Skipping date_to filter.")
+                    self.logger.warning(f"Invalid date_to format: {date_to}. Skipping date_to filter.")
 
             # Sorting
             if sort_by and sort_order:
@@ -109,35 +138,37 @@ class SupabaseClient:
                 'has_more': (page * per_page) < total_items
             }
         except Exception as e:
-            logger.error(f"Error getting blacklist entries: {e}")
+            self.logger.exception("Error getting blacklist entries", e)
             return {'items': [], 'page': page, 'per_page': per_page, 'total_items': 0, 'has_more': False}
 
     def get_total_blacklist_entries_count(self) -> int:
         try:
             # Use admin_client for potentially sensitive counts or if RLS restricts full count for anon
-            result = self.admin_client.table('blacklist_entry').select('id', count='exact').execute()
+            result = self._get_client(True).table('blacklist_entry').select('id', count='exact').execute()
             return result.count if hasattr(result, 'count') and result.count is not None else 0
         except Exception as e:
-            logger.error(f"Error getting total blacklist entries count: {e}")
+            self.logger.exception("Error getting total blacklist entries count", e)
             return 0
 
     # Admin user operations
     def get_admin_user(self, username: str) -> Optional[Dict[str, Any]]:
         try:
-            result = self.admin_client.table('admin_user').select('*').eq('username', username).execute()
+            result = self._get_client(True).table('admin_user').select('*').eq('username', username).execute()
             users = result.data
             return users[0] if users else None
         except Exception as e:
-            logger.error(f"Error getting admin user: {e}")
+            self.logger.exception(f"Error getting admin user for username {username}", e, 
+                                extra={'username': username})
             return None
 
     def get_admin_user_by_id(self, user_id: int) -> Optional[Dict[str, Any]]:
         try:
-            result = self.admin_client.table('admin_user').select('*').eq('id', user_id).execute()
+            result = self._get_client(True).table('admin_user').select('*').eq('id', user_id).execute()
             users = result.data
             return users[0] if users else None
         except Exception as e:
-            logger.error(f"Error getting admin user by ID: {e}")
+            self.logger.exception(f"Error getting admin user by ID {user_id}", e, 
+                                extra={'user_id': user_id})
             return None
 
     def create_admin_user(self, username: str, password_hash: str, role: str) -> bool:
@@ -147,26 +178,28 @@ class SupabaseClient:
                 'password_hash': password_hash,
                 'role': role
             }
-            result = self.admin_client.table('admin_user').insert(data).execute()
+            result = self._get_client(True).table('admin_user').insert(data).execute()
             return bool(result.data)
         except Exception as e:
-            logger.error(f"Error creating admin user: {e}")
+            self.logger.exception(f"Error creating admin user for username {username}", e, 
+                                extra={'username': username})
             return False
 
     def get_all_admin_users(self) -> List[Dict[str, Any]]:
         try:
-            result = self.admin_client.table('admin_user').select('*').order('username').execute()
+            result = self._get_client(True).table('admin_user').select('*').order('username').execute()
             return result.data
         except Exception as e:
-            logger.error(f"Error getting admin users: {e}")
+            self.logger.exception("Error getting all admin users", e)
             return []
 
     def delete_admin_user(self, user_id: int) -> bool:
         try:
-            result = self.admin_client.table('admin_user').delete().eq('id', user_id).execute()
+            result = self._get_client(True).table('admin_user').delete().eq('id', user_id).execute()
             return bool(result.data)
         except Exception as e:
-            logger.error(f"Error deleting admin user: {e}")
+            self.logger.exception(f"Error deleting admin user for ID {user_id}", e, 
+                                extra={'user_id': user_id})
             return False
 
     # Audit Log Operations
@@ -180,15 +213,15 @@ class SupabaseClient:
                 'target_identifier': target_identifier,
                 'details': details
             }
-            result = self.admin_client.table('audit_log').insert(data).execute()
+            result = self._get_client(True).table('audit_log').insert(data).execute()
             return bool(result.data)
         except Exception as e:
-            logger.error(f"Error adding audit log: {e}")
+            self.logger.exception("Error adding audit log", e)
             return False
 
     def get_audit_logs(self, page: int = 1, per_page: int = 50) -> Dict[str, Any]:
         try:
-            query = self.admin_client.table('audit_log').select('*', count='exact')
+            query = self._get_client(True).table('audit_log').select('*', count='exact')
             
             start = (page - 1) * per_page
             query = query.range(start, start + per_page - 1).order('timestamp', desc=True)
@@ -205,7 +238,7 @@ class SupabaseClient:
                 'has_more': (page * per_page) < total_items
             }
         except Exception as e:
-            logger.error(f"Error getting audit logs: {e}")
+            self.logger.exception("Error getting audit logs", e)
             return {'items': [], 'page': page, 'per_page': per_page, 'total_items': 0, 'has_more': False}
 
     # Check Log Operations
@@ -215,104 +248,104 @@ class SupabaseClient:
                 'timestamp': datetime.utcnow().isoformat(),
                 'check_source': check_source 
             }
-            result = self.admin_client.table('check_log').insert(data).execute()
+            result = self._get_client(True).table('check_log').insert(data).execute()
             return bool(result.data)
         except Exception as e:
-            logger.error(f"Error adding check log: {e}")
+            self.logger.exception("Error adding check log", e)
             return False
 
     def count_total_checks(self) -> int:
         try:
-            result = self.admin_client.table('check_log').select('id', count='exact').execute()
+            result = self._get_client(True).table('check_log').select('id', count='exact').execute()
             return result.count if hasattr(result, 'count') and result.count is not None else 0
         except Exception as e:
-            logger.error(f"Error counting total checks: {e}")
+            self.logger.exception("Error counting total checks", e)
             return 0
 
     def count_checks_last_24_hours(self) -> int:
         try:
             # Ensure created_at column is timestamptz for proper timezone handling with now()
             time_24_hours_ago = (datetime.now(timezone.utc) - timedelta(days=1)).isoformat()
-            result = self.admin_client.table('check_log') \
+            result = self._get_client(True).table('check_log') \
                          .select('id', count='exact') \
                          .gte('timestamp', time_24_hours_ago) \
                          .execute()
             return result.count if hasattr(result, 'count') and result.count is not None else 0
         except Exception as e:
-            logger.error(f"Error counting checks in last 24 hours: {e}")
+            self.logger.exception("Error counting checks in last 24 hours", e)
             return 0
 
     # NEW STATISTICS FUNCTIONS
     def get_blacklist_entries_by_month(self, num_months: int = 12) -> List[Dict[str, Any]]:
         try:
-            result = self.admin_client.rpc('get_monthly_blacklist_counts', {'last_n_months': num_months}).execute()
+            result = self._get_client(True).rpc('get_monthly_blacklist_counts', {'last_n_months': num_months}).execute()
             if result.data:
                 # Ensure data is sorted by month ascending for charting
                 return sorted(result.data, key=lambda x: x['month'])
             return []
         except Exception as e:
-            logger.error(f"Error getting blacklist entries by month: {e}")
+            self.logger.exception("Error getting blacklist entries by month", e)
             return []
 
     def get_top_n_reasons(self, n: int = 5) -> List[Dict[str, Any]]:
         try:
-            result = self.admin_client.rpc('get_top_reasons', {'limit_count': n}).execute()
+            result = self._get_client(True).rpc('get_top_reasons', {'limit_count': n}).execute()
             return result.data if result.data else []
         except Exception as e:
-            logger.error(f"Error getting top N reasons: {e}")
+            self.logger.exception("Error getting top N reasons", e)
             return []
 
     def get_unique_player_count_in_blacklist(self) -> int:
         try:
-            result = self.admin_client.rpc('count_unique_blacklist_uuids', {}).execute()
+            result = self._get_client(True).rpc('count_unique_blacklist_uuids', {}).execute()
             return result.data if result.data is not None else 0
         except Exception as e:
-            logger.error(f"Error getting unique player count in blacklist: {e}")
+            self.logger.exception("Error getting unique player count in blacklist", e)
             return 0
             
     def get_latest_n_blacklist_entries(self, n: int = 5) -> List[Dict[str, Any]]:
         try:
-            result = self.client.table('blacklist_entry') \
+            result = self._get_client().table('blacklist_entry') \
                 .select('*') \
                 .order('created_at', desc=True) \
                 .limit(n) \
                 .execute()
             return result.data if result.data else []
         except Exception as e:
-            logger.error(f"Error getting latest N blacklist entries: {e}")
+            self.logger.exception("Error getting latest N blacklist entries", e)
             return []
 
     # Whitelist Operations
     def get_all_whitelist_entries(self) -> List[Dict[str, Any]]:
         try:
-            result = self.client.table('whitelist_players').select('id, uuid, added_by, created_at').order('created_at', desc=True).execute()
+            result = self._get_client().table('whitelist_players').select('id, uuid, added_by, created_at').order('created_at', desc=True).execute()
             return result.data if result.data else []
         except Exception as e:
-            logger.error(f"Error getting all whitelist entries: {e}")
+            self.logger.exception("Error getting all whitelist entries", e)
             return []
 
     def get_all_whitelisted_uuids(self) -> List[str]:
         try:
             # Optimized to fetch only UUIDs if that's all that's needed by the mod
-            result = self.client.table('whitelist_players').select('uuid').execute()
+            result = self._get_client().table('whitelist_players').select('uuid').execute()
             return [item['uuid'] for item in result.data] if result.data else []
         except Exception as e:
-            logger.error(f"Error getting all whitelisted UUIDs: {e}")
+            self.logger.exception("Error getting all whitelisted UUIDs", e)
             return []
 
     def is_whitelisted(self, uuid_to_check: str) -> bool:
         try:
-            result = self.client.table('whitelist_players').select('uuid').eq('uuid', uuid_to_check).limit(1).execute()
+            result = self._get_client().table('whitelist_players').select('uuid').eq('uuid', uuid_to_check).limit(1).execute()
             return bool(result.data)
         except Exception as e:
-            logger.error(f"Error checking if UUID is whitelisted: {e}")
+            self.logger.exception(f"Error checking if UUID is whitelisted for {uuid_to_check}", e)
             return False
 
     def add_to_whitelist(self, uuid_to_add: str, added_by: Optional[str] = None) -> bool:
         try:
             data = {'uuid': uuid_to_add, 'added_by': added_by}
             # Use admin_client for whitelist modifications
-            result = self.admin_client.table('whitelist_players').insert(data).execute()
+            result = self._get_client(True).table('whitelist_players').insert(data).execute()
             return bool(result.data)
         except Exception as e:
             # Could be a duplicate UUID violation (UNIQUE constraint on uuid column)
@@ -324,7 +357,7 @@ class SupabaseClient:
 
     def remove_from_whitelist(self, uuid_to_remove: str) -> bool:
         try:
-            result = self.admin_client.table('whitelist_players').delete().eq('uuid', uuid_to_remove).execute()
+            result = self._get_client(True).table('whitelist_players').delete().eq('uuid', uuid_to_remove).execute()
             return bool(result.data) 
         except Exception as e:
             logger.error(f"Error removing UUID from whitelist: {e}")
