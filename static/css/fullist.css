@@ -43,6 +43,19 @@
   padding: 1rem;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   animation: fadeIn 0.3s ease-in-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.blacklist-entry::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent 0%, rgba(255, 0, 0, 0.1) 100%);
+  pointer-events: none;
 }
 
 .blacklist-entry:hover {
@@ -120,6 +133,30 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Confetti animation */
+@keyframes confetti {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+}
+
+.confetti {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  background-color: #ff0000;
+  animation: confetti 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.blacklist-entry .entry-header h3 {
+  color: #ff0000;
+  font-weight: bold;
+}
+
+.blacklist-entry .reason {
+  color: #ff0000;
 }
 
 /* Responsive Design */
