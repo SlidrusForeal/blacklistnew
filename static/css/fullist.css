@@ -37,14 +37,16 @@
 }
 
 .blacklist-entry {
-  background-color: var(--background-color);
+  background: var(--card-bg);
   border: 2px solid var(--border-color);
   border-radius: 8px;
   padding: 1.5rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  animation: fadeIn 0.3s ease-in-out;
+  margin-bottom: 1.5rem;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
+  transition: all 0.3s ease;
+  word-wrap: break-word;
+  max-width: 100%;
 }
 
 .blacklist-entry::before {
@@ -59,13 +61,16 @@
 
 .blacklist-entry:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .entry-header {
   display: flex;
-  align-items: center;
+  justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .avatar {
@@ -77,10 +82,11 @@
 }
 
 .entry-header h3 {
+  color: var(--text-color);
+  font-size: 1.25rem;
+  font-weight: 600;
   margin: 0;
-  color: #ff4444;
-  font-size: 1.2rem;
-  font-weight: bold;
+  word-break: break-word;
 }
 
 .entry-details {
@@ -88,13 +94,15 @@
 }
 
 .reason {
-  margin: 0.75rem 0;
+  margin: 1rem 0;
   font-size: 1rem;
-  line-height: 1.5;
+  line-height: 1.6;
   color: var(--text-color);
-  padding: 0.5rem;
-  background-color: rgba(255, 68, 68, 0.1);
-  border-radius: 4px;
+  background: var(--bg-color);
+  padding: 1rem;
+  border-radius: 6px;
+  word-break: break-word;
+  white-space: pre-wrap;
 }
 
 .date {
@@ -142,16 +150,17 @@
 
 /* Error message styling */
 .error-message {
-  background-color: #ffebee;
-  color: #d32f2f;
+  background-color: rgba(220, 53, 69, 0.1);
+  border: 1px solid rgba(220, 53, 69, 0.2);
+  color: #dc3545;
   padding: 1rem;
-  border-radius: 8px;
-  border-left: 4px solid #d32f2f;
   margin: 1rem 0;
-  font-weight: 500;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  position: relative;
+  z-index: 1;
 }
 
 .error-message::before {
@@ -161,21 +170,28 @@
 
 /* Success message styling */
 .success-message {
-  background-color: #e8f5e9;
-  color: #2e7d32;
+  background-color: rgba(40, 167, 69, 0.1);
+  border: 1px solid rgba(40, 167, 69, 0.2);
+  color: #28a745;
   padding: 1rem;
-  border-radius: 8px;
-  border-left: 4px solid #2e7d32;
   margin: 1rem 0;
-  font-weight: 500;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  position: relative;
+  z-index: 1;
 }
 
 .success-message::before {
   content: '✓';
   font-size: 1.2rem;
+}
+
+/* Ensure messages don't overlap with buttons */
+.message-container {
+  margin-bottom: 2rem;
+  position: relative;
 }
 
 /* Responsive Design */
@@ -189,7 +205,21 @@
   }
 
   .blacklist-entry {
-    margin-bottom: 1rem;
+    padding: 1rem;
+  }
+
+  .entry-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .entry-header h3 {
+    font-size: 1.1rem;
+  }
+
+  .reason {
+    font-size: 0.95rem;
+    padding: 0.75rem;
   }
 
   .search-input {

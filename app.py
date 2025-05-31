@@ -54,9 +54,6 @@ app.config['GITHUB_SECRET'] = GITHUB_SECRET
 logger = SupabaseLogger(db.admin_client)
 
 # ─────────────── Настройка логирования ───────────────
-# Создаём папку для логов, если её нет
-# if not os.path.exists('logs'):
-#     os.mkdir('logs')
 
 LOG_CONFIG = {
     'version': 1,
@@ -75,26 +72,9 @@ LOG_CONFIG = {
             'formatter': 'default',
             'level': 'INFO'
         },
-        # 'info_file': {
-        #     'class': 'logging.handlers.TimedRotatingFileHandler',
-        #     'filename': 'logs/info.log',
-        #     'when': 'midnight',
-        #     'backupCount': 7,
-        #     'formatter': 'default',
-        #     'level': 'INFO'
-        # },
-        # 'error_file': {
-        #     'class': 'logging.handlers.TimedRotatingFileHandler',
-        #     'filename': 'logs/error.log',
-        #     'when': 'midnight',
-        #     'backupCount': 30,
-        #     'formatter': 'default',
-        #     'level': 'ERROR'
-        # }
     },
     'loggers': {
         '': {
-            # 'handlers': ['console', 'info_file', 'error_file'],
             'handlers': ['console'],
             'level': 'INFO',
             'propagate': True
@@ -320,24 +300,6 @@ def role_required(*allowed_roles):
             return fn(*args, **kwargs)
         return wrapper
     return decorator
-
-# Функции для работы с whitelist (файл uuid_list.json)
-# def load_whitelist():
-#     try:
-#         with open("uuid_list.json", "r", encoding="utf-8") as f:
-#             return json.load(f)
-#     except Exception as e:
-#         app.logger.error(f"Ошибка загрузки whitelist: {str(e)}")
-#         return []
-
-
-# def save_whitelist(data):
-#     try:
-#         with open("uuid_list.json", "w", encoding="utf-8") as f:
-#             json.dump(data, f, indent=2)
-#     except Exception as e:
-#         app.logger.error(f"Ошибка сохранения whitelist: {str(e)}")
-
 
 # --- Helper for Audit Logging ---
 def log_admin_action(action_type: str, target_type: Optional[str] = None, target_identifier: Optional[str] = None, details: Optional[str] = None):
@@ -634,12 +596,8 @@ def admin_whitelist():
                 flash(f"UUID {uuid_to_delete_direct} не найден для удаления.", "warning")
             return redirect(url_for('admin_whitelist'))
 
-    # Fetch all whitelist entries for display
-    whitelist_entries = db.get_all_whitelist_entries() # This now returns a list of dicts
+    whitelist_entries = db.get_all_whitelist_entries()
     
-    # The template admin_whitelist.html will need to be updated to iterate over whitelist_entries
-    # and display appropriate fields (e.g., entry.uuid, entry.added_by, entry.created_at).
-    # It will also need to change how the delete button POSTs, using 'uuid_to_delete_direct' and 'action_direct=delete'.
     return render_template("admin_whitelist.html", form=form, whitelist_entries=whitelist_entries)
 
 # New API endpoint for the mod
@@ -1044,11 +1002,6 @@ def api_player_details(player_uuid):
         # Continue without avatar if it fails, nickname is more critical here
 
     if not nickname and not avatar_base64:
-        # Only return 404 if both are missing and it seems like a totally invalid/unknown UUID
-        # If Mojang API fails for nickname but avatar was found (or vice-versa), we might still return 200 with partial data.
-        # However, get_name_from_uuid returns None on API error or 404.
-        # Minotar returns 404 if UUID is unknown.
-        # So if both are None/failed, it's likely the UUID is bad or Mojang/Minotar are down.
         return jsonify(error="Player details not found or UUID invalid"), 404
 
     return jsonify({
@@ -1122,21 +1075,8 @@ def api_locations_report():
         if client_timestamp:
             record['client_timestamp'] = client_timestamp.isoformat()
         else:
-            # If no client_timestamp, Supabase will use default for created_at
-            # and client_timestamp column will be NULL if not set otherwise in DB schema
             pass 
             
-        # Use the Supabase client (db) to insert
-        # Assuming your Supabase client instance is `db` and has an insert method like:
-        # db.client.table('player_locations').insert(record).execute()
-        # The actual method depends on your `supabase_client.py` implementation.
-        # For now, I will assume a generic insert method on your `db` object.
-        # You might need to adjust this part based on your `SupabaseClient` class methods.
-        
-        # Let's assume db.add_player_location(record) or similar exists in supabase_client.py
-        # If not, we would do: db.client.table('player_locations').insert(record).execute()
-        # This requires knowing the structure of your `db` object from `supabase_client.py`
-        # For now, proceeding with the direct table insert approach:
         response = db.client.table('player_locations').insert(record).execute()
 
         if response.data:
@@ -1149,39 +1089,6 @@ def api_locations_report():
     except Exception as e:
         app.logger.error(f"Error in /api/locations/report: {e}", exc_info=True)
         return jsonify({"error": "An unexpected error occurred."}), 500
-
-@csrf.exempt
-@app.route('/github-webhook', methods=['GET', 'POST'])
-def hook():
-    # GitHub Ping
-    if request.method == 'GET':
-        return 'pong', 200
-
-    # Проверяем подпись POST
-    secret = app.config['GITHUB_SECRET'].encode('utf-8')
-    data = request.get_data()
-    sig256 = request.headers.get('X-Hub-Signature-256', '')
-    sig1   = request.headers.get('X-Hub-Signature', '')
-
-    valid = False
-    if sig256.startswith('sha256='):
-        expected = 'sha256=' + hmac.new(secret, data, hashlib.sha256).hexdigest()
-        valid = hmac.compare_digest(expected, sig256)
-    elif sig1.startswith('sha1='):
-        expected = 'sha1=' + hmac.new(secret, data, hashlib.sha1).hexdigest()
-        valid = hmac.compare_digest(expected, sig1)
-
-    if not valid:
-        abort(403)
-
-    # Всё ок — запускаем скрипт из корня проекта
-    script_path = os.path.join(os.path.dirname(__file__), 'github‑webhook.sh')
-    subprocess.Popen(
-        [script_path],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL
-    )
-    return '', 204
     
 @app.after_request
 def set_security_headers(response):
@@ -1362,9 +1269,4 @@ def admin_logs():
         return redirect(url_for('admin_panel'))
 
 if __name__ == '__main__':
-    # Ensure all required directories exist
-    # for directory in ['logs', 'tmp']:
-    #     if not os.path.exists(directory):
-    #         os.makedirs(directory)
-            
     app.run(debug=False)
