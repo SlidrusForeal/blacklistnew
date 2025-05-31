@@ -381,6 +381,9 @@ def index():
         else:
             result = {"message": f"{name}, вы не в ЧС!", "color": "green"}
         db.add_check_log(check_source='main_page_check') # Log the check
+        # If AJAX/fetch/XHR, return JSON
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.accept_mimetypes['application/json'] > request.accept_mimetypes['text/html']:
+            return jsonify(result)
     return render_template("index.html", form=form, result=result)
 
 
