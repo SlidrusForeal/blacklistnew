@@ -1221,10 +1221,11 @@ def set_security_headers(response):
     csp = (
         "default-src 'self'; "
         "frame-src 'self' https://*; "
-        "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.mojang.com https://api.namemc.com https://minotar.net https://api.minecraftservices.com; "
+        "connect-src 'self' https://*.supabase.co wss://*.supabase.co "
+        "https://api.mojang.com https://api.namemc.com https://minotar.net https://api.minecraftservices.com; "
         "img-src 'self' data: https://minotar.net https://avatars.githubusercontent.com; "
         "media-src 'self' data: blob: https://minotar.net; "
-        "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net 'unsafe-eval'; "
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; "
         "worker-src 'self' blob:; "
         "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; "
         "font-src 'self' data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; "
@@ -1232,7 +1233,9 @@ def set_security_headers(response):
         "base-uri 'self'; "
         "frame-ancestors 'none'; "
         "upgrade-insecure-requests;"
+        "report-uri /csp-violation-report;"
     )
+
     response.headers['Content-Security-Policy'] = csp
     response.headers['X-Frame-Options'] = 'SAMEORIGIN'
     response.headers['X-Content-Type-Options'] = 'nosniff'
@@ -1242,18 +1245,15 @@ def set_security_headers(response):
     response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
     response.headers['Cross-Origin-Embedder-Policy'] = 'require-corp'
     response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains; preload'
-    
-    # Cache control headers
+
+    # Кэширование по типу запроса
     if request.path.startswith('/static/'):
-        # Cache static files for 1 year
-        response.headers['Cache-Control'] = 'public, max-age=31536000'
+        response.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
     elif request.path.startswith('/api/'):
-        # No cache for API responses
         response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
     else:
-        # Cache other pages for 1 hour
         response.headers['Cache-Control'] = 'public, max-age=3600'
-    
+
     return response
 
 # Add Jinja filter for formatting datetimes in templates
