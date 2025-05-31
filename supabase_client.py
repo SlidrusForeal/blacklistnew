@@ -2,7 +2,7 @@ from supabase import create_client, Client
 from datetime import datetime, timedelta, timezone
 from config import SUPABASE_URL, SUPABASE_KEY, SUPABASE_SERVICE_KEY
 from typing import Optional, List, Dict, Any
-from .supabase_logger import SupabaseLogger
+from supabase_logger import SupabaseLogger
 
 class SupabaseClient:
     def __init__(self):

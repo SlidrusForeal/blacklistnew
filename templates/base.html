@@ -7,15 +7,17 @@
   {% set page_title = page_title|default("ЧС Сосмарка") %}
   {% set page_description = page_description|default("Проверьте наличие вашего никнейма в черном списке Сосмаркской Империи. Мгновенная проверка и актуальные данные.") %}
   <title>{{ page_title }}</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  
   <!-- Cache Control -->
   <meta http-equiv="Cache-Control" content="max-age=31536000, public">
   
   <!-- SEO Meta Tags -->
   <meta name="description" content="{{ page_description }}">
-  <meta name="keywords" content="ЧС, черный список, Сосмарк, blacklist, проверка никнейма">
-  <meta name="robots" content="index, follow">
+  <meta name="keywords" content="ЧС, черный список, Сосмарк, blacklist, проверка никнейма, minecraft blacklist">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
   <meta name="author" content="Сосмарк">
+  <link rel="canonical" href="{{ request.url }}" />
 
   <!-- Open Graph -->
   <meta property="og:site_name" content="ЧС Сосмарка">
@@ -42,17 +44,34 @@
   <link rel="icon" href="{{ url_for('static', filename='icons/favicon.ico') }}" type="image/x-icon">
   <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <!-- Resource Hints -->
+  <link rel="preconnect" href="https://minotar.net" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="dns-prefetch" href="https://minotar.net">
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+  
+  <!-- Critical CSS -->
+  <style>
+    /* Inline critical CSS here */
+    body { margin: 0; font-family: system-ui, -apple-system, sans-serif; }
+    .error-message { padding: 1rem; background: #ff5252; color: white; text-align: center; }
+    .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+  </style>
+  
+  <!-- Deferred CSS -->
+  <link rel="preload" href="{{ url_for('static', filename='css/theme.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="{{ url_for('static', filename='css/style.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  </noscript>
 
-  <!-- Preconnect & Preload -->
-  <link rel="preconnect" href="https://minotar.net">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <!-- Preload Key Assets -->
   <link rel="preload" href="{{ url_for('static', filename='fonts/Poppins.woff2') }}" as="font" type="font/woff2" crossorigin>
   
   <!-- Core Libraries -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
   
   <!-- Structured Data -->
   <script type="application/ld+json">
@@ -62,9 +81,13 @@
       "name": "ЧС Сосмарка",
       "url": "{{ request.url_root }}",
       "description": "{{ page_description }}",
+      "inLanguage": "ru-RU",
       "potentialAction": {
         "@type": "SearchAction",
-        "target": "{{ request.url_root }}?nickname={nickname}",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "{{ request.url_root }}?nickname={nickname}"
+        },
         "query-input": "required name=nickname"
       }
     }
@@ -72,7 +95,7 @@
 
   <!-- Service Worker -->
   <script src="{{ url_for('static', filename='js/sw-register.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='js/confetti.browser.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/confetti.browser.min.js') }}" defer></script>
   <script src="{{ url_for('static', filename='js/base.js') }}" defer></script>
   {% block head %}{% endblock %}
 </head>
@@ -81,24 +104,27 @@
     <div class="error-message">Для работы приложения требуется JavaScript</div>
   </noscript>
 
-  <!-- Toast Container -->
-  <div class="toast-container" id="toastContainer"></div>
+  <!-- Skip to main content -->
+  <a href="#main-content" class="skip-link">Перейти к основному содержанию</a>
 
-  <header>
-    <nav>
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer" role="alert" aria-live="polite"></div>
+
+  <header role="banner">
+    <nav role="navigation" aria-label="Основная навигация">
       <ul>
-        <li><a href="{{ url_for('index') }}">Главная</a></li>
-        <li><a href="{{ url_for('fullist') }}">Полный список</a></li>
-        <li><a href="{{ url_for('contacts') }}">Контакты</a></li>
-        <li><a href="{{ url_for('statistics_page') }}">Статистика</a></li>
+        <li><a href="{{ url_for('index') }}" {% if request.endpoint == 'index' %}aria-current="page"{% endif %}>Главная</a></li>
+        <li><a href="{{ url_for('fullist') }}" {% if request.endpoint == 'fullist' %}aria-current="page"{% endif %}>Полный список</a></li>
+        <li><a href="{{ url_for('contacts') }}" {% if request.endpoint == 'contacts' %}aria-current="page"{% endif %}>Контакты</a></li>
+        <li><a href="{{ url_for('statistics_page') }}" {% if request.endpoint == 'statistics_page' %}aria-current="page"{% endif %}>Статистика</a></li>
       </ul>
     </nav>
   </header>
 
-  <main class="container">
+  <main id="main-content" class="container" role="main">
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
-        <div class="notification">
+        <div class="notification" role="alert">
           {% for category, message in messages %}
             <p class="{{ category }}">{{ message }}</p>
           {% endfor %}
@@ -109,12 +135,9 @@
     {% block content %}{% endblock %}
   </main>
 
-  <footer class="footer mt-auto py-3 bg-light">
+  <footer class="footer mt-auto py-3 bg-light" role="contentinfo">
     <div class="container text-center">
-      <span class="text-muted">© {{ current_year() }} Blacklist Sosmark. Все права защищены. 
-        {# <a href="{{ url_for('contacts') }}">Контакты</a> |  #}
-        {# <a href="{{ url_for('statistics_page') }}">Статистика</a> #}
-      </span>
+      <span class="text-muted">© {{ current_year() }} Blacklist Sosmark. Все права защищены.</span>
     </div>
   </footer>
 
