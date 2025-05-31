@@ -51,6 +51,10 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="{{ url_for('static', filename='js/supabase-init.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/api-config.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/infinite-scroll.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/filter-list.js') }}" defer></script>
 <script>
   // Initialize Supabase using the API
   initializeSupabaseFromApi().catch(error => {
