@@ -1223,9 +1223,12 @@ def set_security_headers(response):
         "frame-src 'self' https://*; "
         "connect-src 'self' https://*.supabase.co wss://*.supabase.co "
         "https://api.mojang.com https://api.namemc.com https://minotar.net https://api.minecraftservices.com; "
-        "img-src 'self' data: https://minotar.net https://avatars.githubusercontent.com; "
+        "img-src 'self' data: https://minotar.net https://avatars.githubusercontent.com https://static.cloudflareinsights.com; "
         "media-src 'self' data: blob: https://minotar.net; "
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; "
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' "
+        "https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://static.cloudflareinsights.com; "
+        "script-src-elem 'self' 'unsafe-inline' 'unsafe-eval' "
+        "https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://static.cloudflareinsights.com; "
         "worker-src 'self' blob:; "
         "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; "
         "font-src 'self' data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; "
@@ -1233,7 +1236,6 @@ def set_security_headers(response):
         "base-uri 'self'; "
         "frame-ancestors 'none'; "
         "upgrade-insecure-requests;"
-        "report-uri /csp-violation-report;"
     )
 
     response.headers['Content-Security-Policy'] = csp
