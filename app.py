@@ -1234,7 +1234,7 @@ def set_security_headers(response):
         "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.mojang.com https://api.namemc.com https://minotar.net https://api.minecraftservices.com; "
         "img-src 'self' data: https://minotar.net https://avatars.githubusercontent.com; "
         "media-src 'self' data: blob: https://minotar.net; "
-        "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net 'unsafe-eval'; "
+        "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://static.cloudflareinsights.com 'unsafe-eval'; "
         "worker-src 'self' blob:; "
         "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; "
         "font-src 'self' data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; "
@@ -1271,6 +1271,7 @@ def set_security_headers(response):
         response.headers['CF-Cache-Status'] = 'DYNAMIC'
     
     return response
+
 
 # Add Jinja filter for formatting datetimes in templates
 def format_datetime_filter(value, format='%Y-%m-%d %H:%M:%S'):
