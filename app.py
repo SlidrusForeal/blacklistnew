@@ -1231,7 +1231,7 @@ def set_security_headers(response):
     csp = (
         "default-src 'self'; "
         "frame-src 'self' https://*; "
-        "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.mojang.com https://api.namemc.com https://minotar.net https://api.minecraftservices.com; "
+        "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.mojang.com https://api.namemc.com https://minotar.net https://api.minecraftservices.com https://cloudflareinsights.com/;"
         "img-src 'self' data: https://minotar.net https://avatars.githubusercontent.com; "
         "media-src 'self' data: blob: https://minotar.net; "
         "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://static.cloudflareinsights.com 'unsafe-eval'; "
