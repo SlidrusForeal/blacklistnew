@@ -1226,12 +1226,22 @@ def hook():
     )
     return '', 204
     
+from flask import request
+
 @app.after_request
 def set_security_headers(response):
+    # --- CORS CONFIGURATION ---
+    if request.path.startswith('/api/'):
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+        response.headers['Access-Control-Allow-Credentials'] = 'true'
+    
+    # --- CSP ---
     csp = (
         "default-src 'self'; "
         "frame-src 'self' https://*; "
-        "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.mojang.com https://api.namemc.com https://minotar.net https://api.minecraftservices.com https://cloudflareinsights.com/;"
+        "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.mojang.com https://api.namemc.com https://minotar.net https://api.minecraftservices.com https://cloudflareinsights.com; "
         "img-src 'self' data: https://minotar.net https://avatars.githubusercontent.com; "
         "media-src 'self' data: blob: https://minotar.net; "
         "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://static.cloudflareinsights.com 'unsafe-eval'; "
@@ -1251,25 +1261,22 @@ def set_security_headers(response):
     response.headers['X-XSS-Protection'] = '1; mode=block'
     response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
     response.headers['Cross-Origin-Embedder-Policy'] = 'require-corp'
-    
-    # Cloudflare SSL/TLS headers
+
+    # SSL headers (Cloudflare)
     if request.headers.get('CF-Visitor'):
         response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains; preload'
-    
-    # Cache control headers with Cloudflare support
+
+    # Cache control
     if request.path.startswith('/static/'):
-        # Cache static files for 1 year
         response.headers['Cache-Control'] = 'public, max-age=31536000'
         response.headers['CF-Cache-Status'] = 'DYNAMIC'
     elif request.path.startswith('/api/'):
-        # No cache for API responses
         response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
         response.headers['CF-Cache-Status'] = 'DYNAMIC'
     else:
-        # Cache other pages for 1 hour
         response.headers['Cache-Control'] = 'public, max-age=3600'
         response.headers['CF-Cache-Status'] = 'DYNAMIC'
-    
+
     return response
 
 
